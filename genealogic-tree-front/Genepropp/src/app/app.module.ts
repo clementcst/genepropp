@@ -14,6 +14,7 @@ import { DirectoryPageComponent } from './pages/directory-page/directory-page.co
 import { ProfilPageComponent } from './pages/profil-page/profil-page.component';
 import { RegistrationComponent } from './components/registration/registration.component';
 import { RegistrationPageComponent } from './pages/registration-page/registration-page.component';
+import { ProfilHeaderComponent } from './components/profil-header/profil-header.component';
 
 
 @NgModule({
@@ -29,7 +30,8 @@ import { RegistrationPageComponent } from './pages/registration-page/registratio
     DirectoryPageComponent,
     ProfilPageComponent,
     RegistrationComponent,
-    RegistrationPageComponent
+    RegistrationPageComponent,
+    ProfilHeaderComponent
   ],
   imports: [
     BrowserModule,
