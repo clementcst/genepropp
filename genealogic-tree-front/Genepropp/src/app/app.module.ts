@@ -33,7 +33,7 @@ import { ProfilHeaderComponent } from './components/profil-header/profil-header.
     ProfilPageComponent,
     RegistrationComponent,
     RegistrationPageComponent,
-    HomeContentComponent
+    HomeContentComponent,
     ProfilHeaderComponent
   ],
   imports: [
