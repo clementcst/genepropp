@@ -15,6 +15,8 @@ import { ProfilPageComponent } from './pages/profil-page/profil-page.component';
 import { RegistrationComponent } from './components/registration/registration.component';
 import { RegistrationPageComponent } from './pages/registration-page/registration-page.component';
 import { HomeContentComponent } from './components/home-content/home-content.component';
+import { ProfilHeaderComponent } from './components/profil-header/profil-header.component';
+
 
 
 @NgModule({
@@ -32,6 +34,7 @@ import { HomeContentComponent } from './components/home-content/home-content.com
     RegistrationComponent,
     RegistrationPageComponent,
     HomeContentComponent
+    ProfilHeaderComponent
   ],
   imports: [
     BrowserModule,
