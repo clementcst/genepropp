@@ -1,12 +1,12 @@
 package com.acfjj.app.service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.acfjj.app.model.PersonInfo;
 import com.acfjj.app.model.User;
 import com.acfjj.app.repository.PersonInfoRepository;
 import com.acfjj.app.repository.UserRepository;
@@ -19,10 +19,7 @@ public class UserService {
 	@Autowired
 	PersonInfoRepository personInfoRepository;
 	
-	/*que les methode de base là en dessous, on pourra ajouter des methodes plus complexe 
-	 * => select user by name par exemple ou meme des truc en fonction des autres table*/
-	
-	public List<User> getAll() {
+	public List<User> getAllUser() {
 		List<User> users = new ArrayList<>();
 		userRepository.findAll().forEach(user -> {
 			users.add(user);
@@ -30,24 +27,43 @@ public class UserService {
 		return users;
 	}
 	
-	public User get(long id) {
+	public User getUser(long id) {
 		return userRepository.findById(id).orElse(null);
 	}
 	
-	public void add(User user) {
+	public void addUser(User user) {
 		personInfoRepository.save(user.getPersonInfo());
 		userRepository.save(user);
+		addUserIdToUserPersonInfo(user.getId());
 	}
 	
-	public void delete(long id) {
-		Long personInfoId = get(id).getPersonInfo().getId();
+	public void deleteUser(long id) {
+		Long personInfoId = getUser(id).getPersonInfo().getId();
 		userRepository.deleteById(id);
+		//ajouter verif si le personinfo est orphelin ou pas
 		personInfoRepository.deleteById(personInfoId);
 	}
 	
-	public void update(long id, User user) {
-		if(get(id) != null && user.getId() == id) {
+	public void updateUser(long id, User user) {
+		if(getUser(id) != null && user.getId() == id) {
 			userRepository.save(user);
+		}
+	}
+	
+	public void addUserIdToUserPersonInfo(long userId) {
+		PersonInfo personInfo = getUserPersonInfo(userId);
+		personInfo.setRelated_user_id(userId);
+		updateUserPersonInfo(userId, personInfo);
+	}
+	
+	public PersonInfo getUserPersonInfo(long userId) {
+		return getUser(userId).getPersonInfo();
+	}
+	
+	public void updateUserPersonInfo(long userId, PersonInfo personInfo) {
+		PersonInfo personInfoToUpdate = getUserPersonInfo(userId);
+		if(personInfoToUpdate != null && personInfo.getId() == personInfoToUpdate.getId() ) {
+			personInfoRepository.save(personInfo);
 		}
 	}
 }

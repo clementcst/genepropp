@@ -23,7 +23,12 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web-services'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	runtimeOnly 'com.mysql:mysql-connector-j'
+	
+	// Dépendances Test
+	
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.junit.platform:junit-platform-launcher:1.9.3'
+    testImplementation fileTree(dir: 'libs', include: ['*.jar'])
 }
 
 tasks.named('test') {
