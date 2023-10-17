@@ -13,12 +13,13 @@ import com.acfjj.test.service.*;
 
 @Suite
 @SelectClasses({
+	PersonInfoTest.class,
 	UserTest.class,
 	UserServiceTest.class
 })
 @SpringBootTest(classes = GenTreeApp.class)
 @TestPropertySource(locations = "classpath:test.properties")
-public class GenTreeAppTests {	
+public class GenTreeAppTests {		
 	@Test
 	void contextLoader() {
 	}

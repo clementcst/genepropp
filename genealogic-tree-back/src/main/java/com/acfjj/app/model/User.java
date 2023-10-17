@@ -25,20 +25,20 @@ public class User implements Serializable {
 	private PersonInfo personInfo;
     
     private String email;
-    private String hashedPassword;
+    private String password;
     private Boolean validated;
     private Boolean isAdmin;
 	
 	public User() {
 		super();
 	}
-	public User(String name, String firstname, int gender, LocalDate dateOfBirth, String cityOfBirth, String email, String hashedPassword) {
+	public User(String lastName, String firstname, int gender, LocalDate dateOfBirth, String countryOfBirth, String cityOfBirth, String email, String password) {
 		this();
 		this.email = email;
-		this.hashedPassword = hashedPassword;
+		this.password = password;
 		this.validated = false;
 		this.isAdmin = false;
-		this.personInfo = new PersonInfo(name,firstname,gender,dateOfBirth,cityOfBirth,false);
+		this.personInfo = new PersonInfo(lastName,firstname,gender,dateOfBirth,countryOfBirth,cityOfBirth,false);
 	}
 	
 	/*Getters & Setters*/
@@ -48,32 +48,29 @@ public class User implements Serializable {
 	public PersonInfo getPersonInfo() {
 		return personInfo;
 	}
-	public void setPersonInfo(PersonInfo personInfo) {
-		this.personInfo = personInfo;
-	}
 	public String getEmail() {
 		return email;
 	}
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	public String getHashedPassword() {
-		return hashedPassword;
+	public String getPassword() {
+		return password;
 	}
-	public void setHashedPassword(String hashedPassword) {
-		this.hashedPassword = hashedPassword;
+	public void setPassword(String hashedPassword) {
+		this.password = hashedPassword;
 	}
-	public Boolean getValidated() {
+	public Boolean isValidated() {
 		return validated;
 	}
 	public void setValidated(Boolean validated) {
 		this.validated = validated;
 	}
-	public Boolean getIsAdmin() {
+	public Boolean isAdmin() {
 		return isAdmin;
 	}
-	public void setIsAdmin(Boolean isAdmin) {
-		this.isAdmin = isAdmin;
+	public void setIsAdmin(Boolean admin) {
+		this.isAdmin = admin;
 	}
 	
 	public String getLastName() {
@@ -83,7 +80,7 @@ public class User implements Serializable {
 		getPersonInfo().setLastName(lastName);
 	}
 	public String getFirstName() {
-		return getPersonInfo().getLastName();
+		return getPersonInfo().getFirstName();
 	}
 	public void setFirstName(String firstName) {
 		getPersonInfo().setFirstName(firstName);
@@ -94,9 +91,51 @@ public class User implements Serializable {
 	public void setDateOfBirth(int year, int month, int day) {
 		getPersonInfo().setDateOfBirth(year, month, day);
 	}
+	public int getGender() {
+		return getPersonInfo().getGender();
+	}
+	public void setGender(int gender) {
+		getPersonInfo().setGender(gender);
+	}
+	public String getCityOfBirth() {
+		return getPersonInfo().getCityOfBirth();
+	}
+	public void setCityOfBirth(String cityOfBirth) {
+		getPersonInfo().setCityOfBirth(cityOfBirth);
+	}
+	public String getCountryOfBirth() {
+		return getPersonInfo().getCountryOfBirth();
+	}
+	public void setCountryOfBirth(String countryOfBirth) {
+		getPersonInfo().setCountryOfBirth(countryOfBirth);
+	}
+	
+	
+	@Override
+	public boolean equals(Object obj) {
+	    if (this == obj) {
+	        return true;
+	    }
+	    if (obj == null || getClass() != obj.getClass()) {
+	        return false;
+	    }
+	    User otherUser = (User) obj;
+	    return (id != null && otherUser.id != null) ? 
+	        id.equals(otherUser.id) &&
+	        email.equals(otherUser.email) &&
+	        password.equals(otherUser.password) &&
+	        validated.equals(otherUser.validated) &&
+	        isAdmin.equals(otherUser.isAdmin) &&
+	        personInfo.equals(otherUser.personInfo) :
+	        super.equals(obj);
+	}
 	
 	public String toString() {
-		return "User[" + "id="+getId()+"; "+getPersonInfo()+"; email="+getEmail()+"]";
+		return "User[" + 
+					"id="+getId()+  
+					"," + getPersonInfo() +
+					", email=" + getEmail() + 
+				"]";
 	}
 	
 }

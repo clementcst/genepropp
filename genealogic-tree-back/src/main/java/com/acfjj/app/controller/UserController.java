@@ -21,13 +21,13 @@ public class UserController{
 	@Autowired
 	UserService userService;
 		
-	/*Test & Examples*/ 
-	static private List<User> users = new ArrayList<>(Arrays.asList(
-		new User("name", "firstname", 1, LocalDate.of(2023, 10, 9), "Paris", "joan@mail", "89"),
-		new User("name", "firstname", 1, LocalDate.of(2023, 10, 9), "Paris", "joan@mail", "89"),
-		new User("name", "firstname", 1, LocalDate.of(2023, 10, 9), "Paris", "joan@mail", "89"),
-		new User("name", "firstname", 1, LocalDate.of(2023, 10, 9), "Paris", "joan@mail", "89")
-	));
+	static private List<User> users = new ArrayList<User>(Arrays.asList(new User[] {
+            new User("Bourhara", "Adam", 1, LocalDate.of(2002, 04, 2), "France", "Cergy", "adam@mail", "password1"),
+            new User("Cassiet", "Clement", 1, LocalDate.of(1899, 07, 9), "Péîs", "Tournant-En-Brie", "clement@mail", "password2"),
+            new User("Gautier", "Jordan", 1, LocalDate.of(2002, 11, 21), "Nouvel-Zélande", "Paris Hilton", "jordan@mail", "password3"),
+            new User("Cerf", "Fabien", 1, LocalDate.of(2002, 03, 9), "France", "Paris", "fabien@mail", "password4"),
+            new User("Legrand", "Joan", 1, LocalDate.of(2002, 10, 26), "France", "Paris", "joan@mail", "password5")
+        }));
 	
 	/*ici c'est juste des exemple de merde c'est pour ça que ça à l'air useless mais ici il y aura les truc complexe*/
 	
@@ -45,7 +45,7 @@ public class UserController{
 	
 	@GetMapping("/users") 
 	public List<User> getUsers() {
-		return userService.getAllUser();
+		return userService.getAllUsers();
 	}
 	
 	@GetMapping("/user/{id}") 
