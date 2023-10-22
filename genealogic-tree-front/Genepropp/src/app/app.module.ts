@@ -23,6 +23,9 @@ import { ContactsComponent } from './components/contact-folder/contacts/contacts
 import { ContactsElementComponent } from './components/contact-folder/contacts-element/contacts-element.component';
 import { ContactsContentComponent } from './components/contact-folder/contacts-content/contacts-content.component';
 import { ContactsChatComponent } from './components/contact-folder/contacts-chat/contacts-chat.component';
+import { ProfilContentComponent } from './components/profil-folder/profil-content/profil-content.component';
+import { ProfilLeftComponent } from './components/profil-folder/profil-left/profil-left.component';
+import { ProfilRigthComponent } from './components/profil-folder/profil-rigth/profil-rigth.component';
 
 
 
@@ -48,6 +51,10 @@ import { ContactsChatComponent } from './components/contact-folder/contacts-chat
     ContactsComponent,
     ContactsElementComponent,
     ContactsContentComponent,
+    ContactsChatComponent,
+    ProfilContentComponent,
+    ProfilLeftComponent,
+    ProfilRigthComponent,
   ],
   imports: [
     BrowserModule,
