@@ -48,7 +48,6 @@ import { ContactsChatComponent } from './components/contact-folder/contacts-chat
     ContactsComponent,
     ContactsElementComponent,
     ContactsContentComponent,
-    ContactsChatComponent
   ],
   imports: [
     BrowserModule,
