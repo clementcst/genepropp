@@ -42,7 +42,7 @@ public class NodeService {
     	        } else if (node.getParent2() == null) {
     	            node.setParent2(parentNode);
     	        }
-    	        nodeRepository.save(node);
+    	        updateNode(node.getId(), node);
     	    }
     	 return;
     }
@@ -54,10 +54,10 @@ public class NodeService {
         Node newParent = getNode(parentNodeId);
         if (node != null && whichParent == 1) {
             node.setParent1(newParent);
-            nodeRepository.save(node);
+            updateNode(nodeId, node);
         } else if (node != null && whichParent == 2) {
             node.setParent2(newParent);
-            nodeRepository.save(node);
+            updateNode(nodeId, node);
         }
         return;
     }
