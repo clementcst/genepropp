@@ -29,7 +29,11 @@ public class Node implements Serializable {
 	private User createdBy;
 
     private int privacy;
+    @OneToOne
+    @JoinColumn(name = "parent_1_node_id")
 	private Node Parent1;
+    @OneToOne
+    @JoinColumn(name = "parent_2_node_id")
 	private Node Parent2;
 	
 	//Voir si person node peux etre null
@@ -145,8 +149,8 @@ public class Node implements Serializable {
 				+ "id=" + id +
 				", personInfo=" + personInfo + 
 				", createdBy=" + createdBy + 
-				", Parent1=" + Parent1 + 
-				", Parent2=" + Parent2 + "]";
+				", Parent1=" + Parent1.getPersonInfo().getFirstName() + 
+				", Parent2=" + Parent2.getPersonInfo().getFirstName()  + "]";
 	}
 	
 }
