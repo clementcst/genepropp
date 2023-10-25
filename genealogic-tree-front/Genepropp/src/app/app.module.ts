@@ -26,6 +26,8 @@ import { ContactsChatComponent } from './components/contact-folder/contacts-chat
 import { ProfilContentComponent } from './components/profil-folder/profil-content/profil-content.component';
 import { ProfilLeftComponent } from './components/profil-folder/profil-left/profil-left.component';
 import { ProfilRigthComponent } from './components/profil-folder/profil-rigth/profil-rigth.component';
+import { ProfilStatboxComponent } from './components/profil-folder/profil-statbox/profil-statbox.component';
+import { ProfilInputsComponent } from './components/profil-folder/profil-inputs/profil-inputs.component';
 
 
 
@@ -55,6 +57,8 @@ import { ProfilRigthComponent } from './components/profil-folder/profil-rigth/pr
     ProfilContentComponent,
     ProfilLeftComponent,
     ProfilRigthComponent,
+    ProfilStatboxComponent,
+    ProfilInputsComponent,
   ],
   imports: [
     BrowserModule,

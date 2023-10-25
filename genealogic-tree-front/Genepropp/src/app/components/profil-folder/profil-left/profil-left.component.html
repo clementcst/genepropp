@@ -1,14 +1,21 @@
-<div class="block md:flex h-full p-4">
+<div class="block md:flex h-full p-4 justify-center">
 
     <form class="sm:p-6 lg:p-8 bg-white rounded-lg">
 
         <div class="pb-8 px-8 mx-2">
             <span class="text-xl font-semibold block mb-6">Profil : </span>
-            <div class="flex">
-                <img class="w-40 h-40 rounded"
-                    src="https://media.istockphoto.com/id/1212753856/fr/vectoriel/visage-dr%C3%B4le-de-monstre-de-dessin-anim%C3%A9-vector-halloween-monstre-avatar-carr%C3%A9.jpg?s=1024x1024&w=is&k=20&c=ieEC08fVXLWAKgNjfoRKmVAupCneP0sU9BHTrugSkMI="
-                    alt="Default avatar">
-                <div class="w-full mx-2 justify-center">
+            <div class="flex items-center">
+                <div class="w-40 h-40 rounded mr-12">
+                    <img
+                        src="https://media.istockphoto.com/id/1212753856/fr/vectoriel/visage-dr%C3%B4le-de-monstre-de-dessin-anim%C3%A9-vector-halloween-monstre-avatar-carr%C3%A9.jpg?s=1024x1024&w=is&k=20&c=ieEC08fVXLWAKgNjfoRKmVAupCneP0sU9BHTrugSkMI="
+                        alt="Default avatar"
+                        class="object-none object-scale-down">
+                </div>
+                <app-profil-statbox 
+                    *ngFor="let element of tab"
+                    [element]="element">
+                </app-profil-statbox>
+                <!-- <div class="mx-2 justify-center">
                     <div class="mx-4 sm:mx-auto sm:px-6 lg:px-8">
                         <div class="sm:flex sm:space-x-4">
                             <div
@@ -36,17 +43,17 @@
                                 <div class="bg-white p-5">
                                     <div class="sm:flex sm:items-start">
                                         <div class="text-center sm:mt-0 sm:ml-2 sm:text-left pt-1">
-                                            <h3 class="text-sm leading-6 font-medium text-gray-500 text-center">Tree length
+                                            <h3 class="text-sm leading-6 font-medium text-gray-500 text-center">Tree
+                                                length
                                             </h3>
-                                            <a href="./myTreePage"
-                                                class="text-xl font-bold text-black text-center">42103</a>
+                                            <p class="text-xl font-bold text-black text-center">42103</p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
         </div>
 
@@ -59,7 +66,7 @@
         </div>
 
         <div class="w-full pb-8 px-8 mx-2 flex mt-14">
-            <label for="confidentialite" class="block mb-1 mr-4 text-xl font-semibold block">Node visibility :</label>
+            <label for="confidentialite" class="block mb-1 mr-4 text-xl font-semibold block">Tree visibility :</label>
 
             <div class="flex">
                 <div class="flex items-center mr-4">
@@ -79,8 +86,11 @@
                 </div>
             </div>
         </div>
-        <div class="w-full px-8 pb-8 mx-2 block"> <!-- mettre hidden quand la visibility du compte est sur privé ou protected -->
-            <a href="myTreePage" class="font-medium text-xl font-semibold block text-green-800 dark:text-green-800 hover:underline">Go to the Tree</a>
+        <div class="w-full px-8 pb-8 mx-2 block">
+            <!-- mettre hidden quand la visibility du compte est sur privé ou protected -->
+            <a href="myTreePage"
+                class="font-medium text-xl font-semibold block text-green-800 dark:text-green-800 hover:underline">Go to
+                the Tree</a>
         </div>
         <button type="submit"
             class="ml-10 text-white bg-green-800 hover:bg-green-300 focus:ring-2 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm sm:w-auto px-5 py-2.5">Submit

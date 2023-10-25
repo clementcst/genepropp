@@ -6,5 +6,9 @@ import { Component } from '@angular/core';
   styleUrls: ['./profil-left.component.css']
 })
 export class ProfilLeftComponent {
-
+  tab = [
+    { title: "Month views", value: "45" },
+    { title: "Annual views", value: "132" },
+    { title: "Tree length", value: "4" }
+  ];
 }
