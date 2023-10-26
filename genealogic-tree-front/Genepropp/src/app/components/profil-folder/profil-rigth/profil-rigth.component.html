@@ -1,42 +1,16 @@
-<div class="block md:flex h-full p-4">
+<div class="block md:flex h-full p-4 bg-green-900 justify-center">
 
     <form class="sm:p-6 lg:p-8 bg-white rounded-lg">
         <span class="text-xl font-semibold block mb-6">My information : </span>
         <div class="grid gap-10 mb-10 md:grid-cols-2">
-            <div>
-                <label for="firstname"
-                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-black">Firstname</label>
-                <input type="text" id="firstname"
-                    class="cursor-not-allowed text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-300 dark:border-gray-600 dark:value-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    value="Adam" disabled>
-            </div>
-            <div>
-                <label for="lastname"
-                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-black">Lastname</label>
-                <input type="text" id="lastname"
-                    class="cursor-not-allowed text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-300 dark:border-gray-600 dark:value-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    value="Bouhrara" disabled>
-            </div>
-            <div>
-                <label for="secu" class="block mb-2 text-sm font-medium text-gray-900 dark:text-black">Secu
-                    number</label>
-                <input type="text" id="secu"
-                    class="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-300 dark:border-gray-600 dark:value-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    value="212313213">
-            </div>
-            <div>
-                <label for="téléphone" class="block mb-2 text-sm font-medium text-gray-900 dark:text-black">Phone
-                    number</label>
-                <input type="tel" id="téléphone"
-                    class="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-300 dark:border-gray-600 dark:value-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    value="0628079905" pattern="[0-9]{2}[0-9]{2}[0-9]{2}[0-9]{2}[0-9]{2}">
-            </div>
-            <div class="grid gap-6 mb-6 grid-cols-2">
+            <app-profil-inputs *ngFor="let input of inputs1"
+            [input]="input">></app-profil-inputs>
+            <div class="grid gap-6 grid-cols-2">
                 <div>
                     <label for="birthday"
                         class="block mb-2 text-sm font-medium text-gray-900 dark:text-black">Birthday</label>
                     <input type="date" id="birthday"
-                        class="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-300 dark:border-gray-600 dark:value-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        class="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-300 bg-gray-300 dark:border-gray-600 dark:value-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         value="2002-01-20">
                 </div>
                 <div>
@@ -44,45 +18,21 @@
                     <div class="flex">
                         <div class="flex items-center mr-4">
                             <input type="radio" id="man"
-                                class="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-300 dark:border-gray-600 dark:value-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                value="" name="Sexe_choice">
+                                class="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-300 bg-gray-300 dark:border-gray-600 dark:value-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                value="" name="Sexe_choice" checked>
                             <label for="man" class="ml-2 text-sm font-medium">Man</label>
                         </div>
                         <div class="flex items-center mr-4">
                             <input type="radio" id="woman"
-                                class="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-300 dark:border-gray-600 dark:value-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                class="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-300 bg-gray-300 dark:border-gray-600 dark:value-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                 value="" name="Sexe_choice">
                             <label for="woman" class="ml-2 text-sm font-medium">Woman</label>
-                        </div>
-                        <div class="flex items-center mr-4">
-                            <input type="radio" id="other"
-                                class="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-300 dark:border-gray-600 dark:value-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                name="Sexe_choice" checked>
-                            <label for="other" class="ml-2 text-sm font-medium">Other</label>
                         </div>
                     </div>
                 </div>
             </div>
-            <div>
-                <label for="nationality"
-                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-black">Nationality of origin</label>
-                <input type="text" id="nationality"
-                    class="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-300 dark:border-gray-600 dark:value-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    value="France">
-            </div>
-            <div>
-                <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-black">Email</label>
-                <input type="email" id="email"
-                    class="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-300 dark:border-gray-600 dark:value-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    value="bouhraraad@cy-tech.fr">
-            </div>
-            <div>
-                <label for="address"
-                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-black">Address</label>
-                <input type="text" id="address"
-                    class="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-300 dark:border-gray-600 dark:value-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    value="5 rue gabriel péri, 95240, Cormeilles">
-            </div>
+            <app-profil-inputs *ngFor="let input of inputs2"
+            [input]="input">></app-profil-inputs>
         </div>
         <button type="submit"
             class="text-white bg-green-800 hover:bg-green-300 focus:ring-2 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">Submit
