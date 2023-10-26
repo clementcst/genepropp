@@ -6,5 +6,9 @@ import { Component, Input } from '@angular/core';
   styleUrls: ['./profil-inputs.component.css']
 })
 export class ProfilInputsComponent {
-  @Input() element:any;
+  @Input() input:any;
+
+  isCursorNotAllowed(): boolean {
+    return this.input.disabled === true;
+  }
 }

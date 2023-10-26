@@ -6,5 +6,5 @@ import { Component, Input } from '@angular/core';
   styleUrls: ['./profil-statbox.component.css']
 })
 export class ProfilStatboxComponent {
-  @Input() element:any;
+  @Input() box:any;
 }
