@@ -39,6 +39,9 @@ public class Tree implements Serializable {
 		this.viewOfMonth = 0;
 		this.viewOfYear = 0;
 	}	
+	
+	//addnode + removenode
+	
 	//utiliser ce constructeur à la création
 	public Tree(String name, int privacy) {
 		this(name, privacy, null);

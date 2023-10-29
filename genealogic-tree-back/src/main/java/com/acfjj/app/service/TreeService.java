@@ -38,7 +38,7 @@ public class TreeService {
     }
 
     public void deleteTree(long id) {
-        List<TreeNodes> treeNodes = nodeService.getTreeNodesByTreeId(id);
+        List<TreeNodes> treeNodes = nodeService.getTreeNodesByTreeId(id); //supprimer service (autorwired aussi) + appel juste de la list de node du tree + test si juste remove node de la list = remove de treenode
         for (TreeNodes treeNode : treeNodes) {
             nodeService.deleteNode(treeNode.getNode().getId());
         }
@@ -50,6 +50,7 @@ public class TreeService {
         Tree existingTree = getTree(id);
         if (existingTree != null && tree.getId() == id) {
             treeRepository.save(tree);
+            //update nodes aussi 
         }
         return;
     }
@@ -63,7 +64,7 @@ public class TreeService {
     }
 
     //à deplacer dans NodeService Selon moi
-    //à finir grace à TreeNodesRepository
+    //à finir 
     public boolean doesNodeBelongToTree(Long nodeId, Long treeId) { 
         Tree tree = getTree(treeId);
         if (tree == null) {
@@ -79,6 +80,7 @@ public class TreeService {
         return false;
     }
     
+    //à revoir
     public void deleteNodeFromTree(Long nodeId, Long treeId) {
     	Tree tree = treeRepository.findById(treeId).orElse(null);
         if (tree != null) {

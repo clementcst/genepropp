@@ -5,6 +5,8 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -23,14 +25,17 @@ public class User implements Serializable {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
+    @JsonIgnore
     @OneToOne
     @JoinColumn(name = "person_info_id")
 	private PersonInfo personInfo;
     
+    @JsonIgnore
     @OneToOne
     @JoinColumn(name = "my_tree_id")
 	private Tree myTree;
     
+    @JsonIgnore
     @OneToMany(targetEntity = Conversation.class)
 	private Set<Conversation> conversations = new HashSet<>();
     
