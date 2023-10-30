@@ -28,6 +28,9 @@ import { ProfilLeftComponent } from './components/profil-folder/profil-left/prof
 import { ProfilRigthComponent } from './components/profil-folder/profil-rigth/profil-rigth.component';
 import { ProfilStatboxComponent } from './components/profil-folder/profil-statbox/profil-statbox.component';
 import { ProfilInputsComponent } from './components/profil-folder/profil-inputs/profil-inputs.component';
+import { TreeContentComponent } from './components/tree-folder/tree-content/tree-content.component';
+import { TreeNodeComponent } from './components/tree-folder/tree-node/tree-node.component';
+
 
 
 
@@ -59,6 +62,8 @@ import { ProfilInputsComponent } from './components/profil-folder/profil-inputs/
     ProfilRigthComponent,
     ProfilStatboxComponent,
     ProfilInputsComponent,
+    TreeContentComponent,
+    TreeNodeComponent
   ],
   imports: [
     BrowserModule,

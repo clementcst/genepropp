@@ -1,0 +1,8 @@
+<li>
+    <a><img src="{{ node.url_photo }}"><span>{{ node.firstName }}</span></a>
+    <ul *ngIf="node.childs">
+        <li *ngFor="let child of node.childs">
+            <app-tree-node [node]="child"></app-tree-node>
+        </li>
+    </ul>
+</li>
