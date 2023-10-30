@@ -1,9 +1,0 @@
-<div class=" md:w-[71vh] h-auto md:h-[85vh] bg-green-900 flex md:flex-col overflow-hidden">
-  <div class="w-full md:w-auto h-full overflow-y-auto mx-4 my-2">
-    <app-contacts-element
-      *ngFor="let contact of contacts"
-      [contact]="contact"
-      (click)="contactClick.emit(contact)"
-    ></app-contacts-element>
-  </div>
-</div>
