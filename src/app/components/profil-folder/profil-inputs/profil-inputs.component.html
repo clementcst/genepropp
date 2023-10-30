@@ -1,0 +1,7 @@
+<div>
+    <label [for]="input.label" class="block mb-2 text-sm font-medium text-gray-900 dark:text-black">{{ input.fieldname
+        }}</label>
+    <input [type]="input.type" [id]="input.label" [class.cursor-not-allowed]="isCursorNotAllowed()"
+        class="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-300 bg-gray-300 dark:border-gray-600 dark:value-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+        [value]="input.value" [disabled]="input.disabled" [attr.pattern]="input.pattern">
+</div>

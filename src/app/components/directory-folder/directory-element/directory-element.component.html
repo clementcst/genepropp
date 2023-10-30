@@ -1,0 +1,14 @@
+<!-- directory-entry.component.html -->
+<div class="bg-gray-300 text-gray-800 border border-gray-500 rounded-lg p-3 mx-2 my-2">
+    <div class="flex items-center space-x-4">
+      <img src="{{ user.url_photo }}" alt="Photo de la personne" class="w-12 h-12 rounded-full">
+      <div class="ml-4">
+        <h3 class="text-lg font-semibold">{{ user.firstName }} {{ user.lastName }}</h3>
+        <div class="flex items-center">
+          <p class="mr-4">{{ user.age }} years old</p>
+          <p>Tree Size: {{ user.treeSize }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  
