@@ -18,8 +18,6 @@ public class TreeService {
     TreeRepository treeRepository;
 
     @Autowired
-    NodeService nodeService;
-    @Autowired
     NodeRepository nodeRepository;
 
     public List<Tree> getAllTrees() {
@@ -38,9 +36,11 @@ public class TreeService {
     }
 
     public void deleteTree(long id) {
-        List<TreeNodes> treeNodes = nodeService.getTreeNodesByTreeId(id); //supprimer service (autorwired aussi) + appel juste de la list de node du tree + test si juste remove node de la list = remove de treenode
+    	Tree tree = getTree(id);
+        Set<TreeNodes> treeNodes = tree.getNodes(); // test si juste remove node de la list = remove de treenode
         for (TreeNodes treeNode : treeNodes) {
-            nodeService.deleteNode(treeNode.getNode().getId());
+        	tree.removeNode(treeNode.getNode());
+//            nodeService.deleteNode(treeNode.getNode().getId());
         }
         treeRepository.deleteById(id);
         return;
@@ -50,7 +50,10 @@ public class TreeService {
         Tree existingTree = getTree(id);
         if (existingTree != null && tree.getId() == id) {
             treeRepository.save(tree);
-            //update nodes aussi 
+            Set<TreeNodes> treeNodes = tree.getNodes();
+            for (TreeNodes treeNode : treeNodes) {
+            	nodeRepository.save(treeNode.getNode());
+            }
         }
         return;
     }
@@ -62,27 +65,9 @@ public class TreeService {
     public List<Tree> getPublicTrees() {
         return treeRepository.findByPrivacy(1);
     }
-
-    //à deplacer dans NodeService Selon moi
-    //à finir 
-    public boolean doesNodeBelongToTree(Long nodeId, Long treeId) { 
-        Tree tree = getTree(treeId);
-        if (tree == null) {
-            return false;
-        }
-
-        Set<TreeNodes> treeNodes = tree.getNodes();
-        for (TreeNodes treeNode : treeNodes) {
-            if (treeNode.getNode().getId().equals(nodeId)) {
-                return true;
-            }
-        }
-        return false;
-    }
     
-    //à revoir
     public void deleteNodeFromTree(Long nodeId, Long treeId) {
-    	Tree tree = treeRepository.findById(treeId).orElse(null);
+    	Tree tree = getTree(treeId);
         if (tree != null) {
         	Set<TreeNodes> treeNodes = tree.getNodes();
             for (TreeNodes treeNode : treeNodes) {
