@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins = "${angular.app.url}")
 public class TreeController{	
 	@Autowired
 	TreeService TreeService;

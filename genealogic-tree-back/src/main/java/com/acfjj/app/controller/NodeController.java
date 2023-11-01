@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins = "${angular.app.url}")
 public class NodeController {
 
     @Autowired
