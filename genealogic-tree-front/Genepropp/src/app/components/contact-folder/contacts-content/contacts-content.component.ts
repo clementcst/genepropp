@@ -1,42 +1,23 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-contacts-content',
   templateUrl: './contacts-content.component.html',
   styleUrls: ['./contacts-content.component.css']
 })
-export class ContactsContentComponent {
+export class ContactsContentComponent implements OnInit{
 
-  contacts = [
-    { firstName: "Sophie", lastName: "Martin", url_photo: "../assets/media/profil.jpeg" },
-    { firstName: "Thomas", lastName: "Dupont", url_photo: "../assets/media/profil.jpeg" },
-    { firstName: "Emma", lastName: "Dubois", url_photo: "../assets/media/profil.jpeg" },
-    { firstName: "Sophie", lastName: "Martin", url_photo: "../assets/media/profil.jpeg" },
-    { firstName: "Thomas", lastName: "Dupont", url_photo: "../assets/media/profil.jpeg" },
-    { firstName: "Emma", lastName: "Dubois", url_photo: "../assets/media/profil.jpeg" },
-    { firstName: "Sophie", lastName: "Martin", url_photo: "../assets/media/profil.jpeg" },
-    { firstName: "Thomas", lastName: "Dupont", url_photo: "../assets/media/profil.jpeg" },
-    { firstName: "Emma", lastName: "Dubois", url_photo: "../assets/media/profil.jpeg" },
-    { firstName: "Sophie", lastName: "Martin", url_photo: "../assets/media/profil.jpeg" },
-    { firstName: "Thomas", lastName: "Dupont", url_photo: "../assets/media/profil.jpeg" },
-    { firstName: "Emma", lastName: "Dubois", url_photo: "../assets/media/profil.jpeg" },
-    { firstName: "Sophie", lastName: "Martin", url_photo: "../assets/media/profil.jpeg" },
-    { firstName: "Thomas", lastName: "Dupont", url_photo: "../assets/media/profil.jpeg" },
-    { firstName: "Emma", lastName: "Dubois", url_photo: "../assets/media/profil.jpeg" },
-    { firstName: "Sophie", lastName: "Martin", url_photo: "../assets/media/profil.jpeg" },
-    { firstName: "Thomas", lastName: "Dupont", url_photo: "../assets/media/profil.jpeg" },
-    { firstName: "Emma", lastName: "Dubois", url_photo: "../assets/media/profil.jpeg" },
-    { firstName: "Sophie", lastName: "Martin", url_photo: "../assets/media/profil.jpeg" },
-    { firstName: "Thomas", lastName: "Dupont", url_photo: "../assets/media/profil.jpeg" },
-    { firstName: "Emma", lastName: "Dubois", url_photo: "../assets/media/profil.jpeg" },
-    { firstName: "Lucas", lastName: "Lefebvre", url_photo: "../assets/media/profil.jpeg" }
-  ];
-
+  contacts: any[] = [];
   currentContact: any;
 
-  ngOnInit() {
-    // Ouvrir le chat du premier contact à l'ouverture de la page
-    this.currentContact = this.contacts[0];
+  constructor(private http: HttpClient) { }
+
+  ngOnInit(): void {
+    this.http.get<any[]>('http://localhost:8080/users').subscribe((data) => {
+      this.contacts = data;
+      this.currentContact = this.contacts[0];
+    });
   }
 
   openChat(contact: any) {

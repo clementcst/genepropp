@@ -1,12 +1,18 @@
 package com.acfjj.app.model;
 
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 
 
@@ -19,31 +25,62 @@ public class User implements Serializable {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
+    @JsonIgnore
     @OneToOne
     @JoinColumn(name = "person_info_id")
 	private PersonInfo personInfo;
-	private String email;
+    
+    @JsonIgnore
+    @OneToOne
+    @JoinColumn(name = "my_tree_id")
+	private Tree myTree;
+    
+    @JsonIgnore
+    @OneToMany(targetEntity = Conversation.class)
+	private Set<Conversation> conversations = new HashSet<>();
+    
+    private String email;
+    private String password;
+    private Boolean validated;
+    private Boolean isAdmin;
+    private String noSecu;
+    private String noPhone;
 	
 	public User() {
 		super();
 	}
-	public User(PersonInfo personInfo, String email) {
-		super();
-		this.personInfo=personInfo;
-		this.email=email;
-	}
-	public User(String name, String firstname, String email) {
-		super();
-		this.personInfo = new PersonInfo(name, firstname);
-		this.email=email;
+	public User(
+		String lastName, 
+		String firstname, 
+		int gender, 
+		LocalDate dateOfBirth, 
+		String countryOfBirth, 
+		String cityOfBirth, 
+		String email, 
+		String password, 
+		String noSecu, 
+		String noPhone,
+		String nationality,
+		String adress,
+		int postalCode,
+		String profilPictureData64
+	) {
+		this();
+		this.email = email;
+		this.password = password;
+		this.validated = false;
+		this.isAdmin = false;
+		this.noSecu = noSecu;
+		this.noPhone = noPhone;
+		this.personInfo = new PersonInfo(lastName,firstname,gender,dateOfBirth,countryOfBirth,cityOfBirth,false,nationality,adress,postalCode,profilPictureData64);
 	}
 	
 	/*Getters & Setters*/
 	public Long getId() {
 		return id;
 	}
-	public void setId(Long id) {
-		this.id = id;
+	public PersonInfo getPersonInfo() {
+		return personInfo;
 	}
 	public String getEmail() {
 		return email;
@@ -51,15 +88,144 @@ public class User implements Serializable {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	public PersonInfo getPersonInfo() {
-		return personInfo;
+	public String getPassword() {
+		return password;
 	}
-	public void setPersonInfo(PersonInfo personInfo) {
-		this.personInfo = personInfo;
+	public void setPassword(String hashedPassword) {
+		this.password = hashedPassword;
+	}
+	public Boolean isValidated() {
+		return validated;
+	}
+	public void setValidated(Boolean validated) {
+		this.validated = validated;
+	}
+	public Boolean isAdmin() {
+		return isAdmin;
+	}
+	public void setIsAdmin(Boolean admin) {
+		this.isAdmin = admin;
+	}
+	public Tree getMyTree() {
+		return myTree;
+	}
+	public void setMyTree(Tree myTree) {
+		this.myTree = myTree;
+	}
+	public Set<Conversation> getConversations() {
+		return conversations;
+	}
+	public void setConversations(Set<Conversation> conversations) {
+		this.conversations = conversations;
+	}
+	public String getNoSecu() {
+		return noSecu;
+	}
+	public void setNoSecu(String noSecu) {
+		this.noSecu = noSecu;
+	}
+	public String getNoPhone() {
+		return noPhone;
+	}
+	public void setNoPhone(String noPhone) {
+		this.noPhone = noPhone;
+	}
+	public String getLastName() {
+		return getPersonInfo().getLastName();
+	}
+	public void setLastName(String lastName) {
+		getPersonInfo().setLastName(lastName);
+	}
+	public String getFirstName() {
+		return getPersonInfo().getFirstName();
+	}
+	public void setFirstName(String firstName) {
+		getPersonInfo().setFirstName(firstName);
+	}
+	public LocalDate getDateOfBirth() {
+		return getPersonInfo().getDateOfBirth();
+	}
+	public void setDateOfBirth(int year, int month, int day) {
+		getPersonInfo().setDateOfBirth(year, month, day);
+	}
+	public int getGender() {
+		return getPersonInfo().getGender();
+	}
+	public void setGender(int gender) {
+		getPersonInfo().setGender(gender);
+	}
+	public String getCityOfBirth() {
+		return getPersonInfo().getCityOfBirth();
+	}
+	public void setCityOfBirth(String cityOfBirth) {
+		getPersonInfo().setCityOfBirth(cityOfBirth);
+	}
+	public String getCountryOfBirth() {
+		return getPersonInfo().getCountryOfBirth();
+	}
+	public void setCountryOfBirth(String countryOfBirth) {
+		getPersonInfo().setCountryOfBirth(countryOfBirth);
+	}
+	public String getNationality() {
+	    return getPersonInfo().getNationality();
+	}
+	public void setNationality(String nationality) {
+	    getPersonInfo().setNationality(nationality);
+	}
+	public String getAdress() {
+	    return getPersonInfo().getAdress();
+	}
+	public void setAdress(String adress) {
+	    getPersonInfo().setAdress(adress);
+	}
+	public int getPostalCode() {
+	    return getPersonInfo().getPostalCode();
+	}
+	public void setPostalCode(int postalCode) {
+	    getPersonInfo().setPostalCode(postalCode);
+	}
+	public String getProfilPictureData64() {
+	    return getPersonInfo().getProfilPictureData64();
+	}
+	public void setProfilPictureData64(String profilPictureData64) {
+	    getPersonInfo().setProfilPictureData64(profilPictureData64);
 	}
 	
-	public String toString() {
-		return "User[id="+getId()+"; "+getPersonInfo()+"; email="+getEmail()+"]";
+	@Override
+	public boolean equals(Object obj) {
+	    if (this == obj) {
+	        return true;
+	    }
+	    if (obj == null || getClass() != obj.getClass()) {
+	        return false;
+	    }
+	    User otherUser = (User) obj;
+	    return (id != null && otherUser.id != null) ? 
+	        id.equals(otherUser.id) &&
+	        email.equals(otherUser.email) &&
+	        password.equals(otherUser.password) &&
+	        validated.equals(otherUser.validated) &&
+	        isAdmin.equals(otherUser.isAdmin) &&
+	        personInfo.equals(otherUser.personInfo) &&
+	        noSecu.equals(otherUser.noSecu) &&
+	        noPhone.equals(otherUser.noPhone) :
+	        super.equals(obj);
 	}
+
+	
+	@Override
+	public String toString() {
+	    return "User[" + 
+	            "id=" + id + 
+	            ", personInfo=" + personInfo + 
+	            ", email=" + email + 
+	            ", password=" + password + 
+	            ", validated=" + validated + 
+	            ", isAdmin=" + isAdmin + 
+	            ", noSecu=" + noSecu + 
+	            ", noPhone=" + noPhone + 
+	        "]";
+	}
+
 	
 }
