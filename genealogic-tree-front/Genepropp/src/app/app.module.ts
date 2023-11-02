@@ -31,6 +31,8 @@ import { ProfilInputsComponent } from './components/profil-folder/profil-inputs/
 import { TreeContentComponent } from './components/tree-folder/tree-content/tree-content.component';
 import { TreeNodeComponent } from './components/tree-folder/tree-node/tree-node.component';
 
+import { HttpClientModule } from '@angular/common/http';
+
 
 
 
@@ -67,7 +69,8 @@ import { TreeNodeComponent } from './components/tree-folder/tree-node/tree-node.
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    HttpClientModule
   ],
   providers: [],
   bootstrap: [AppComponent]

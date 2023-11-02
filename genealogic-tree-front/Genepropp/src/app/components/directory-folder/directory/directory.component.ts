@@ -1,46 +1,21 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-directory',
   templateUrl: './directory.component.html',
   styleUrls: ['./directory.component.css']
 })
-export class DirectoryComponent {
+export class DirectoryComponent implements OnInit {
 
+  users: any[] = [];
 
+  constructor(private http: HttpClient) { }
 
-  users = [
-    { firstName: "Sophie", lastName: "Martin", age: "28", treeSize: "42", url_photo: "../assets/media/profil.jpeg" },
-    { firstName: "Thomas", lastName: "Dupont", age: "35", treeSize: "60", url_photo: "../assets/media/profil.jpeg" },
-    { firstName: "Emma", lastName: "Dubois", age: "23", treeSize: "30", url_photo: "../assets/media/profil.jpeg" },
-    { firstName: "Sophie", lastName: "Martin", age: "28", treeSize: "42", url_photo: "../assets/media/profil.jpeg" },
-    { firstName: "Thomas", lastName: "Dupont", age: "35", treeSize: "60", url_photo: "../assets/media/profil.jpeg" },
-    { firstName: "Emma", lastName: "Dubois", age: "23", treeSize: "30", url_photo: "../assets/media/profil.jpeg" },
-    { firstName: "Sophie", lastName: "Martin", age: "28", treeSize: "42", url_photo: "../assets/media/profil.jpeg" },
-    { firstName: "Thomas", lastName: "Dupont", age: "35", treeSize: "60", url_photo: "../assets/media/profil.jpeg" },
-    { firstName: "Emma", lastName: "Dubois", age: "23", treeSize: "30", url_photo: "../assets/media/profil.jpeg" },
-    { firstName: "Sophie", lastName: "Martin", age: "28", treeSize: "42", url_photo: "../assets/media/profil.jpeg" },
-    { firstName: "Thomas", lastName: "Dupont", age: "35", treeSize: "60", url_photo: "../assets/media/profil.jpeg" },
-    { firstName: "Emma", lastName: "Dubois", age: "23", treeSize: "30", url_photo: "../assets/media/profil.jpeg" },
-    { firstName: "Sophie", lastName: "Martin", age: "28", treeSize: "42", url_photo: "../assets/media/profil.jpeg" },
-    { firstName: "Thomas", lastName: "Dupont", age: "35", treeSize: "60", url_photo: "../assets/media/profil.jpeg" },
-    { firstName: "Emma", lastName: "Dubois", age: "23", treeSize: "30", url_photo: "../assets/media/profil.jpeg" },
-    { firstName: "Sophie", lastName: "Martin", age: "28", treeSize: "42", url_photo: "../assets/media/profil.jpeg" },
-    { firstName: "Thomas", lastName: "Dupont", age: "35", treeSize: "60", url_photo: "../assets/media/profil.jpeg" },
-    { firstName: "Emma", lastName: "Dubois", age: "23", treeSize: "30", url_photo: "../assets/media/profil.jpeg" },
-    { firstName: "Sophie", lastName: "Martin", age: "28", treeSize: "42", url_photo: "../assets/media/profil.jpeg" },
-    { firstName: "Thomas", lastName: "Dupont", age: "35", treeSize: "60", url_photo: "../assets/media/profil.jpeg" },
-    { firstName: "Emma", lastName: "Dubois", age: "23", treeSize: "30", url_photo: "../assets/media/profil.jpeg" },
-    { firstName: "Lucas", lastName: "Lefebvre", age: "31", treeSize: "55", url_photo: "../assets/media/profil.jpeg" }
-  ];
-  
-  
-  
-  
-
-  constructor() { }
-
-  ngOnInit() : void{ }
-
+  ngOnInit(): void {
+    this.http.get<any[]>('http://localhost:8080/users').subscribe((data) => {
+      this.users = data;
+    });
+  }
 
 }
