@@ -13,4 +13,8 @@ export class UserService {
   getUsers():Observable<any[]> {
     return this.http.get<any[]>('http://localhost:8080/users',{responseType: 'json'});
   }
+
+  getUser(id: number):Observable<any[]> {
+    return this.http.get<any[]>(`http://localhost:8080/user/${id}`,{responseType: 'json'});
+  }
 }
