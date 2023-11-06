@@ -24,13 +24,6 @@ public class TreeNodes {
 	    private int privacy;
 	    private int depth;
 	    
-	    public TreeNodes(Tree tree, Node node, int privacy, int depth) {
-	        this.tree = tree;
-	        this.node = node;
-	        this.privacy = privacy;
-	        this.depth = depth;
-	    }
-	    
 	    /*Getters & Setters*/
 		public Long getId() {
 			return id;
@@ -62,22 +55,5 @@ public class TreeNodes {
 		public void setDepth(int profondeur) {
 			this.depth = profondeur;
 		}
-
-		@Override
-		public boolean equals(Object obj) {
-		    if (this == obj) {
-		        return true;
-		    }
-		    if (obj == null || getClass() != obj.getClass()) {
-		        return false;
-		    }
-		    TreeNodes otherTreeNodes = (TreeNodes) obj;
-		    return (id != null && otherTreeNodes.id != null) ? 
-		        id.equals(otherTreeNodes.id) &&
-		        tree.equals(otherTreeNodes.tree) &&
-		        node.equals(otherTreeNodes.node) &&
-		        privacy == otherTreeNodes.privacy &&
-		        depth == otherTreeNodes.depth :
-		        super.equals(obj);
-		}
+		//equals à faire
 }

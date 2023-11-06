@@ -40,6 +40,8 @@ public class Tree implements Serializable {
 		this.viewOfYear = 0;
 	}	
 	
+	//addnode + removenode
+	
 	//utiliser ce constructeur à la création
 	public Tree(String name, int privacy) {
 		this(name, privacy, null);
@@ -96,36 +98,6 @@ public class Tree implements Serializable {
 	public void setViewOfYear(long viewOfYear) {
 		this.viewOfYear = viewOfYear;
 	}
-	
-	public void addNode(Node node) {
-	    if (node != null) {
-	        if (this.nodes == null) {
-	            this.nodes = new HashSet<>();
-	        }
-	        boolean associationExists = this.nodes.stream()
-	                .anyMatch(treeNodes -> treeNodes.getNode().equals(node));
-	        if (!associationExists) {
-	            TreeNodes treeNodes = new TreeNodes(this, node, node.getPrivacy(), 0);
-	            this.nodes.add(treeNodes);
-	            node.getTrees().add(treeNodes);
-	        }
-	    }
-	}
-	
-	public void removeNode(Node node) {
-	    if (node != null && this.nodes != null) {
-	        TreeNodes nodesToRemove = this.nodes.stream()
-	                .filter(treeNodes -> treeNodes.getNode().equals(node))
-	                .findFirst()
-	                .orElse(null);
-
-	        if (nodesToRemove != null) {
-	            this.nodes.remove(nodesToRemove);
-	            node.getTrees().remove(nodesToRemove);
-	        }
-	    }
-	}
-
 
 	@Override
 	public boolean equals(Object obj) {
@@ -145,14 +117,8 @@ public class Tree implements Serializable {
 		    super.equals(obj);
 	}
 
-	@Override
 	public String toString() {
-		return "Tree [id=" + id 
-				+ ", name=" + name 
-				+ ", privacy=" + privacy 
-				+ ", viewOfMonth=" + viewOfMonth
-				+ ", viewOfYear=" + viewOfYear 
-				+ ", nodes=" + nodes + "]";
+		return "User[id="+getId()+"; Nom ="+getName()+"Privacy="+getPrivacy()+"]";
 	}	
 	
 }
