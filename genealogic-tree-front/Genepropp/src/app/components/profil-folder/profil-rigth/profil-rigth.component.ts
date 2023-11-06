@@ -7,9 +7,9 @@ import { UserService } from '../../../services/user/user.service';
   styleUrls: ['./profil-rigth.component.css']
 })
 export class ProfilRigthComponent implements OnInit {
-  user: any = {}; // Change this to an object instead of an array
-  inputs1: any[] = []; 
-  inputs2: any[] = []; 
+  user: any = {};
+  inputs1: any[] = [];
+  inputs2: any[] = [];
 
   constructor(private userService : UserService ) { 
     this.userService = userService;
