@@ -53,20 +53,20 @@ public class Conversation implements Serializable {
 		public Set<Message> getMessages() {
 			return messages;
 		}
-		public void setMessages(Set<Message> messages) {
-			this.messages = messages;
+		public void addMessage(Message message) {
+			this.messages.add(message);
 		}
-		public User getUser1() {
+		public void addMessage(User sender, User receiver, String content) {
+			addMessage(new Message(sender, receiver, content));
+		}
+		private User getUser1() {
 			return user1;
 		}
-		public void setUser1(User user1) {
-			this.user1 = user1;
-		}
-		public User getUser2() {
+		private User getUser2() {
 			return user2;
 		}
-		public void setUser2(User user2) {
-			this.user2 = user2;
+		public User getWithWho(User asker) {
+			return asker.equals(getUser1()) ? getUser2() : getUser1();
 		}
 		
 		

@@ -3,6 +3,7 @@ package com.acfjj.app.service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,23 +33,15 @@ public class UserService {
 		return userRepository.findById(id).orElse(null);
 	}
 	
-	
+	s
 	
 	public User getUserByNameAndBirthInfo(String lastName, String firstName, LocalDate dateOfBirth, String countryOfBirth, String cityofBirth) {
-		List<User> usersWithLastName = getUsersByLastName(lastName);
-		List<User> usersWithFirstName = getUsersByFirstName(firstName);
-		List<User> usersWithDateOfBirth = getUsersByDateOfBirth(dateOfBirth);
-		List<User> usersWithCityOfBirth = getUsersByCityOfBirth(cityofBirth);
-		List<User> usersWithCountryOfBirth = getUsersByCountryOfBirth(countryOfBirth);
-		if(usersWithLastName.isEmpty() || usersWithFirstName.isEmpty() || usersWithDateOfBirth.isEmpty() || usersWithCityOfBirth.isEmpty() || usersWithCountryOfBirth.isEmpty()) {
-			return null;
-		}		
-		List<User> foundUsers = usersWithLastName;
-		foundUsers.retainAll(usersWithFirstName);
-		foundUsers.retainAll(usersWithDateOfBirth);
-		foundUsers.retainAll(usersWithCityOfBirth);
-		foundUsers.retainAll(usersWithCountryOfBirth);
-		return foundUsers.isEmpty() ? null : foundUsers.get(0);
+		User userFound = null;
+		PersonInfo personInfoFound = personInfoRepository.findByLastNameAndFirstNameAndDateOfBirthAndCountryOfBirthAndCityOfBirth(lastName, firstName, dateOfBirth, countryOfBirth, cityofBirth); 
+		if(!Objects.isNull(personInfoFound)) {
+			userFound = userRepository.findByPersonInfo(personInfoFound);
+		}
+		return userFound;
 	}
 	
 	public PersonInfo getUserPersonInfo(long userId) {
@@ -58,7 +51,6 @@ public class UserService {
 	public void addUser(User user) {
 		personInfoRepository.save(user.getPersonInfo());
 		userRepository.save(user);
-		//addRUIDtoUPI(user.getId());
 	}
 	
 	public void deleteUser(long id) {
@@ -78,71 +70,4 @@ public class UserService {
 			personInfoRepository.save(user.getPersonInfo());
 		}
 	}
-	
-	/*Private Methods*/
-	private List<User> getUsersByLastName(String lastName) {
-		List<PersonInfo> personInfos = personInfoRepository.findByLastName(lastName);
-		if(personInfos.isEmpty()) {
-			return null;
-		}
-		List<User> users = new ArrayList<>();
-		for (PersonInfo personInfo : personInfos) {
-			users.add(userRepository.findByPersonInfo(personInfo));
-		}
-		return users.isEmpty() ? null : users;
-	}
-	
-	private List<User> getUsersByFirstName(String firstName) {
-		List<PersonInfo> personInfos = personInfoRepository.findByFirstName(firstName);
-		if(personInfos.isEmpty()) {
-			return null;
-		}
-		List<User> users = new ArrayList<>();
-		for (PersonInfo personInfo : personInfos) {
-			users.add(userRepository.findByPersonInfo(personInfo));
-		}
-		return users.isEmpty() ? null : users;
-	}
-	
-	private List<User> getUsersByCityOfBirth(String cityOfBirth) {
-		List<PersonInfo> personInfos = personInfoRepository.findByCityOfBirth(cityOfBirth);
-		if(personInfos.isEmpty()) {
-			return null;
-		}
-		List<User> users = new ArrayList<>();
-		for (PersonInfo personInfo : personInfos) {
-			users.add(userRepository.findByPersonInfo(personInfo));
-		}
-		return users.isEmpty() ? null : users;
-	}
-	
-	private List<User> getUsersByCountryOfBirth(String countryOfBirth) {
-		List<PersonInfo> personInfos = personInfoRepository.findByCountryOfBirth(countryOfBirth);
-		if(personInfos.isEmpty()) {
-			return null;
-		}
-		List<User> users = new ArrayList<>();
-		for (PersonInfo personInfo : personInfos) {
-			users.add(userRepository.findByPersonInfo(personInfo));
-		}
-		return users.isEmpty() ? null : users;
-	}
-	
-	private List<User> getUsersByDateOfBirth(LocalDate dateOfBirth) {
-		List<PersonInfo> personInfos = personInfoRepository.findByDateOfBirth(dateOfBirth);
-		if(personInfos.isEmpty()) {
-			return null;
-		}
-		List<User> users = new ArrayList<>();
-		for (PersonInfo personInfo : personInfos) {
-			users.add(userRepository.findByPersonInfo(personInfo));
-		}
-		return users.isEmpty() ? null : users;
-	}
-	
-//	private void addRUIDtoUPI(long userId) {
-//		User user = getUser(userId);
-//		user.getPersonInfo().setRelated_user_id(userId);
-//		updateUser(userId, user);
-//	} 
 }

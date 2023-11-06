@@ -115,8 +115,19 @@ public class User implements Serializable {
 	public Set<Conversation> getConversations() {
 		return conversations;
 	}
-	public void setConversations(Set<Conversation> conversations) {
-		this.conversations = conversations;
+	public void addConversation(Conversation conversation) {
+		this.conversations.add(conversation);
+	}
+	public void removeConversation(Conversation conversation) {
+		this.conversations.remove(conversation);
+	}
+	public Conversation getConversationWith(User user) {
+		for (Conversation conversation : conversations) {
+			if(conversation.getWithWho(this) == user) {
+				return conversation;
+			}
+		}
+		return null;
 	}
 	public String getNoSecu() {
 		return noSecu;
