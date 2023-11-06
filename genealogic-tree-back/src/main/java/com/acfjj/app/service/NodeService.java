@@ -3,8 +3,11 @@ package com.acfjj.app.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.acfjj.app.model.Node;
+import com.acfjj.app.model.PersonInfo;
+import com.acfjj.app.model.Tree;
 import com.acfjj.app.model.TreeNodes;
 import com.acfjj.app.repository.PersonInfoRepository;
+import com.acfjj.app.repository.TreeRepository;
 import com.acfjj.app.repository.NodeRepository;
 
 import java.util.ArrayList;
@@ -18,6 +21,8 @@ public class NodeService {
     NodeRepository nodeRepository;
     @Autowired
 	PersonInfoRepository personInfoRepository;
+    @Autowired
+    TreeRepository treeRepository;
 
     public List<Node> getAllNodes() {
         List<Node> nodes = new ArrayList<>();
@@ -68,8 +73,10 @@ public class NodeService {
         if (node != null) {
             nodeRepository.deleteById(id);
             if (node.isOrphan()) {
-            	//personInfoRepository.save(Node.getPersonInfo());
-                // Supprimer la PersonInfo associée s'il est orphelin
+                PersonInfo personInfo = node.getPersonInfo();
+                if (personInfo != null) {
+                    personInfoRepository.deleteById(personInfo.getId());
+                }
             }
         }
         return;
@@ -89,17 +96,22 @@ public class NodeService {
         parents.add(node.getParent2());
         return parents;
     }
+    
+    
+    public boolean doesNodeBelongToTree(Long nodeId, Long treeId) {
+        Node node = getNode(nodeId);
+        Tree tree = treeRepository.findById(treeId).orElse(null);
 
-    public List<TreeNodes> getTreeNodesByTreeId(Long treeId) { //à revoir 
-        List<TreeNodes> treeNodes = new ArrayList<>();
-        for (Node node : nodeRepository.findAll()) {
-            Set<TreeNodes> nodes = node.getTrees();
-            for (TreeNodes treeNode : nodes) {
-                if (treeNode.getTree().getId().equals(treeId)) {
-                    treeNodes.add(treeNode);
-                }
+        if (node == null || tree == null) {
+            return false;
+        }
+
+        Set<TreeNodes> treeNodes = node.getTrees();
+        for (TreeNodes treeNode : treeNodes) {
+            if (treeNode.getTree().equals(tree)) {
+                return true;
             }
         }
-        return treeNodes;
+        return false;
     }
 }
