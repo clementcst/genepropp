@@ -1,20 +1,37 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-profil-rigth',
   templateUrl: './profil-rigth.component.html',
   styleUrls: ['./profil-rigth.component.css']
 })
-export class ProfilRigthComponent {
-  inputs1 = [
-    {label: "firstname", type: "text", fieldname: "Firstname", value: "Adam", disabled: true},
-    {label: "lastname", type: "text", fieldname: "Lastname", value: "Bouhrara", disabled: true},
-    {label: "secu", type: "text", fieldname: "Secu number", value: "212313213"},
-    {label: "phone_number", type: "tel", fieldname: "Phone number", value: "0628079905", pattern: "[0-9]{2}[0-9]{2}[0-9]{2}[0-9]{2}[0-9]{2}"},
-  ];
-  inputs2 = [
-    {label: "nationality", type:"text", fieldname: "Nationality of origin", value: "France"},
-    {label: "email", type:"email", fieldname: "Email", value: "bouhraraad@cy-tech.fr"},
-    {label: "address", type:"text", fieldname: "Address", value: "5 rue gabriel péri, 95240, Cormeilles"}
-  ];
+export class ProfilRigthComponent implements OnInit {
+  users: any = {}; // Change this to an object instead of an array
+  inputs1: any[] = []; 
+  inputs2: any[] = []; 
+
+  constructor(private http: HttpClient) { }
+
+  ngOnInit(): void {
+    this.http.get<any>('http://localhost:8080/user/1').subscribe((data) => {
+      this.users = data;
+      console.log(data)
+
+      // Define inputs1 after receiving data
+      this.inputs1 = [
+        { label: "firstname", type: "text", fieldname: "Firstname", value: this.users.firstName, disabled: true },
+        { label: "lastname", type: "text", fieldname: "Lastname", value: this.users.lastName, disabled: true },
+        { label: "secu", type: "text", fieldname: "Secu number", value: this.users.noSecu },
+        { label: "phone_number", type: "tel", fieldname: "Phone number", value: this.users.noPhone, pattern: "[0-9]{2}[0-9]{2}[0-9]{2}[0-9]{2}[0-9]{2}" },
+      ];
+
+      this.inputs2 = [
+        { label: "nationality", type: "text", fieldname: "Nationality of origin", value: this.users.nationality },
+        { label: "email", type: "email", fieldname: "Email", value: this.users.email },
+        { label: "address", type: "text", fieldname: "Address", value: this.users.adress }
+      ];
+      // ... Define other inputs if needed
+    });
+  }
 }
