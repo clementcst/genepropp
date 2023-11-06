@@ -15,13 +15,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.acfjj.app.model.User;
+import com.acfjj.app.service.ConversationService;
 import com.acfjj.app.service.UserService;
 
 @RestController
 @CrossOrigin(origins = "${angular.app.url}")
-public class UserController{	
+public class ConversationController{	
 	@Autowired
 	UserService userService;
+	@Autowired
+	ConversationService conversationService;
 		
 	static private List<User> users = new ArrayList<User>(Arrays.asList(new User[] {
 			new User("Bourhara", "Adam", 1, LocalDate.of(2002, 04, 2), "France", "Cergy", "adam@mail", "password1","Sécurité socisse", "Telephone ui", "nationality", "adress", 1234, "profilPictureData64"),
@@ -33,29 +36,27 @@ public class UserController{
 	
 	/*ici c'est juste des exemple de merde c'est pour ça que ça à l'air useless mais ici il y aura les truc complexe*/
 	
-	@PostMapping("/users") 
-	public void addTestUsers() {
-		for (User user : users) {
-			userService.addUser(user);
-		}
+	@PostMapping("/contacts/new") 
+	public void addTestUsers(@RequestBody long userId1, @RequestBody long userId2) {
+		
 	}
 	
-	@PostMapping("/user") 
+	@PostMapping("/contacts") 
 	public void addUser(@RequestBody User user) {
 			userService.addUser(user);
 	}
 	
-	@GetMapping("/users") 
+	@GetMapping("/contacts") 
 	public List<User> getUsers() {
 		return userService.getAllUsers();
 	}
 	
-	@GetMapping("/user/{id}") 
+	@GetMapping("/contacts") 
 	public User getUser(@PathVariable Long id) {
 		return userService.getUser(id);
 	}
 	
-	@DeleteMapping("user/{id}")
+	@DeleteMapping("/contacts")
 	public void deleteUser(@PathVariable Long id) {
 		userService.deleteUser(id);
 	}
