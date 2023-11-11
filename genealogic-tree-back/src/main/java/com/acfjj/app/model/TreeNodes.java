@@ -88,7 +88,10 @@ public class TreeNodes {
 
 		@Override
 		public String toString() {
-			return "TreeNodes [id=" + id + ", tree=" + tree.getId() + ", node=" + node.getId() + ", privacy=" + privacy + ", depth="
-					+ depth + "]";
+			return "TreeNodes [id=" + id + 
+				", tree=" + tree.getId() + 
+				", node=" + node.getId() + 
+				", privacy=" + privacy + 
+				", depth=" + depth + "]";
 		}
 }
