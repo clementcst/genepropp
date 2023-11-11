@@ -6,7 +6,6 @@ import java.util.List;
 import org.springframework.data.repository.CrudRepository;
 
 import com.acfjj.app.model.PersonInfo;
-import com.acfjj.app.model.User;
 
 public interface PersonInfoRepository extends CrudRepository<PersonInfo, Long>{
 	List<PersonInfo> findByLastName(String lastName);

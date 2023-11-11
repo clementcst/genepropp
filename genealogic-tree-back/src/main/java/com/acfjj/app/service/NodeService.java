@@ -6,12 +6,15 @@ import com.acfjj.app.model.Node;
 import com.acfjj.app.model.PersonInfo;
 import com.acfjj.app.model.Tree;
 import com.acfjj.app.model.TreeNodes;
+import com.acfjj.app.model.User;
 import com.acfjj.app.repository.PersonInfoRepository;
 import com.acfjj.app.repository.TreeRepository;
 import com.acfjj.app.repository.NodeRepository;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Service
@@ -114,4 +117,13 @@ public class NodeService {
         }
         return false;
     }
+    
+    public Node getNodeByNameAndBirthInfo(String lastName, String firstName, LocalDate dateOfBirth, String countryOfBirth, String cityofBirth) {
+		Node nodeFound = null;
+		PersonInfo personInfoFound = personInfoRepository.findByLastNameAndFirstNameAndDateOfBirthAndCountryOfBirthAndCityOfBirth(lastName, firstName, dateOfBirth, countryOfBirth, cityofBirth); 
+		if(!Objects.isNull(personInfoFound)) {
+			nodeFound = nodeRepository.findByPersonInfo(personInfoFound);
+		}
+		return nodeFound;
+	}
 }

@@ -24,7 +24,12 @@ public class TreeNodes {
 	    private int privacy;
 	    private int depth;
 	    
+	    public TreeNodes() {
+	    	super();
+	    }
+	    
 	    public TreeNodes(Tree tree, Node node, int privacy, int depth) {
+	    	this();
 	        this.tree = tree;
 	        this.node = node;
 	        this.privacy = privacy;
@@ -79,5 +84,11 @@ public class TreeNodes {
 		        privacy == otherTreeNodes.privacy &&
 		        depth == otherTreeNodes.depth :
 		        super.equals(obj);
+		}
+
+		@Override
+		public String toString() {
+			return "TreeNodes [id=" + id + ", tree=" + tree.getId() + ", node=" + node.getId() + ", privacy=" + privacy + ", depth="
+					+ depth + "]";
 		}
 }

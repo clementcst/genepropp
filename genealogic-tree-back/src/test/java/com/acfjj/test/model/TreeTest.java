@@ -83,7 +83,7 @@ public class TreeTest {
         Tree tree = new Tree(name, privacy, nodes);
         Node node1 = new Node("NewNode1", "FirstName1", 1, LocalDate.of(2000, 1, 1), "Country1", "City1", null, 1, "Nationality1", "Address1", 12345, "Base64Image1");
 
-        tree.addNode(node1);
+        tree.addNode(node1, 1, 0);
         assertTrue(tree.getNodes().stream().anyMatch(treeNodes -> treeNodes.getNode().equals(node1)));
     }
 
@@ -93,7 +93,7 @@ public class TreeTest {
         Tree tree = new Tree(name, privacy, nodes);
         Node node1 = new Node("NewNode1", "FirstName1", 1, LocalDate.of(2000, 1, 1), "Country1", "City1", null, 1, "Nationality1", "Address1", 12345, "Base64Image1");
 
-        tree.addNode(node1);
+        tree.addNode(node1, 1, 0);
         assertTrue(tree.getNodes().stream().anyMatch(treeNodes -> treeNodes.getNode().equals(node1)));
 
         tree.removeNode(node1);

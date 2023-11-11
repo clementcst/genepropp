@@ -33,8 +33,6 @@ public class UserService {
 		return userRepository.findById(id).orElse(null);
 	}
 	
-	s
-	
 	public User getUserByNameAndBirthInfo(String lastName, String firstName, LocalDate dateOfBirth, String countryOfBirth, String cityofBirth) {
 		User userFound = null;
 		PersonInfo personInfoFound = personInfoRepository.findByLastNameAndFirstNameAndDateOfBirthAndCountryOfBirthAndCityOfBirth(lastName, firstName, dateOfBirth, countryOfBirth, cityofBirth); 
