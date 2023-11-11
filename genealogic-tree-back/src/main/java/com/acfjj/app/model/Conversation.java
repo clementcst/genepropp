@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -20,10 +22,12 @@ public class Conversation implements Serializable {
 	    private Long id;
 	 	
 	 	@ManyToOne
+	 	@JsonIgnore
 	    @JoinColumn(name = "user_1_id")
 	    private User user1;
 
 	    @ManyToOne
+	    @JsonIgnore
 	    @JoinColumn(name = "user_2_id")
 	    private User user2;
 	 	
@@ -55,15 +59,19 @@ public class Conversation implements Serializable {
 		}
 		public void addMessage(Message message) {
 			this.messages.add(message);
+			message.setConversation(this);
 		}
-		public void addMessage(User sender, User receiver, String content) {
-			addMessage(new Message(sender, receiver, content));
-		}
-		private User getUser1() {
+		public User getUser1() {
 			return user1;
 		}
-		private User getUser2() {
+		public User getUser2() {
 			return user2;
+		}
+		public Long getUserId1() {
+			return user1.getId();
+		}
+		public Long getUserId2() {
+			return user2.getId();
 		}
 		public User getWithWho(User asker) {
 			return asker.equals(getUser1()) ? getUser2() : getUser1();

@@ -1,22 +1,20 @@
 package com.acfjj.app.controller;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.acfjj.app.model.Conversation;
+import com.acfjj.app.model.Message;
 import com.acfjj.app.model.User;
 import com.acfjj.app.service.ConversationService;
 import com.acfjj.app.service.UserService;
+import com.acfjj.app.utils.Response;
 
 @RestController
 @CrossOrigin(origins = "${angular.app.url}")
@@ -26,40 +24,35 @@ public class ConversationController{
 	@Autowired
 	ConversationService conversationService;
 		
-	static private List<User> users = new ArrayList<User>(Arrays.asList(new User[] {
-			new User("Bourhara", "Adam", 1, LocalDate.of(2002, 04, 2), "France", "Cergy", "adam@mail", "password1","Sécurité socisse", "Telephone ui", "nationality", "adress", 1234, "profilPictureData64"),
-            new User("Cassiet", "Clement", 1, LocalDate.of(1899, 07, 9), "Péîs", "Tournant-En-Brie", "clement@mail", "password2", "Sécurité socisse", "Telephone ui", "nationality", "adress", 1234, "profilPictureData64"),
-            new User("Gautier", "Jordan", 1, LocalDate.of(2002, 11, 21), "Nouvelle-Zélande", "Paris Hilton", "jordan@mail", "password3", "Sécurité socisse", "Telephone ui", "nationality", "adress", 1234, "profilPictureData64"),
-            new User("Cerf", "Fabien", 1, LocalDate.of(2002, 03, 9), "France", "Paris", "fabien@mail", "password4", "Sécurité socisse", "Telephone ui", "nationality", "adress", 1234, "profilPictureData64"),
-            new User("Legrand", "Joan", 1, LocalDate.of(2002, 10, 26), "France", "Paris", "joan@mail", "password5", "Sécurité socisse", "Telephone ui", "nationality", "adress", 1234, "profilPictureData64")
-        }));
-	
-	/*ici c'est juste des exemple de merde c'est pour ça que ça à l'air useless mais ici il y aura les truc complexe*/
-	
-	@PostMapping("/contacts/new") 
-	public void addTestUsers(@RequestBody long userId1, @RequestBody long userId2) {
-		
+	@PostMapping("/conversation/new") 
+	public Response newConversation(@RequestParam long userId1, @RequestParam long userId2) {
+		User user1 = userService.getUser(userId1);
+		User user2 = userService.getUser(userId2);
+		if(Objects.isNull(user1) || Objects.isNull(user2)) {
+			return new Response("User not found", false);
+		}
+		return new Response(conversationService.addConversation(user1, user2));
 	}
 	
-	@PostMapping("/contacts") 
-	public void addUser(@RequestBody User user) {
-			userService.addUser(user);
+	@PostMapping("/conversation/message/new") 
+	public Response newMessage(@RequestParam long senderId, @RequestParam long receiverId, @RequestParam String content) {
+		User sender = userService.getUser(senderId);
+		User receiver = userService.getUser(receiverId);
+		if(Objects.isNull(sender) || Objects.isNull(receiver)) {
+			return new Response("User not found", false);
+		}
+		Conversation conversation = conversationService.getConversationOfUsers(sender, receiver);
+		conversationService.addMessageToConversation(new Message(sender, receiver, content), conversation);
+		return new Response("Success", true);
 	}
 	
-	@GetMapping("/contacts") 
-	public List<User> getUsers() {
-		return userService.getAllUsers();
-	}
-	
-	@GetMapping("/contacts") 
-	public User getUser(@PathVariable Long id) {
-		return userService.getUser(id);
-	}
-	
-	@DeleteMapping("/contacts")
-	public void deleteUser(@PathVariable Long id) {
-		userService.deleteUser(id);
-	}
-	
-	
+	@GetMapping(value = "/conversation")
+    public Response getConversation(@RequestParam long conversationId) {
+        Conversation conversation = conversationService.getConversation(conversationId);
+        if (Objects.isNull(conversation)) {
+            return new Response("Conversation not found", false);
+        } else {
+            return new Response(conversationService.getConversation(conversationId));
+        }
+    }
 }

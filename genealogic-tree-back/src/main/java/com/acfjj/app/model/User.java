@@ -12,6 +12,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 
@@ -35,9 +36,16 @@ public class User implements Serializable {
     @JoinColumn(name = "my_tree_id")
 	private Tree myTree;
     
-    @JsonIgnore
     @OneToMany(targetEntity = Conversation.class)
-	private Set<Conversation> conversations = new HashSet<>();
+    @JoinTable(name = "user_conversation1")
+    @JsonIgnore
+    //conversations where this is user1
+	private Set<Conversation> conversations1 = new HashSet<>();
+    @OneToMany(targetEntity = Conversation.class) 
+    @JoinTable(name = "user_conversation2")
+    @JsonIgnore
+    //conversations where this is user2
+	private Set<Conversation> conversations2 = new HashSet<>();
     
     private String email;
     private String password;
@@ -112,17 +120,28 @@ public class User implements Serializable {
 	public void setMyTree(Tree myTree) {
 		this.myTree = myTree;
 	}
+	public Long getMyTreeId() {
+		return myTree.getId();
+	}
 	public Set<Conversation> getConversations() {
+		Set<Conversation> conversations = new HashSet<>(conversations1);
+		conversations.addAll(conversations2);
 		return conversations;
 	}
-	public void addConversation(Conversation conversation) {
-		this.conversations.add(conversation);
+	public void addConversation1(Conversation conversation) {
+		this.conversations1.add(conversation);
 	}
-	public void removeConversation(Conversation conversation) {
-		this.conversations.remove(conversation);
+	public void removeConversation1(Conversation conversation) {
+		this.conversations1.remove(conversation);
+	}
+	public void addConversation2(Conversation conversation) {
+		this.conversations2.add(conversation);
+	}
+	public void removeConversation2(Conversation conversation) {
+		this.conversations2.remove(conversation);
 	}
 	public Conversation getConversationWith(User user) {
-		for (Conversation conversation : conversations) {
+		for (Conversation conversation : getConversations()) {
 			if(conversation.getWithWho(this) == user) {
 				return conversation;
 			}

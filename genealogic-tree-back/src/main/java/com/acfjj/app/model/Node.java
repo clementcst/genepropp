@@ -71,6 +71,9 @@ public class Node implements Serializable {
 		this.parent2=parent2;
 		this.privacy = privacy;
 	}
+	public Node(PersonInfo personInfo, User createdBy, int privacy) {
+		this(personInfo, createdBy, null, null, 0);
+	}
 	public Node(String lastName, String firstname, int gender, LocalDate dateOfBirth, String countryOfBirth, String cityOfBirth, User createdBy, Node parent1, Node parent2, int privacy, String nationality, String adress, int postalCode, String profilPictureData64) {
 	    this(new PersonInfo(lastName, firstname, gender, dateOfBirth, countryOfBirth, cityOfBirth, false, nationality, adress, postalCode, profilPictureData64),
 	    	 createdBy, parent1, parent2, privacy);
@@ -116,12 +119,11 @@ public class Node implements Serializable {
 	public void setParent2(Node parent2) {
 		this.parent2 = parent2;
 	}
-	
 	public Set<TreeNodes> getTrees() {
 		return trees;
 	}
-	public void setTrees(Set<TreeNodes> nodeTrees) {
-		this.trees = nodeTrees;
+	public void addTreeNodes(TreeNodes nodeTree) {
+		this.trees.add(nodeTree);
 	}
 	
 	public Node getPartner() {
@@ -133,14 +135,14 @@ public class Node implements Serializable {
 	public Set<Node> getExPartners() {
 		return exPartners;
 	}
-	public void setExPartners(Set<Node> exPartners) {
-		this.exPartners = exPartners;
+	public void addExPartners(Node exPartner) {
+		this.exPartners.add(exPartner);
 	}
 	public Set<Node> getSiblings() {
 		return siblings;
 	}
-	public void setSiblings(Set<Node> siblings) {
-		this.siblings = siblings;
+	public void addSiblings(Node sibling) {
+		this.siblings.add(sibling);
 	}
 	public boolean isOrphan() {
 		return (Objects.isNull(this.getParent1()) && Objects.isNull(this.getParent2()) && this.getSiblings().isEmpty() && Objects.isNull(this.getPartner()) && this.getExPartners().isEmpty());
