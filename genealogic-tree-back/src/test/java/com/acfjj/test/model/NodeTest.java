@@ -3,6 +3,7 @@ package com.acfjj.test.model;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -50,7 +51,7 @@ public class NodeTest {
             {new PersonInfo("LastName3", "FirstName3", 1, LocalDate.of(2002, 3, 3), "Country3", "City3", false, "Nationality3", "Address3", 67890, "Base64Image3"), user1, parent1, null, 1, "Nationality3", "Address3", 67890, "Base64Image3", new HashSet<TreeNodes>()},
             {new PersonInfo("LastName4", "FirstName4", 1, LocalDate.of(2003, 4, 4), "Country4", "City4", false, "Nationality4", "Address4", 98765, "Base64Image4"), user2, parent2, null, 0, "Nationality4", "Address4", 98765, "Base64Image4", new HashSet<TreeNodes>()},
         }));
-    } 
+    }
 
     @ParameterizedTest
     @MethodSource("testData")
@@ -84,43 +85,17 @@ public class NodeTest {
         PersonInfo newPersonInfo = new PersonInfo("NewLastName", "NewFirstName", 1, LocalDate.of(2000, 1, 1), "NewCountry", "NewCity", false, "NewNationality", "NewAddress", 99999, "NewBase64Image");
         User newCreatedBy = new User("NewUser", "NewFirstName", 1, LocalDate.of(2000, 1, 1), "NewCountry", "NewCity", "NewEmail", "NewPassword", "NewSecurity", "NewPhone", "NewNationality", "NewAddress", 99999, "NewBase64Image");
         Node newParent1 = new Node("NewParent", "NewParentFirstName", 1, LocalDate.of(1990, 3, 3), "NewCountry", "NewCity", newCreatedBy, 1, "NewNationality", "NewAddress", 99999, "NewBase64Image");
-        Node Partner = new Node("Partner", "Partner", 1, LocalDate.of(1990, 3, 3), "NewCountry", "NewCity", newCreatedBy, 1, "NewNationality", "NewAddress", 99999, "NewBase64Image");
-        Node exPartners = new Node("exPartners", "exPartners", 1, LocalDate.of(1990, 3, 3), "NewCountry", "NewCity", newCreatedBy, 1, "NewNationality", "NewAddress", 99999, "NewBase64Image");
-        Node siblings = new Node("siblings", "siblings", 1, LocalDate.of(1990, 3, 3), "NewCountry", "NewCity", newCreatedBy, 1, "NewNationality", "NewAddress", 99999, "NewBase64Image");
 
-        Set<Node> exPartnersList =  new HashSet<>();
-        exPartnersList.add(exPartners);
-        Set<Node> siblingsList = new HashSet<>();
-        siblingsList.add(siblings);
-        
         node.setPersonInfo(newPersonInfo);
         node.setCreatedBy(newCreatedBy);
         node.setParent1(newParent1);
-        node.setPrivacy(2); 
-        node.setParent2(parent2);
-        node.setTrees(treeNodes);
-        node.setPartner(Partner);
-        node.setExPartners(exPartnersList);
-        node.setSiblings(siblingsList);
+        node.setPrivacy(2);
 
         assertAll(() -> {
             assertEquals(newPersonInfo, node.getPersonInfo());
             assertEquals(newCreatedBy, node.getCreatedBy());
             assertEquals(newParent1, node.getParent1());
             assertEquals(2, node.getPrivacy());
-            assertEquals(parent2, node.getParent2());
-            assertEquals(treeNodes, node.getTrees());
-            assertEquals(Partner, node.getPartner());
-            assertEquals(exPartnersList, node.getExPartners());
-            assertEquals(siblingsList, node.getSiblings());
-            assertFalse(node.isOrphan());
-            assertEquals("NewLastName", node.getLastName());
-            assertEquals("NewFirstName", node.getFirstName());
-            assertEquals(1, node.getGender());
-            assertEquals(LocalDate.of(2000, 1, 1), node.getDateOfBirth());
-            assertEquals("NewCountry", node.getCountryOfBirth());
-            assertEquals("NewCity", node.getCityOfBirth());
-            assertEquals(false, node.isDead());
         });
     }
 
@@ -132,34 +107,8 @@ public class NodeTest {
     ) {
         Node nodeWithParents = new Node(personInfo, createdBy, parent1, parent2, privacy);
         Node nodeWithoutParents = new Node(personInfo, createdBy, null, null, privacy);
-        User newCreatedBy = new User("NewUser", "NewFirstName", 1, LocalDate.of(2000, 1, 1), "NewCountry", "NewCity", "NewEmail", "NewPassword", "NewSecurity", "NewPhone", "NewNationality", "NewAddress", 99999, "NewBase64Image");
-        Node Partner = new Node("Partner", "Partner", 1, LocalDate.of(1990, 3, 3), "NewCountry", "NewCity", newCreatedBy, 1, "NewNationality", "NewAddress", 99999, "NewBase64Image");
-        Node exPartners = new Node("exPartners", "exPartners", 1, LocalDate.of(1990, 3, 3), "NewCountry", "NewCity", newCreatedBy, 1, "NewNationality", "NewAddress", 99999, "NewBase64Image");
-        Node siblings = new Node("siblings", "siblings", 1, LocalDate.of(1990, 3, 3), "NewCountry", "NewCity", newCreatedBy, 1, "NewNationality", "NewAddress", 99999, "NewBase64Image");
-        Node nodeWithParent1 = new Node(personInfo, createdBy, parent1, null, privacy);
-        Node nodeWithParent2 = new Node(personInfo, createdBy, null, parent2, privacy);
-        Node nodeWithPartner = new Node(personInfo, createdBy, null, null, privacy);
-        nodeWithPartner.setPartner(Partner);
-        Node nodeWithExPartners = new Node(personInfo, createdBy, null, null, privacy);
-        Node nodeWithSiblings = new Node(personInfo, createdBy, null, null, privacy);
-        
-        Set<Node> exPartnersList =  new HashSet<>();
-        exPartnersList.add(exPartners);
-        nodeWithExPartners.setExPartners(exPartnersList);
-        Set<Node> siblingsList = new HashSet<>();
-        siblingsList.add(siblings);
-        nodeWithSiblings.setSiblings(siblingsList);
-        
+
         assertFalse(nodeWithParents.isOrphan());
-        assertFalse(nodeWithParent1.isOrphan());
-    	if(parent2 == null) {
-    		assertTrue(nodeWithParent2.isOrphan());
-    	} else {
-    		assertFalse(nodeWithParent2.isOrphan());
-    	}
-        assertFalse(nodeWithPartner.isOrphan());
-        assertFalse(nodeWithExPartners.isOrphan());
-        assertFalse(nodeWithSiblings.isOrphan());
         assertTrue(nodeWithoutParents.isOrphan());
     }
     

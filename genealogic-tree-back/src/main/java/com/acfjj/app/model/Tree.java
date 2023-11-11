@@ -31,8 +31,6 @@ public class Tree implements Serializable {
 	public Tree() {
 		super();
 	}
-	
-	
 	public Tree(String name, int privacy, Set<TreeNodes> nodes) {
 		this();
 		this.name=name;
@@ -74,9 +72,9 @@ public class Tree implements Serializable {
 	public Set<TreeNodes> getNodes() {
 		return nodes;
 	}
-
-	public void setNodes(Set<TreeNodes> treeNodes) {
-		this.nodes = treeNodes;
+	
+	public void addTreeNodes(TreeNodes treeNode) {
+		this.getNodes().add(treeNode);
 	}
 
 	public boolean isTreePublic() {
@@ -99,7 +97,7 @@ public class Tree implements Serializable {
 		this.viewOfYear = viewOfYear;
 	}
 	
-	public void addNode(Node node) {
+	public void addNode(Node node, int privacy, int depth) {
 	    if (node != null) {
 	        if (this.nodes == null) {
 	            this.nodes = new HashSet<>();
@@ -107,9 +105,9 @@ public class Tree implements Serializable {
 	        boolean associationExists = this.nodes.stream()
 	                .anyMatch(treeNodes -> treeNodes.getNode().equals(node));
 	        if (!associationExists) {
-	            TreeNodes treeNodes = new TreeNodes(this, node, node.getPrivacy(), 0);
-	            this.nodes.add(treeNodes);
-	            node.getTrees().add(treeNodes);
+	            TreeNodes treeNodes = new TreeNodes(this, node, privacy, depth);
+	            this.addTreeNodes(treeNodes);
+	            node.addTreeNodes(treeNodes);
 	        }
 	    }
 	}

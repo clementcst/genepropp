@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import com.acfjj.app.model.Tree;
 import com.acfjj.app.model.TreeNodes;
 import com.acfjj.app.repository.NodeRepository;
+import com.acfjj.app.repository.TreeNodesRepository;
 import com.acfjj.app.repository.TreeRepository;
 
 import java.util.ArrayList;
@@ -19,6 +20,9 @@ public class TreeService {
 
     @Autowired
     NodeRepository nodeRepository;
+    
+    @Autowired
+    TreeNodesRepository treeNodesRepository;
 
     public List<Tree> getAllTrees() {
         List<Tree> trees = new ArrayList<>();
@@ -31,9 +35,6 @@ public class TreeService {
     }
 
     public void addTree(Tree tree) {
-    	if(isNameTaken(tree.getName())){
-    		//changer le nom
-    	}
         treeRepository.save(tree);
         return;
     }
@@ -52,21 +53,17 @@ public class TreeService {
     public void updateTree(long id, Tree tree) {
         Tree existingTree = getTree(id);
         if (existingTree != null && tree.getId() == id) {
+            Set<TreeNodes> treeNodes = tree.getNodes();
+            for (TreeNodes treeNode : treeNodes) {
+            	treeNodesRepository.save(treeNode);
+            }
             treeRepository.save(tree);
-//            Set<TreeNodes> treeNodes = tree.getNodes();
-//            for (TreeNodes treeNode : treeNodes) {
-//            	nodeRepository.save(treeNode.getNode());
-//            }
         }
         return;
     }
 
     public Tree getTreeByName(String name) {
         return treeRepository.findByName(name);
-    }
-    
-    public boolean isNameTaken(String name) { 
-    	return (getTreeByName(name) == null) ? false : true;
     }
 
     public List<Tree> getPublicTrees() {
