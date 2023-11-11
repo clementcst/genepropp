@@ -35,6 +35,9 @@ public class TreeService {
     }
 
     public void addTree(Tree tree) {
+        if(isNameTaken(tree.getName())){
+    		//changer le nom
+    	}
         treeRepository.save(tree);
         return;
     }
@@ -64,6 +67,10 @@ public class TreeService {
 
     public Tree getTreeByName(String name) {
         return treeRepository.findByName(name);
+    }
+
+    public boolean isNameTaken(String name) { 
+    	return (getTreeByName(name) == null) ? false : true;
     }
 
     public List<Tree> getPublicTrees() {
