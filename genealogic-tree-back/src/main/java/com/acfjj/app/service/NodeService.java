@@ -8,6 +8,7 @@ import com.acfjj.app.model.Tree;
 import com.acfjj.app.model.TreeNodes;
 import com.acfjj.app.model.User;
 import com.acfjj.app.repository.PersonInfoRepository;
+import com.acfjj.app.repository.TreeNodesRepository;
 import com.acfjj.app.repository.TreeRepository;
 import com.acfjj.app.repository.NodeRepository;
 
@@ -26,6 +27,8 @@ public class NodeService {
 	PersonInfoRepository personInfoRepository;
     @Autowired
     TreeRepository treeRepository;
+    @Autowired
+    TreeNodesRepository treeNodesRepository;
 
     public List<Node> getAllNodes() {
         List<Node> nodes = new ArrayList<>();
@@ -39,6 +42,10 @@ public class NodeService {
 
     public void addNode(Node node) {
     	personInfoRepository.save(node.getPersonInfo());
+    	for (TreeNodes treeNode : node.getTrees()) {
+    		if(treeNode != null)
+            treeNodesRepository.save(treeNode);
+        }
         nodeRepository.save(node);
         return;
     }
@@ -72,15 +79,46 @@ public class NodeService {
 
 
     public void deleteNode(Long id) {
+    	//regarder si le créateur est celui qui veux delete
         Node node = getNode(id);
+        PersonInfo person = node.getPersonInfo();
+//        User user = userService.getUserByNameAndBirthInfo(person.getLastName(), person.getFirstName(), person.getDateOfBirth(), person.getCountryOfBirth(), person.getCityOfBirth());
+        if(node.getPersonInfo() != null)
         if (node != null) {
-            nodeRepository.deleteById(id);
+        	List<Node> nodes = getAllNodes();
+        	for(Node parcoursNode : nodes) {
+        		if(parcoursNode.getId() != id) {
+        			if(parcoursNode.getParent1() != null && parcoursNode.getParent1().getId() == id) {
+            			parcoursNode.setParent1(null);
+            		}
+    	        	if(parcoursNode.getParent2() != null && parcoursNode.getParent2().getId() == id) {
+    	    			parcoursNode.setParent2(null);
+    	    		}
+    	        	if(parcoursNode.getPartner() != null && parcoursNode.getPartner().getId() == id) {
+            			parcoursNode.setPartner(null);
+            		}
+    	        	for(Node exPartners : parcoursNode.getExPartners()) {
+    	        		if(exPartners.getId() == id) {
+    	        			parcoursNode.getExPartners().remove(exPartners);
+    	        		}
+    	        	}
+    	        	for(Node Siblings : parcoursNode.getSiblings()) {
+    	        		if(Siblings.getId() == id) {
+    	        			parcoursNode.getSiblings().remove(Siblings);
+    	        		}
+    	        	}
+            	updateNode(parcoursNode.getId(), parcoursNode);
+        		}
+        	}
+        		
+        	
             if (node.isOrphan()) {
                 PersonInfo personInfo = node.getPersonInfo();
                 if (personInfo != null) {
                     personInfoRepository.deleteById(personInfo.getId());
                 }
             }
+            nodeRepository.deleteById(id);
         }
         return;
     }
@@ -102,6 +140,7 @@ public class NodeService {
     
     
     public boolean doesNodeBelongToTree(Long nodeId, Long treeId) {
+
         Node node = getNode(nodeId);
         Tree tree = treeRepository.findById(treeId).orElse(null);
 

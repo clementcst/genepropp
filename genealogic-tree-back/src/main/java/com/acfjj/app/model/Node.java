@@ -8,11 +8,14 @@ import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 
@@ -28,8 +31,9 @@ public class Node implements Serializable {
     @OneToOne
     @JoinColumn(name = "person_info_id")
 	private PersonInfo personInfo;
+    
     @JsonIgnore
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "created_by_user_id")
 	private User createdBy;
 
@@ -49,15 +53,15 @@ public class Node implements Serializable {
 	private Node partner;
     
     @JsonIgnore
-    @OneToMany
+    @OneToMany(fetch=FetchType.EAGER)
 	private Set<Node> exPartners = new HashSet<>();
     
     @JsonIgnore
-    @OneToMany
+    @OneToMany(fetch=FetchType.EAGER)
 	private Set<Node> siblings = new HashSet<>();
     
     @JsonIgnore
-	@OneToMany(mappedBy = "node")
+	@OneToMany(mappedBy = "node",fetch=FetchType.EAGER)
 	private Set<TreeNodes> trees = new HashSet<>();
 	
 	public Node() {
@@ -125,6 +129,14 @@ public class Node implements Serializable {
 	public void addTreeNodes(TreeNodes nodeTree) {
 		this.trees.add(nodeTree);
 	}
+	public void setTreeNodes(Set<TreeNodes> nodeTree) {
+		this.trees = nodeTree;
+	}
+	
+	public void removeTreeNodes(TreeNodes treeNode) {
+		this.trees.remove(treeNode);
+	}
+
 	
 	public Node getPartner() {
 		return partner;
@@ -221,13 +233,31 @@ public class Node implements Serializable {
 	
 	@Override
 	public String toString() {
+		long parent1Id;
+		long parent2Id;
+		long partnerId;
+		if(parent1 == null) {
+			parent1Id = -1;
+		}else {
+			parent1Id = parent1.getId();
+		}
+		if(parent2 == null) {
+			parent2Id = -1;
+		}else {
+			parent2Id = parent2.getId();
+		}
+		if(partner == null) {
+			partnerId = -1;
+		}else {
+			partnerId = partner.getId();
+		}
 		return "Node [id=" + id 
 				+ ", personInfo=" + personInfo 
 				+ ", createdBy=" + createdBy.getId()
 				+ ", privacy=" + privacy
-				+ ", parent1=" + parent1.getId()
-				+ ", parent2=" + parent2.getId() 
-				+ ", partner=" + partner.getId() 
+				+ ", parent1=" + parent1Id
+				+ ", parent2=" + parent2Id
+				+ ", partner=" + partnerId 
 				+ ", exPartners=" + exPartners
 				+ ", siblings=" + siblings 
 				+ ", trees=" + trees + "]";

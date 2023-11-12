@@ -4,7 +4,9 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -24,18 +26,18 @@ public class Tree implements Serializable {
 	private long viewOfMonth;
 	private long viewOfYear;
 	
-	@OneToMany(mappedBy = "tree")
+	@OneToMany(mappedBy = "tree",fetch=FetchType.EAGER, cascade = CascadeType.ALL)
 	private Set<TreeNodes> nodes = new HashSet<>();
 	
 	
 	public Tree() {
 		super();
 	}
-	public Tree(String name, int privacy, Set<TreeNodes> nodes) {
+	public Tree(String name, int privacy,  TreeNodes nodes) {
 		this();
 		this.name=name;
 		this.privacy = privacy;
-		this.nodes = nodes;
+		this.getNodes().add(nodes);
 		this.viewOfMonth = 0;
 		this.viewOfYear = 0;
 	}	
@@ -76,6 +78,14 @@ public class Tree implements Serializable {
 	public void addTreeNodes(TreeNodes treeNode) {
 		this.getNodes().add(treeNode);
 	}
+	
+	public void setTreeNodes(Set<TreeNodes> treeNode) {
+		this.nodes = treeNode;
+	}
+	
+//	public void removeTreeNodes(TreeNodes treeNode) {
+//		this.getNodes().remove(treeNode);
+//	}
 
 	public boolean isTreePublic() {
 		return this.getPrivacy() == 1;		
@@ -95,35 +105,6 @@ public class Tree implements Serializable {
 
 	public void setViewOfYear(long viewOfYear) {
 		this.viewOfYear = viewOfYear;
-	}
-	
-	public void addNode(Node node, int privacy, int depth) {
-	    if (node != null) {
-	        if (this.nodes == null) {
-	            this.nodes = new HashSet<>();
-	        }
-	        boolean associationExists = this.nodes.stream()
-	                .anyMatch(treeNodes -> treeNodes.getNode().equals(node));
-	        if (!associationExists) {
-	            TreeNodes treeNodes = new TreeNodes(this, node, privacy, depth);
-	            this.addTreeNodes(treeNodes);
-	            node.addTreeNodes(treeNodes);
-	        }
-	    }
-	}
-	
-	public void removeNode(Node node) {
-	    if (node != null && this.nodes != null) {
-	        TreeNodes nodesToRemove = this.nodes.stream()
-	                .filter(treeNodes -> treeNodes.getNode().equals(node))
-	                .findFirst()
-	                .orElse(null);
-
-	        if (nodesToRemove != null) {
-	            this.nodes.remove(nodesToRemove);
-	            node.getTrees().remove(nodesToRemove);
-	        }
-	    }
 	}
 
 
