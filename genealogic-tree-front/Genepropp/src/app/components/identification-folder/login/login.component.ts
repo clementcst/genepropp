@@ -1,4 +1,7 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
+import { CookieService } from 'ngx-cookie-service';
+import { IdentificationService } from '../../../services/identificaton/identification.service';
 
 @Component({
   selector: 'app-login',
@@ -6,5 +9,24 @@ import { Component } from '@angular/core';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
+  privatecode: string = '';
+  password: string = '';
 
+  constructor(
+    private identificationService: IdentificationService,
+    private router: Router,
+    private cookieService: CookieService
+    ) {}
+
+  onSubmit() {
+    this.identificationService.loginattempt(this.privatecode, this.password)
+      .subscribe(response => {
+        if (response.success) {
+          this.cookieService.set('userId', response.userId);
+          this.router.navigate(['homePage']);
+        } else {
+          console.error(response.errorMsg);
+        }
+      });
+  }
 }
