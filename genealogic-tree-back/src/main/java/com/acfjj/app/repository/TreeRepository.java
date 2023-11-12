@@ -8,6 +8,5 @@ import com.acfjj.app.model.Tree;
 
 public interface TreeRepository extends CrudRepository<Tree, Long>{
 	List<Tree> findByPrivacy(int i);
-	List<Tree> findByName(String name);
-	
+	Tree findByName(String name);
 }

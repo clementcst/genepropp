@@ -4,7 +4,9 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -24,23 +26,21 @@ public class Tree implements Serializable {
 	private long viewOfMonth;
 	private long viewOfYear;
 	
-	@OneToMany(mappedBy = "tree")
+	@OneToMany(mappedBy = "tree",fetch=FetchType.EAGER, cascade = CascadeType.ALL)
 	private Set<TreeNodes> nodes = new HashSet<>();
 	
 	
 	public Tree() {
 		super();
 	}
-	public Tree(String name, int privacy, Set<TreeNodes> nodes) {
+	public Tree(String name, int privacy,  TreeNodes nodes) {
 		this();
 		this.name=name;
 		this.privacy = privacy;
-		this.nodes = nodes;
+		this.getNodes().add(nodes);
 		this.viewOfMonth = 0;
 		this.viewOfYear = 0;
 	}	
-	
-	//addnode + removenode
 	
 	//utiliser ce constructeur à la création
 	public Tree(String name, int privacy) {
@@ -74,10 +74,18 @@ public class Tree implements Serializable {
 	public Set<TreeNodes> getNodes() {
 		return nodes;
 	}
-
-	public void setNodes(Set<TreeNodes> treeNodes) {
-		this.nodes = treeNodes;
+	
+	public void addTreeNodes(TreeNodes treeNode) {
+		this.getNodes().add(treeNode);
 	}
+	
+	public void setTreeNodes(Set<TreeNodes> treeNode) {
+		this.nodes = treeNode;
+	}
+	
+//	public void removeTreeNodes(TreeNodes treeNode) {
+//		this.getNodes().remove(treeNode);
+//	}
 
 	public boolean isTreePublic() {
 		return this.getPrivacy() == 1;		
@@ -99,6 +107,7 @@ public class Tree implements Serializable {
 		this.viewOfYear = viewOfYear;
 	}
 
+
 	@Override
 	public boolean equals(Object obj) {
 	    if (this == obj) {
@@ -117,8 +126,14 @@ public class Tree implements Serializable {
 		    super.equals(obj);
 	}
 
+	@Override
 	public String toString() {
-		return "User[id="+getId()+"; Nom ="+getName()+"Privacy="+getPrivacy()+"]";
+		return "Tree [id=" + id 
+				+ ", name=" + name 
+				+ ", privacy=" + privacy 
+				+ ", viewOfMonth=" + viewOfMonth
+				+ ", viewOfYear=" + viewOfYear 
+				+ ", nodes=" + nodes + "]";
 	}	
 	
 }
