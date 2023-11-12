@@ -3,6 +3,7 @@ package com.acfjj.app.model;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -121,8 +122,11 @@ public class User implements Serializable {
 		this.myTree = myTree;
 	}
 	public Long getMyTreeId() {
-		return myTree.getId();
-	}
+        if(Objects.isNull(myTree)) {
+            return null;
+        }
+        return myTree.getId();
+    }
 	public Set<Conversation> getConversations() {
 		Set<Conversation> conversations = new HashSet<>(conversations1);
 		conversations.addAll(conversations2);
