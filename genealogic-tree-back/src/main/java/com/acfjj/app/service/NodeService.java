@@ -3,12 +3,19 @@ package com.acfjj.app.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.acfjj.app.model.Node;
+import com.acfjj.app.model.PersonInfo;
+import com.acfjj.app.model.Tree;
 import com.acfjj.app.model.TreeNodes;
+import com.acfjj.app.model.User;
 import com.acfjj.app.repository.PersonInfoRepository;
+import com.acfjj.app.repository.TreeNodesRepository;
+import com.acfjj.app.repository.TreeRepository;
 import com.acfjj.app.repository.NodeRepository;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Service
@@ -18,6 +25,10 @@ public class NodeService {
     NodeRepository nodeRepository;
     @Autowired
 	PersonInfoRepository personInfoRepository;
+    @Autowired
+    TreeRepository treeRepository;
+    @Autowired
+    TreeNodesRepository treeNodesRepository;
 
     public List<Node> getAllNodes() {
         List<Node> nodes = new ArrayList<>();
@@ -31,6 +42,10 @@ public class NodeService {
 
     public void addNode(Node node) {
     	personInfoRepository.save(node.getPersonInfo());
+    	for (TreeNodes treeNode : node.getTrees()) {
+    		if(treeNode != null)
+            treeNodesRepository.save(treeNode);
+        }
         nodeRepository.save(node);
         return;
     }
@@ -64,13 +79,46 @@ public class NodeService {
 
 
     public void deleteNode(Long id) {
+    	//regarder si le créateur est celui qui veux delete
         Node node = getNode(id);
+        PersonInfo person = node.getPersonInfo();
+//        User user = userService.getUserByNameAndBirthInfo(person.getLastName(), person.getFirstName(), person.getDateOfBirth(), person.getCountryOfBirth(), person.getCityOfBirth());
+        if(node.getPersonInfo() != null)
         if (node != null) {
-            nodeRepository.deleteById(id);
+        	List<Node> nodes = getAllNodes();
+        	for(Node parcoursNode : nodes) {
+        		if(parcoursNode.getId() != id) {
+        			if(parcoursNode.getParent1() != null && parcoursNode.getParent1().getId() == id) {
+            			parcoursNode.setParent1(null);
+            		}
+    	        	if(parcoursNode.getParent2() != null && parcoursNode.getParent2().getId() == id) {
+    	    			parcoursNode.setParent2(null);
+    	    		}
+    	        	if(parcoursNode.getPartner() != null && parcoursNode.getPartner().getId() == id) {
+            			parcoursNode.setPartner(null);
+            		}
+    	        	for(Node exPartners : parcoursNode.getExPartners()) {
+    	        		if(exPartners.getId() == id) {
+    	        			parcoursNode.getExPartners().remove(exPartners);
+    	        		}
+    	        	}
+    	        	for(Node Siblings : parcoursNode.getSiblings()) {
+    	        		if(Siblings.getId() == id) {
+    	        			parcoursNode.getSiblings().remove(Siblings);
+    	        		}
+    	        	}
+            	updateNode(parcoursNode.getId(), parcoursNode);
+        		}
+        	}
+        		
+        	
             if (node.isOrphan()) {
-            	//personInfoRepository.save(Node.getPersonInfo());
-                // Supprimer la PersonInfo associée s'il est orphelin
+                PersonInfo personInfo = node.getPersonInfo();
+                if (personInfo != null) {
+                    personInfoRepository.deleteById(personInfo.getId());
+                }
             }
+            nodeRepository.deleteById(id);
         }
         return;
     }
@@ -89,17 +137,32 @@ public class NodeService {
         parents.add(node.getParent2());
         return parents;
     }
+    
+    
+    public boolean doesNodeBelongToTree(Long nodeId, Long treeId) {
 
-    public List<TreeNodes> getTreeNodesByTreeId(Long treeId) { //à revoir 
-        List<TreeNodes> treeNodes = new ArrayList<>();
-        for (Node node : nodeRepository.findAll()) {
-            Set<TreeNodes> nodes = node.getTrees();
-            for (TreeNodes treeNode : nodes) {
-                if (treeNode.getTree().getId().equals(treeId)) {
-                    treeNodes.add(treeNode);
-                }
+        Node node = getNode(nodeId);
+        Tree tree = treeRepository.findById(treeId).orElse(null);
+
+        if (node == null || tree == null) {
+            return false;
+        }
+
+        Set<TreeNodes> treeNodes = node.getTrees();
+        for (TreeNodes treeNode : treeNodes) {
+            if (treeNode.getTree().equals(tree)) {
+                return true;
             }
         }
-        return treeNodes;
+        return false;
     }
+    
+    public Node getNodeByNameAndBirthInfo(String lastName, String firstName, LocalDate dateOfBirth, String countryOfBirth, String cityofBirth) {
+		Node nodeFound = null;
+		PersonInfo personInfoFound = personInfoRepository.findByLastNameAndFirstNameAndDateOfBirthAndCountryOfBirthAndCityOfBirth(lastName, firstName, dateOfBirth, countryOfBirth, cityofBirth); 
+		if(!Objects.isNull(personInfoFound)) {
+			nodeFound = nodeRepository.findByPersonInfo(personInfoFound);
+		}
+		return nodeFound;
+	}
 }

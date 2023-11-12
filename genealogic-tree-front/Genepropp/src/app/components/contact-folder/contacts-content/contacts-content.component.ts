@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { UserService } from '../../../services/user/user.service';
 
 @Component({
   selector: 'app-contacts-content',
@@ -8,16 +8,19 @@ import { HttpClient } from '@angular/common/http';
 })
 export class ContactsContentComponent implements OnInit{
 
-  contacts: any[] = [];
+  contacts!:any;
   currentContact: any;
 
-  constructor(private http: HttpClient) { }
+  constructor(private userService : UserService ) { 
+    this.userService = userService;
+  }
 
   ngOnInit(): void {
-    this.http.get<any[]>('http://localhost:8080/users').subscribe((data) => {
+    this.userService.getUsers().subscribe((data) => {
       this.contacts = data;
       this.currentContact = this.contacts[0];
     });
+    
   }
 
   openChat(contact: any) {

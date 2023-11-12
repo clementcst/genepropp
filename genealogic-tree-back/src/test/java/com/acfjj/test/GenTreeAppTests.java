@@ -15,7 +15,11 @@ import com.acfjj.test.service.*;
 @SelectClasses({
 	PersonInfoTest.class,
 	UserTest.class,
-	UserServiceTest.class
+	UserServiceTest.class,
+	TreeTest.class,
+	NodeTest.class,
+	TreeServiceTest.class,
+	NodeServiceTest.class	
 })
 @SpringBootTest(classes = GenTreeApp.class)
 @TestPropertySource(locations = "classpath:test.properties")

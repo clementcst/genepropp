@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { UserService } from '../../../services/user/user.service';
 
 @Component({
   selector: 'app-directory',
@@ -10,10 +10,12 @@ export class DirectoryComponent implements OnInit {
 
   users: any[] = [];
 
-  constructor(private http: HttpClient) { }
+  constructor(private userService : UserService ) { 
+    this.userService = userService;
+  }
 
   ngOnInit(): void {
-    this.http.get<any[]>('http://localhost:8080/users').subscribe((data) => {
+    this.userService.getUsers().subscribe((data) => {
       this.users = data;
     });
   }

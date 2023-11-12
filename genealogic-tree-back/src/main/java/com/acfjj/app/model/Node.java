@@ -3,15 +3,19 @@ package com.acfjj.app.model;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 
@@ -27,8 +31,9 @@ public class Node implements Serializable {
     @OneToOne
     @JoinColumn(name = "person_info_id")
 	private PersonInfo personInfo;
+    
     @JsonIgnore
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "created_by_user_id")
 	private User createdBy;
 
@@ -48,30 +53,34 @@ public class Node implements Serializable {
 	private Node partner;
     
     @JsonIgnore
-    @OneToMany
+    @OneToMany(fetch=FetchType.EAGER)
 	private Set<Node> exPartners = new HashSet<>();
     
     @JsonIgnore
-    @OneToMany
+    @OneToMany(fetch=FetchType.EAGER)
 	private Set<Node> siblings = new HashSet<>();
     
     @JsonIgnore
-	@OneToMany(mappedBy = "node")
+	@OneToMany(mappedBy = "node",fetch=FetchType.EAGER)
 	private Set<TreeNodes> trees = new HashSet<>();
 	
 	public Node() {
 		super();
 	}
-	public Node(PersonInfo personInfo, User createdBy, Node parent1, Node parent2) {
+	public Node(PersonInfo personInfo, User createdBy, Node parent1, Node parent2, int privacy) {
 		this();
 		this.personInfo=personInfo;
 		this.createdBy=createdBy;
 		this.parent1=parent1;
 		this.parent2=parent2;
+		this.privacy = privacy;
+	}
+	public Node(PersonInfo personInfo, User createdBy, int privacy) {
+		this(personInfo, createdBy, null, null, 0);
 	}
 	public Node(String lastName, String firstname, int gender, LocalDate dateOfBirth, String countryOfBirth, String cityOfBirth, User createdBy, Node parent1, Node parent2, int privacy, String nationality, String adress, int postalCode, String profilPictureData64) {
 	    this(new PersonInfo(lastName, firstname, gender, dateOfBirth, countryOfBirth, cityOfBirth, false, nationality, adress, postalCode, profilPictureData64),
-	    	 createdBy, parent1, parent2);
+	    	 createdBy, parent1, parent2, privacy);
 	}
 	public Node(String lastName, String firstname, int gender, LocalDate dateOfBirth, String countryOfBirth, String cityOfBirth, User createdBy, Node parent1, int privacy, String nationality, String adress, int postalCode, String profilPictureData64) {
 	    this(lastName, firstname, gender, dateOfBirth, countryOfBirth, cityOfBirth, createdBy, parent1, null, privacy, nationality, adress, postalCode, profilPictureData64);
@@ -114,13 +123,20 @@ public class Node implements Serializable {
 	public void setParent2(Node parent2) {
 		this.parent2 = parent2;
 	}
-	
 	public Set<TreeNodes> getTrees() {
 		return trees;
 	}
-	public void setTrees(Set<TreeNodes> nodeTrees) {
-		this.trees = nodeTrees;
+	public void addTreeNodes(TreeNodes nodeTree) {
+		this.trees.add(nodeTree);
 	}
+	public void setTreeNodes(Set<TreeNodes> nodeTree) {
+		this.trees = nodeTree;
+	}
+	
+	public void removeTreeNodes(TreeNodes treeNode) {
+		this.trees.remove(treeNode);
+	}
+
 	
 	public Node getPartner() {
 		return partner;
@@ -131,17 +147,17 @@ public class Node implements Serializable {
 	public Set<Node> getExPartners() {
 		return exPartners;
 	}
-	public void setExPartners(Set<Node> exPartners) {
-		this.exPartners = exPartners;
+	public void addExPartners(Node exPartner) {
+		this.exPartners.add(exPartner);
 	}
 	public Set<Node> getSiblings() {
 		return siblings;
 	}
-	public void setSiblings(Set<Node> siblings) {
-		this.siblings = siblings;
+	public void addSiblings(Node sibling) {
+		this.siblings.add(sibling);
 	}
 	public boolean isOrphan() {
-		return this.getTrees().isEmpty();
+		return (Objects.isNull(this.getParent1()) && Objects.isNull(this.getParent2()) && this.getSiblings().isEmpty() && Objects.isNull(this.getPartner()) && this.getExPartners().isEmpty());
 	}
 	
 	public int getPrivacy() {
@@ -150,47 +166,47 @@ public class Node implements Serializable {
 	public void setPrivacy(int privacy) {
 		this.privacy = privacy;
 	}
-	public String getUserLastName() {
+	public String getLastName() {
 	    return personInfo.getLastName();
 	}
 
-	public String getUserFirstName() {
+	public String getFirstName() {
 	    return personInfo.getFirstName();
 	}
 
-	public int getUserGender() {
+	public int getGender() {
 	    return personInfo.getGender();
 	}
 
-	public LocalDate getUserDateOfBirth() {
+	public LocalDate getDateOfBirth() {
 	    return personInfo.getDateOfBirth();
 	}
 
-	public String getUserCountryOfBirth() {
+	public String getCountryOfBirth() {
 	    return personInfo.getCountryOfBirth();
 	}
 
-	public String getUserCityOfBirth() {
+	public String getCityOfBirth() {
 	    return personInfo.getCityOfBirth();
 	}
 
-	public Boolean isUserDead() {
+	public Boolean isDead() {
 	    return personInfo.isDead();
 	}
 
-	public String getUserNationality() {
+	public String getNationality() {
 	    return personInfo.getNationality();
 	}
 
-	public String getUserAdress() {
+	public String getAdress() {
 	    return personInfo.getAdress();
 	}
 
-	public int getUserPostalCode() {
+	public int getPostalCode() {
 	    return personInfo.getPostalCode();
 	}
 
-	public String getUserProfilPictureData64() {
+	public String getProfilPictureData64() {
 	    return personInfo.getProfilPictureData64();
 	}
 
@@ -217,12 +233,34 @@ public class Node implements Serializable {
 	
 	@Override
 	public String toString() {
-		return "PersonNode ["
-				+ "id=" + id +
-				", personInfo=" + personInfo + 
-				", createdBy=" + createdBy + 
-				", parent1=" + parent1.getPersonInfo().getFirstName() + 
-				", parent2=" + parent2.getPersonInfo().getFirstName()  + "]";
+		long parent1Id;
+		long parent2Id;
+		long partnerId;
+		if(parent1 == null) {
+			parent1Id = -1;
+		}else {
+			parent1Id = parent1.getId();
+		}
+		if(parent2 == null) {
+			parent2Id = -1;
+		}else {
+			parent2Id = parent2.getId();
+		}
+		if(partner == null) {
+			partnerId = -1;
+		}else {
+			partnerId = partner.getId();
+		}
+		return "Node [id=" + id 
+				+ ", personInfo=" + personInfo 
+				+ ", createdBy=" + createdBy.getId()
+				+ ", privacy=" + privacy
+				+ ", parent1=" + parent1Id
+				+ ", parent2=" + parent2Id
+				+ ", partner=" + partnerId 
+				+ ", exPartners=" + exPartners
+				+ ", siblings=" + siblings 
+				+ ", trees=" + trees + "]";
 	}
 	
 }

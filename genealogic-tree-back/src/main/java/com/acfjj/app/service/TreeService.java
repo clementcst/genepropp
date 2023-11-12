@@ -2,12 +2,17 @@ package com.acfjj.app.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.acfjj.app.model.Node;
 import com.acfjj.app.model.Tree;
 import com.acfjj.app.model.TreeNodes;
 import com.acfjj.app.repository.NodeRepository;
+import com.acfjj.app.repository.TreeNodesRepository;
 import com.acfjj.app.repository.TreeRepository;
 
+
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -18,9 +23,10 @@ public class TreeService {
     TreeRepository treeRepository;
 
     @Autowired
-    NodeService nodeService; //revoir les methodes pour remove.
-    @Autowired
     NodeRepository nodeRepository;
+    
+    @Autowired
+    TreeNodesRepository treeNodesRepository;
 
     public List<Tree> getAllTrees() {
         List<Tree> trees = new ArrayList<>();
@@ -33,14 +39,23 @@ public class TreeService {
     }
 
     public void addTree(Tree tree) {
-        treeRepository.save(tree);
+        if(isNameTaken(tree.getName())){
+        	tree.setName(tree.getName()+"2");
+    	}
+        for (TreeNodes treeNode : tree.getNodes()) {
+            if(treeNode != null)
+        	treeNodesRepository.save(treeNode);
+        }    
+        treeRepository.save(tree);        
         return;
     }
 
     public void deleteTree(long id) {
-        List<TreeNodes> treeNodes = nodeService.getTreeNodesByTreeId(id); //supprimer service (autorwired aussi) + appel juste de la list de node du tree + test si juste remove node de la list = remove de treenode
+    	Tree tree = getTree(id);
+        Set<TreeNodes> treeNodes = tree.getNodes(); 
         for (TreeNodes treeNode : treeNodes) {
-            nodeService.deleteNode(treeNode.getNode().getId());
+        	removeNodeFromTree(tree, treeNode.getNode());
+//            nodeService.deleteNode(treeNode.getNode().getId());
         }
         treeRepository.deleteById(id);
         return;
@@ -48,53 +63,94 @@ public class TreeService {
 
     public void updateTree(long id, Tree tree) {
         Tree existingTree = getTree(id);
-        if (existingTree != null && tree.getId() == id) {
+        if (existingTree != null) {
+            Set<TreeNodes> treeNodes = tree.getNodes();
+            for (TreeNodes treeNode : treeNodes) {
+            	treeNodesRepository.save(treeNode);
+            }
             treeRepository.save(tree);
-            //update nodes aussi 
         }
         return;
     }
 
-    public List<Tree> getTreesByName(String name) {
+    public Tree getTreeByName(String name) {
         return treeRepository.findByName(name);
+    }
+
+    public boolean isNameTaken(String name) { 
+    	return (getTreeByName(name) == null) ? false : true;
     }
 
     public List<Tree> getPublicTrees() {
         return treeRepository.findByPrivacy(1);
     }
-
-    //à deplacer dans NodeService Selon moi
-    //à finir 
-    public boolean doesNodeBelongToTree(Long nodeId, Long treeId) { 
+    
+    public void deleteNodeFromTree(Long nodeId, Long treeId) {
         Tree tree = getTree(treeId);
-        if (tree == null) {
-            return false;
-        }
 
-        Set<TreeNodes> treeNodes = tree.getNodes();
-        for (TreeNodes treeNode : treeNodes) {
-            if (treeNode.getNode().getId().equals(nodeId)) {
-                return true;
+        if (tree != null) {
+        	 Set<TreeNodes> treeNodes = treeNodesRepository.findAll();
+
+        	 for (TreeNodes treeNode : treeNodes) {
+        		 if(treeNode.getNode().getId().equals(nodeId)) {
+        			 if(treeNode.getTree() != null && treeNode.getTree().getId().equals(treeId)) {
+        				 removeNodeFromTree(tree, treeNode.getNode());
+        				 tree = getTree(treeId);
+        			 }
+        			 treeNodesRepository.delete(treeNode);
+        			 
+        		 }
+        	 }
+             nodeRepository.deleteById(nodeId);
+
+             treeRepository.save(tree);
+        }
+    }
+
+    
+    public void addNodeToTree(Tree tree, Node node, int privacy, int depth) {
+        if (tree != null && node != null) {
+
+            Set<TreeNodes> treeNodes = tree.getNodes();
+            if (treeNodes.contains(null) || treeNodes == null ) {
+                treeNodes = new HashSet<>();
+            }
+            boolean associationExists = treeNodes.stream().anyMatch(treeNode -> treeNode.getNode().equals(node));
+            if (!associationExists) {
+                TreeNodes treeNode = new TreeNodes(tree, node, privacy, depth);
+                treeNodesRepository.save(treeNode);
+                treeNodes.add(treeNode);
+                node.setTreeNodes(treeNodes);
+                treeRepository.save(tree);
             }
         }
-        return false;
     }
     
-    //à revoir
-    public void deleteNodeFromTree(Long nodeId, Long treeId) {
-    	Tree tree = treeRepository.findById(treeId).orElse(null);
-        if (tree != null) {
-        	Set<TreeNodes> treeNodes = tree.getNodes();
-            for (TreeNodes treeNode : treeNodes) {
-                if (treeNode.getNode().getId().equals(nodeId)) {
-                    treeNodes.remove(treeNode);
+    public void removeNodeFromTree(Tree tree, Node node) {
+    	Long treeId = tree.getId();
+        if (tree != null && node != null) {
+            Set<TreeNodes> treeNodes = tree.getNodes();
+            if (treeNodes != null) {
+                TreeNodes nodeToRemove = treeNodes.stream()
+                        .filter(treeNode -> treeNode.getNode().getId().equals(node.getId()))
+                        .findFirst()
+                        .orElse(null);
+
+                if (nodeToRemove != null) {
+                	treeNodes.remove(nodeToRemove);
+                    node.setTreeNodes(treeNodes);
+                    tree.setTreeNodes(treeNodes);
+                    
+                    nodeRepository.save(node);
+                    nodeToRemove.setTree(null);
+                    treeNodesRepository.save(nodeToRemove);
+
                     treeRepository.save(tree);
-                    nodeRepository.deleteById(nodeId);
-                    return;
+                    tree = getTree(treeId);
                 }
             }
         }
-        return;
     }
+
 
 }
