@@ -69,9 +69,9 @@ public class UserController{
 		if(Objects.isNull(node)) {
 			return new Response("Fail to create user's node: step 3 failed", false);
 		}
-		tree.addNode(node, 1, 0);
+		/*treeService.addNodeToTree(tree, node,1,0);
 		System.out.println(tree);
-		treeService.updateTree(tree.getId(), tree);
+		treeService.updateTree(tree.getId(), tree);*/
 		return new Response("Success", true);
 	}
 	
