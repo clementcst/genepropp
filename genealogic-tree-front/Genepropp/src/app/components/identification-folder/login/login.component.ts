@@ -20,13 +20,14 @@ export class LoginComponent {
 
   onSubmit() {
     this.identificationService.loginattempt(this.privatecode, this.password)
-      .subscribe(response => {
+      .subscribe((response) => {
         alert(response)
         if (response.success) {
-          this.cookieService.set('userId', response.userId);
+          this.cookieService.set('userId', response.value.id);
           this.router.navigate(['homePage']);
-        } else {
-          console.error(response.errorMsg);
+        }
+        else {
+          console.error(response.message);
         }
       });
   }
