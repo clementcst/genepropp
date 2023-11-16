@@ -31,7 +31,7 @@ public class Node implements Serializable {
     @JoinColumn(name = "person_info_id")
 	private PersonInfo personInfo;
     @JsonIgnore
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "created_by_user_id")
 	private User createdBy;
 
@@ -51,15 +51,15 @@ public class Node implements Serializable {
 	private Node partner;
     
     @JsonIgnore
-    @OneToMany
+    @OneToMany(fetch=FetchType.EAGER)
 	private Set<Node> exPartners = new HashSet<>();
     
     @JsonIgnore
-    @OneToMany
+    @OneToMany(fetch=FetchType.EAGER)
 	private Set<Node> siblings = new HashSet<>();
     
     @JsonIgnore
-	@OneToMany(mappedBy = "node")
+	@OneToMany(mappedBy = "node",fetch=FetchType.EAGER)
 	private Set<TreeNodes> treeNodes = new HashSet<>();
 	
 	public Node() {
@@ -112,6 +112,12 @@ public class Node implements Serializable {
 	public Node getParent1() {
 		return parent1;
 	}
+	public Long getParent1Id() {
+		if(Objects.isNull(parent1)) {
+			return null;
+		}
+		return parent1.getId();
+	}
 	public void setParent1(Node parent1) {
 		this.parent1 = parent1;
 	}
@@ -121,11 +127,24 @@ public class Node implements Serializable {
 	public void setParent2(Node parent2) {
 		this.parent2 = parent2;
 	}
+	public Long getParent1Id() {
+		if(Objects.isNull(parent2)) {
+			return null;
+		}
+		return parent2.getId();
+	}
 	public Set<TreeNodes> getTreeNodes() {
 		return treeNodes;
 	}
 	public void addTreeNodes(TreeNodes nodeTree) {
-		this.treeNodes.add(nodeTree);
+		this.trees.add(nodeTree);
+	}
+	public void setTreeNodes(Set<TreeNodes> nodeTree) {
+		this.trees = nodeTree;
+	}
+
+	public void removeTreeNodes(TreeNodes treeNode) {
+		this.trees.remove(treeNode);
 	}
 	
 	public Node getPartner() {
@@ -256,16 +275,34 @@ public class Node implements Serializable {
 	
 	@Override
 	public String toString() {
+		long parent1Id;
+		long parent2Id;
+		long partnerId;
+		if(parent1 == null) {
+			parent1Id = -1;
+		}else {
+			parent1Id = parent1.getId();
+		}
+		if(parent2 == null) {
+			parent2Id = -1;
+		}else {
+			parent2Id = parent2.getId();
+		}
+		if(partner == null) {
+			partnerId = -1;
+		}else {
+			partnerId = partner.getId();
+		}
 		return "Node [id=" + id 
 				+ ", personInfo=" + personInfo 
 				+ ", createdBy=" + createdBy.getId()
 				+ ", privacy=" + privacy
-				+ ", parent1=" + parent1.getId()
-				+ ", parent2=" + parent2.getId() 
-				+ ", partner=" + partner.getId() 
-				+ ", exPartners=" + exPartners
-				+ ", siblings=" + siblings 
-				+ ", trees=" + treeNodes + "]";
+				+ ", parent1=" + getParent2Id()
+				+ ", parent2=" + getParent2Id()
+				+ ", partner=" + getPartnerId()
+				+ ", exPartners=" +  getExPartnersId()
+				+ ", siblings=" + getSiblingsId()
+				+ ", trees= faire getTreesId" + "]";
 	}
 	
 }
