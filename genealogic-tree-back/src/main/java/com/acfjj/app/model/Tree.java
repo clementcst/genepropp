@@ -29,18 +29,18 @@ public class Tree implements Serializable {
 	private long viewOfYear;
 	
 	@JsonIgnore
-	@OneToMany(mappedBy = "tree")
+	@OneToMany(mappedBy = "tree",fetch=FetchType.EAGER, cascade = CascadeType.ALL)
 	private Set<TreeNodes> treeNodes = new HashSet<>();
 	
 	
 	public Tree() {
 		super();
 	}
-	public Tree(String name, int privacy, Set<TreeNodes> nodes) {
+	public Tree(String name, int privacy,  TreeNodes treeNode) {
 		this();
 		this.name=name;
 		this.privacy = privacy;
-		this.treeNodes = nodes;
+		this.treeNodes = treeNode;
 		this.viewOfMonth = 0;
 		this.viewOfYear = 0;
 	}	
@@ -79,8 +79,16 @@ public class Tree implements Serializable {
 	}
 	
 	public void addTreeNodes(TreeNodes treeNode) {
-		this.getTreeNodes().add(treeNode);
+		this.getNodes().add(treeNode);
 	}
+
+	public void setTreeNodes(Set<TreeNodes> treeNode) {
+		this.nodes = treeNode;
+	}
+
+	//	public void removeTreeNodes(TreeNodes treeNode) {
+	//		this.getNodes().remove(treeNode);
+	//	}
 
 	public boolean isTreePublic() {
 		return this.getPrivacy() == 1;		
@@ -109,36 +117,6 @@ public class Tree implements Serializable {
 		}
 		return nodes;
 	}
-	
-	public void addNode(Node node, int privacy, int depth) {
-	    if (node != null) {
-	        if (this.treeNodes == null) {
-	            this.treeNodes = new HashSet<>();
-	        }
-	        boolean associationExists = this.treeNodes.stream()
-	                .anyMatch(treeNodes -> treeNodes.getNode().equals(node));
-	        if (!associationExists) {
-	            TreeNodes treeNodes = new TreeNodes(this, node, privacy, depth);
-	            this.addTreeNodes(treeNodes);
-	            node.addTreeNodes(treeNodes);
-	        }
-	    }
-	}
-	
-	public void removeNode(Node node) {
-	    if (node != null && this.treeNodes != null) {
-	        TreeNodes nodesToRemove = this.treeNodes.stream()
-	                .filter(treeNodes -> treeNodes.getNode().equals(node))
-	                .findFirst()
-	                .orElse(null);
-
-	        if (nodesToRemove != null) {
-	            this.treeNodes.remove(nodesToRemove);
-	            node.getTreeNodes().remove(nodesToRemove);
-	        }
-	    }
-	}
-
 
 	@Override
 	public boolean equals(Object obj) {
