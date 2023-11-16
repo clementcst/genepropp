@@ -9,5 +9,5 @@ import com.acfjj.app.model.TreeNodes;
 
 
 public interface TreeNodesRepository extends CrudRepository<TreeNodes, Long>{
-	Set<TreeNodes> findAll();
+	  Set<TreeNodes> findAll();
 }
