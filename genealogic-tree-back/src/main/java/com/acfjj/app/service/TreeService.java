@@ -86,8 +86,6 @@ public class TreeService {
     
     public void deleteNodeFromTree(Long nodeId, Long treeId) {
         Tree tree = getTree(treeId);
-
-    	Tree tree = getTree(treeId);
         if (tree != null) {
         	 Set<TreeNodes> treeNodes = treeNodesRepository.findAll();
 
