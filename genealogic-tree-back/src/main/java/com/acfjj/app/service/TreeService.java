@@ -143,6 +143,7 @@ public class TreeService {
                     nodeToRemove.setTree(null);
                     treeNodesRepository.save(nodeToRemove);
                     treeRepository.save(tree);
+                     tree = getTree(treeId);
                 }
             }
         }
