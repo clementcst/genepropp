@@ -24,9 +24,11 @@ public class NodeService {
     @Autowired
     NodeRepository nodeRepository;
     @Autowired
-	PersonInfoRepository personInfoRepository;
+    PersonInfoRepository personInfoRepository;
     @Autowired
     TreeRepository treeRepository;
+    @Autowired
+    TreeNodesRepository treeNodesRepository;
 
     public List<Node> getAllNodes() {
         List<Node> nodes = new ArrayList<>();
