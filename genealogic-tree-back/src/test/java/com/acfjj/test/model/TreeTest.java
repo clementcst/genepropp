@@ -3,7 +3,7 @@ package com.acfjj.test.model;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
@@ -33,29 +33,32 @@ public class TreeTest {
 
     static public List<Object> testData() {
         Node node1 = new Node("Bourhara", "Adam", 1, LocalDate.of(2002, 04, 2), "France", "Cergy", null, 1, "French", "Some Address", 12345, "Base64Image");
-        Node node2 = new Node("Cassiet", "Clement", 1, LocalDate.of(1899, 07, 9), "Péîs", "Tournant-En-Brie", null, 2, "Peïsian", "Another Address", 54321, "Base64Image2");
+        Node node2 = new Node("Cassiet", "Clement", 1, LocalDate.of(1899, 07, 9), "Péîs", "Tournant-En-Brie", null, 1, "NewNationality", "NewAddress", 99999, "NewBase64Image");
         Node node3 = new Node("Gautier", "Jordan", 1, LocalDate.of(2002, 11, 21), "Nouvel-Zélande", "Paris Hilton", null, 1, "Kiwi", "Yet Another Address", 67890, "Base64Image3");
 
-        Set<TreeNodes> nodes1 = new HashSet<>();
-        Set<TreeNodes> nodes2 = new HashSet<>();
-        nodes1.add(new TreeNodes(null, node1, 1, 0));
-        nodes2.add(new TreeNodes(null, node2, 0, 0));
-        nodes2.add(new TreeNodes(null, node3, 0, 0));
+        TreeNodes nodes1 = new TreeNodes(null, node1, 1, 0);
+        TreeNodes nodes2 = new TreeNodes(null, node2, 0, 0);
+        
+        long viewOfMonth1 = 3;
+        long viewOfMonth2 = 5;
+        
+        long viewOfYear1 = 3;
+        long viewOfYear2 = 5;
 
         return new ArrayList<Object>(Arrays.asList(new Object[][] {
-            {"Tree1", 1, nodes1},
-            {"Tree2", 0, nodes2},
-            {"Tree3", 2, new HashSet<>()},
-            {"Tree4", 1, new HashSet<>()},
-            {"Tree5", 0, new HashSet<>()}
+            {"Tree1", 1, nodes1, viewOfMonth1, viewOfYear2},
+            {"Tree2", 0, nodes2, viewOfMonth1, viewOfYear2},
+            {"Tree3", 2, new TreeNodes(), viewOfMonth2, viewOfYear1},
+            {"Tree4", 1, new TreeNodes(), viewOfMonth1, viewOfYear2},
+            {"Tree5", 0, new TreeNodes(), viewOfMonth2, viewOfYear1}
         }));
     }
 
     @ParameterizedTest
     @MethodSource("testData")
-    void testTreeConstructor(String name, int privacy, Set<TreeNodes> nodes) {
-        Tree tree = new Tree(name, privacy, nodes);
-        assertNotNull(tree.getTreeNodes());
+    void testTreeConstructor(String name, int privacy, TreeNodes nodes,long viewOfMonth, long viewOfYear) {
+        Tree tree = new Tree(name, privacy);
+        assertTrue(tree.getNodes().contains(null));
         assertAll(() -> {
             assertEquals(name, tree.getName());
             assertEquals(privacy, tree.getPrivacy());
@@ -64,45 +67,33 @@ public class TreeTest {
 
     @ParameterizedTest
     @MethodSource("testData")
-    void testTreeSetters(String name, int privacy, Set<TreeNodes> nodes) {
+    void testTreeSetters(String name, int privacy, TreeNodes nodes, long viewOfMonth, long viewOfYear) {
         String nameTest = "TreeTestName";
-        int privacyTest = 2;
+        int privacyTest = 2; 
 
-        Tree tree = new Tree(name, privacy, nodes);
+        Tree tree = new Tree();
+        tree.setViewOfMonth(viewOfMonth);
 
         tree.setName(nameTest);
         assertEquals(nameTest, tree.getName());
 
         tree.setPrivacy(privacyTest);
         assertEquals(privacyTest, tree.getPrivacy());
-    }
-    
-    @ParameterizedTest
-    @MethodSource("testData")
-    void testAddNodeToTree(String name, int privacy, Set<TreeNodes> nodes) {
-        Tree tree = new Tree(name, privacy, nodes);
-        Node node1 = new Node("NewNode1", "FirstName1", 1, LocalDate.of(2000, 1, 1), "Country1", "City1", null, 1, "Nationality1", "Address1", 12345, "Base64Image1");
+        
+        tree.setViewOfMonth(viewOfMonth);
+        assertEquals(viewOfMonth, tree.getViewOfMonth());
+        
+        tree.setViewOfYear(viewOfYear);
+        assertEquals(viewOfYear, tree.getViewOfYear());
+        
+        tree.addTreeNodes(nodes);
+        assertTrue(tree.getNodes().contains(nodes));
 
-        tree.addNode(node1, 1, 0);
-        assertTrue(tree.getTreeNodes().stream().anyMatch(treeNodes -> treeNodes.getNode().equals(node1)));
-    }
-
-    @ParameterizedTest
-    @MethodSource("testData")
-    void testRemoveNodeFromTree(String name, int privacy, Set<TreeNodes> nodes) {
-        Tree tree = new Tree(name, privacy, nodes);
-        Node node1 = new Node("NewNode1", "FirstName1", 1, LocalDate.of(2000, 1, 1), "Country1", "City1", null, 1, "Nationality1", "Address1", 12345, "Base64Image1");
-
-        tree.addNode(node1, 1, 0);
-        assertTrue(tree.getTreeNodes().stream().anyMatch(treeNodes -> treeNodes.getNode().equals(node1)));
-
-        tree.removeNode(node1);
-        assertFalse(tree.getTreeNodes().stream().anyMatch(treeNodes -> treeNodes.getNode().equals(node1)));
     }
 
     @ParameterizedTest
     @MethodSource("testData")
-    void testIsTreePublic(String name, int privacy, Set<TreeNodes> nodes) {
+    void testIsTreePublic(String name, int privacy, TreeNodes nodes, long viewOfMonth, long viewOfYear) {
         Tree publicTree = new Tree("PublicTree", 1, nodes);
         Tree privateTree = new Tree("PrivateTree", 0, nodes);
 
