@@ -2,7 +2,9 @@ package com.acfjj.app.model;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -122,15 +124,25 @@ public class User implements Serializable {
 		this.myTree = myTree;
 	}
 	public Long getMyTreeId() {
-        if(Objects.isNull(myTree)) {
-            return null;
-        }
-        return myTree.getId();
-    }
+		if(Objects.isNull(myTree)) {
+			return null;
+		}
+		return myTree.getId();
+	}
+	@JsonIgnore
 	public Set<Conversation> getConversations() {
 		Set<Conversation> conversations = new HashSet<>(conversations1);
 		conversations.addAll(conversations2);
 		return conversations;
+	}
+	public List<Long> getConversationsId() {
+		Set<Conversation> conversations = new HashSet<>(conversations1);
+		conversations.addAll(conversations2);
+		List<Long> conversationsId = new ArrayList<>();
+		for (Conversation conversation : conversations) {
+			conversationsId.add(conversation.getId());
+		}
+		return conversationsId;
 	}
 	public void addConversation1(Conversation conversation) {
 		this.conversations1.add(conversation);

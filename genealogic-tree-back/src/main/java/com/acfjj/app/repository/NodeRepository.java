@@ -8,5 +8,4 @@ import com.acfjj.app.model.User;
 
 public interface NodeRepository extends CrudRepository<Node, Long>{
 	Node findByPersonInfo(PersonInfo personInfo);
-	Void deleteById(long id);
 }

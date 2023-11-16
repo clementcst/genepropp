@@ -1,12 +1,14 @@
 package com.acfjj.app.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
-import jakarta.persistence.CascadeType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -26,18 +28,19 @@ public class Tree implements Serializable {
 	private long viewOfMonth;
 	private long viewOfYear;
 	
-	@OneToMany(mappedBy = "tree",fetch=FetchType.EAGER, cascade = CascadeType.ALL)
-	private Set<TreeNodes> nodes = new HashSet<>();
+	@JsonIgnore
+	@OneToMany(mappedBy = "tree")
+	private Set<TreeNodes> treeNodes = new HashSet<>();
 	
 	
 	public Tree() {
 		super();
 	}
-	public Tree(String name, int privacy,  TreeNodes nodes) {
+	public Tree(String name, int privacy, Set<TreeNodes> nodes) {
 		this();
 		this.name=name;
 		this.privacy = privacy;
-		this.getNodes().add(nodes);
+		this.treeNodes = nodes;
 		this.viewOfMonth = 0;
 		this.viewOfYear = 0;
 	}	
@@ -71,21 +74,13 @@ public class Tree implements Serializable {
 		this.privacy = privacy;
 	}
 	
-	public Set<TreeNodes> getNodes() {
-		return nodes;
+	public Set<TreeNodes> getTreeNodes() {
+		return treeNodes;
 	}
 	
 	public void addTreeNodes(TreeNodes treeNode) {
-		this.getNodes().add(treeNode);
+		this.getTreeNodes().add(treeNode);
 	}
-	
-	public void setTreeNodes(Set<TreeNodes> treeNode) {
-		this.nodes = treeNode;
-	}
-	
-//	public void removeTreeNodes(TreeNodes treeNode) {
-//		this.getNodes().remove(treeNode);
-//	}
 
 	public boolean isTreePublic() {
 		return this.getPrivacy() == 1;		
@@ -105,6 +100,43 @@ public class Tree implements Serializable {
 
 	public void setViewOfYear(long viewOfYear) {
 		this.viewOfYear = viewOfYear;
+	}
+	
+	public List<Node> getNodes() {
+		List<Node> nodes = new ArrayList<>();
+		for (TreeNodes treeNodes : treeNodes) {
+			nodes.add(treeNodes.getNode());
+		}
+		return nodes;
+	}
+	
+	public void addNode(Node node, int privacy, int depth) {
+	    if (node != null) {
+	        if (this.treeNodes == null) {
+	            this.treeNodes = new HashSet<>();
+	        }
+	        boolean associationExists = this.treeNodes.stream()
+	                .anyMatch(treeNodes -> treeNodes.getNode().equals(node));
+	        if (!associationExists) {
+	            TreeNodes treeNodes = new TreeNodes(this, node, privacy, depth);
+	            this.addTreeNodes(treeNodes);
+	            node.addTreeNodes(treeNodes);
+	        }
+	    }
+	}
+	
+	public void removeNode(Node node) {
+	    if (node != null && this.treeNodes != null) {
+	        TreeNodes nodesToRemove = this.treeNodes.stream()
+	                .filter(treeNodes -> treeNodes.getNode().equals(node))
+	                .findFirst()
+	                .orElse(null);
+
+	        if (nodesToRemove != null) {
+	            this.treeNodes.remove(nodesToRemove);
+	            node.getTreeNodes().remove(nodesToRemove);
+	        }
+	    }
 	}
 
 
@@ -133,7 +165,7 @@ public class Tree implements Serializable {
 				+ ", privacy=" + privacy 
 				+ ", viewOfMonth=" + viewOfMonth
 				+ ", viewOfYear=" + viewOfYear 
-				+ ", nodes=" + nodes + "]";
+				+ ", nodes=" + treeNodes + "]";
 	}	
 	
 }

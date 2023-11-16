@@ -9,18 +9,19 @@ public class Response {
 		
 	}
 	
-	public Response(Object value) {
+	public Response(Object value, String message, Boolean success) {
 		super();
 		this.value = value;
-		this.message = null;
-		this.success = true;
+		this.message = message;
+		this.success = success;
+	}
+	
+	public Response(Object value) {
+		this(value, null, true);
 	}
 	
 	public Response(String message, Boolean success) {
-		super();
-		this.value = null;
-		this.message = message;
-		this.success = success;
+		this(null, message, success);
 	}
 
 	public Object getValue() {
