@@ -11,10 +11,12 @@ import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 
@@ -124,27 +126,27 @@ public class Node implements Serializable {
 	public Node getParent2() {
 		return parent2;
 	}
-	public void setParent2(Node parent2) {
-		this.parent2 = parent2;
-	}
-	public Long getParent1Id() {
+	public Long getParent2Id() {
 		if(Objects.isNull(parent2)) {
 			return null;
 		}
 		return parent2.getId();
 	}
+	public void setParent2(Node parent2) {
+		this.parent2 = parent2;
+	}
 	public Set<TreeNodes> getTreeNodes() {
 		return treeNodes;
 	}
 	public void addTreeNodes(TreeNodes nodeTree) {
-		this.trees.add(nodeTree);
+		this.treeNodes.add(nodeTree);
 	}
 	public void setTreeNodes(Set<TreeNodes> nodeTree) {
-		this.trees = nodeTree;
+		this.treeNodes = nodeTree;
 	}
 
 	public void removeTreeNodes(TreeNodes treeNode) {
-		this.trees.remove(treeNode);
+		this.treeNodes.remove(treeNode);
 	}
 	
 	public Node getPartner() {
@@ -243,14 +245,37 @@ public class Node implements Serializable {
 	public String getProfilPictureData64() {
 	    return personInfo.getProfilPictureData64();
 	}
+	@JsonIgnore
+	public Tree getTree() {
+		for (TreeNodes treeNodes : getTreeNodes()) {
+			return treeNodes.getTree();
+		}
+		return null;
+	}
+	public Long getTreeId() {
+		Tree tree = this.getTree();
+		if(tree == null) {
+			return null;
+		}
+		return tree.getId();
+	}
+	
 	
 	@JsonIgnore
-	public List<Tree> getTree() {
+	public List<Tree> getTrees() {
 		List<Tree> trees = new ArrayList<>();
 		for (TreeNodes treeNodes : treeNodes) {
 			trees.add(treeNodes.getTree());
 		}
 		return trees;
+	}
+	
+	public List<Long> getTreesId() {
+		List<Long> treesId = new ArrayList<>();
+		for (Tree trees : this.getTrees()) {
+			treesId.add(trees.getId());
+		}
+		return treesId;
 	}
 	
 	@Override
@@ -275,34 +300,16 @@ public class Node implements Serializable {
 	
 	@Override
 	public String toString() {
-		long parent1Id;
-		long parent2Id;
-		long partnerId;
-		if(parent1 == null) {
-			parent1Id = -1;
-		}else {
-			parent1Id = parent1.getId();
-		}
-		if(parent2 == null) {
-			parent2Id = -1;
-		}else {
-			parent2Id = parent2.getId();
-		}
-		if(partner == null) {
-			partnerId = -1;
-		}else {
-			partnerId = partner.getId();
-		}
 		return "Node [id=" + id 
 				+ ", personInfo=" + personInfo 
 				+ ", createdBy=" + createdBy.getId()
 				+ ", privacy=" + privacy
-				+ ", parent1=" + getParent2Id()
+				+ ", parent1=" + getParent1Id()
 				+ ", parent2=" + getParent2Id()
 				+ ", partner=" + getPartnerId()
 				+ ", exPartners=" +  getExPartnersId()
 				+ ", siblings=" + getSiblingsId()
-				+ ", trees= faire getTreesId" + "]";
+				+ ", trees=" +  getTreesId() + "]";
 	}
 	
 }

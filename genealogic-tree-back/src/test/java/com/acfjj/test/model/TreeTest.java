@@ -3,7 +3,6 @@ package com.acfjj.test.model;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
@@ -34,7 +33,7 @@ public class TreeTest {
     static public List<Object> testData() {
         Node node1 = new Node("Bourhara", "Adam", 1, LocalDate.of(2002, 04, 2), "France", "Cergy", null, 1, "French", "Some Address", 12345, "Base64Image");
         Node node2 = new Node("Cassiet", "Clement", 1, LocalDate.of(1899, 07, 9), "Péîs", "Tournant-En-Brie", null, 1, "NewNationality", "NewAddress", 99999, "NewBase64Image");
-        Node node3 = new Node("Gautier", "Jordan", 1, LocalDate.of(2002, 11, 21), "Nouvel-Zélande", "Paris Hilton", null, 1, "Kiwi", "Yet Another Address", 67890, "Base64Image3");
+//        Node node3 = new Node("Gautier", "Jordan", 1, LocalDate.of(2002, 11, 21), "Nouvel-Zélande", "Paris Hilton", null, 1, "Kiwi", "Yet Another Address", 67890, "Base64Image3");
 
         TreeNodes nodes1 = new TreeNodes(null, node1, 1, 0);
         TreeNodes nodes2 = new TreeNodes(null, node2, 0, 0);
@@ -58,7 +57,7 @@ public class TreeTest {
     @MethodSource("testData")
     void testTreeConstructor(String name, int privacy, TreeNodes nodes,long viewOfMonth, long viewOfYear) {
         Tree tree = new Tree(name, privacy);
-        assertTrue(tree.getNodes().contains(null));
+        assertTrue(tree.getTreeNodes().contains(null));
         assertAll(() -> {
             assertEquals(name, tree.getName());
             assertEquals(privacy, tree.getPrivacy());
@@ -87,7 +86,7 @@ public class TreeTest {
         assertEquals(viewOfYear, tree.getViewOfYear());
         
         tree.addTreeNodes(nodes);
-        assertTrue(tree.getNodes().contains(nodes));
+        assertTrue(tree.getTreeNodes().contains(nodes));
 
     }
 
