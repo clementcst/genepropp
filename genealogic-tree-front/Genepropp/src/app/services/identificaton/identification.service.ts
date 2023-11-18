@@ -15,6 +15,7 @@ export class IdentificationService {
   }
 
   registerResquest(username: string, password: string):Observable<any> {
+    const data = { username, password }
     return this.http.post<any[]>("http://localhost:8080/register",{responseType: 'json'});
   }
 }

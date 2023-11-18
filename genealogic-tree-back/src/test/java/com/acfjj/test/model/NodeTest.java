@@ -57,7 +57,7 @@ public class NodeTest {
         int privacy, String nationality, String address, int postalCode, String profilPictureData64, TreeNodes treeNodes
     ) {
         Node node = new Node(personInfo, createdBy, parent1, parent2, privacy);
-        assertNotNull(node.getTrees());
+        assertNotNull(node.getTree());
         assertAll(() -> {
             assertEquals(personInfo, node.getPersonInfo());
             assertEquals(createdBy, node.getCreatedBy());
@@ -103,7 +103,7 @@ public class NodeTest {
             assertEquals(newParent1, node.getParent1());
             assertEquals(2, node.getPrivacy());
             assertEquals(parent2, node.getParent2());
-            assertTrue(node.getTrees().contains(treeNodes));
+            assertTrue(node.getTreeNodes().contains(treeNodes));
             assertEquals(Partner, node.getPartner());
             assertTrue(node.getExPartners().contains(exPartners));
             assertTrue(node.getSiblings().contains(siblings));

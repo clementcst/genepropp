@@ -109,7 +109,7 @@ public class TreeServiceTest {
         treeService.addNodeToTree(tree, node2, 1, 2);
         retrievedTree = treeService.getTree(tree.getId());
 
-        Set<TreeNodes> treeNodes = retrievedTree.getNodes();
+        Set<TreeNodes> treeNodes = retrievedTree.getTreeNodes();
         assertNotNull(treeNodes);
         assertFalse(treeNodes.isEmpty());
         assertTrue(treeNodes.size() ==  2);
@@ -121,7 +121,7 @@ public class TreeServiceTest {
       Tree tree = treeService.getTreeByName("TDM");
       Node node = nodeService.getNode((long) 2);
 
-      Set<TreeNodes> treeNodesBeforeRemoval = tree.getNodes();
+      Set<TreeNodes> treeNodesBeforeRemoval = tree.getTreeNodes();
       assertNotNull(treeNodesBeforeRemoval);
       assertFalse(treeNodesBeforeRemoval.isEmpty());
 
@@ -130,7 +130,7 @@ public class TreeServiceTest {
       Tree retrievedTreeAfterRemoval = treeService.getTree(tree.getId());
       assertNotNull(retrievedTreeAfterRemoval);
 
-      Set<TreeNodes> treeNodesAfterRemoval = retrievedTreeAfterRemoval.getNodes();
+      Set<TreeNodes> treeNodesAfterRemoval = retrievedTreeAfterRemoval.getTreeNodes();
       assertNotNull(treeNodesAfterRemoval);
       assertEquals(treeNodesAfterRemoval.size(), 1);
   }
@@ -154,8 +154,8 @@ public void testUpdateTree() {
     Tree retrievedTree = treeService.getTree(tree.getId());
     assertNotNull(retrievedTree);
     assertEquals("UpdatedTreeName", retrievedTree.getName());
-    assertTrue(updatedTree.getNodes().stream().anyMatch(treeNode -> treeNode.getNode().equals(node)));
-    assertTrue(updatedTree.getNodes().stream().anyMatch(treeNode -> treeNode.getNode().getId().equals(nodeService.getNode((long) 1).getId())));
+    assertTrue(updatedTree.getNodes().stream().anyMatch(treeNode -> treeNode.equals(node)));
+    assertTrue(updatedTree.getNodes().stream().anyMatch(treeNode -> treeNode.getId().equals(nodeService.getNode((long) 1).getId())));
 }
 
     @Test
@@ -168,7 +168,7 @@ public void testUpdateTree() {
 
         Tree retrievedTree = treeService.getTree(tree.getId());
         assertNotNull(retrievedTree);
-        assertFalse(retrievedTree.getNodes().stream().anyMatch(treeNode -> treeNode.getNode().equals(node)));
+        assertFalse(retrievedTree.getNodes().stream().anyMatch(treeNode -> treeNode.getTreeNodes().equals(node)));
         assertFalse(nodeService.getAllNodes().contains(node));
 
     }
@@ -185,7 +185,7 @@ public void testUpdateTree() {
       Node node = nodeService.getNode((long) 1);
 
       assertNull(retrievedTree);
-      assertFalse(node.getTrees().stream().anyMatch(treeNode -> treeNode.getTree() != null && treeNode.getTree().getId().equals(treeId)));
+      assertFalse(node.getTreeNodes().stream().anyMatch(treeNode -> treeNode.getTree() != null && treeNode.getTree().getId().equals(treeId)));
   }
 
   
