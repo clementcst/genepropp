@@ -57,6 +57,8 @@ public class NodeService {
     	        } else if (node.getParent2() == null) {
     	            node.setParent2(parentNode);
     	        }
+//    	        TreeNodes TNChild = new treeNodes();
+//    	        node.addTreeNodes();
     	        updateNode(node.getId(), node);
     	    }
     	 return;

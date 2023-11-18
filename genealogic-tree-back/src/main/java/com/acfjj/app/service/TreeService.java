@@ -42,7 +42,7 @@ public class TreeService {
         if(isNameTaken(tree.getName())){
         	tree.setName(tree.getName()+"2");
     	}
-        for (TreeNodes treeNode : tree.getNodes()) {
+        for (TreeNodes treeNode : tree.getTreeNodes()) {
             if(treeNode != null)
         	treeNodesRepository.save(treeNode);
         }    
@@ -85,6 +85,7 @@ public class TreeService {
     }
     
     public void deleteNodeFromTree(Long nodeId, Long treeId) {
+    	//sécurité de user
         Tree tree = getTree(treeId);
         if (tree != null) {
         	 Set<TreeNodes> treeNodes = treeNodesRepository.findAll();
@@ -102,14 +103,14 @@ public class TreeService {
              nodeRepository.deleteById(nodeId);
 
              treeRepository.save(tree);
-        }
+        } 
     }
 
 
     public void addNodeToTree(Tree tree, Node node, int privacy, int depth) {
         if (tree != null && node != null) {
 
-            Set<TreeNodes> treeNodes = tree.getNodes();
+            Set<TreeNodes> treeNodes = tree.getTreeNodes();
             if (treeNodes.contains(null) || treeNodes == null ) {
                 treeNodes = new HashSet<>();
             }
