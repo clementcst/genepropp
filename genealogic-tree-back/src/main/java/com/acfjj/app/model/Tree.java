@@ -8,7 +8,9 @@ import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -40,7 +42,7 @@ public class Tree implements Serializable {
 		this();
 		this.name=name;
 		this.privacy = privacy;
-		this.treeNodes = treeNode;
+		this.treeNodes.add(treeNode);
 		this.viewOfMonth = 0;
 		this.viewOfYear = 0;
 	}	
@@ -79,11 +81,11 @@ public class Tree implements Serializable {
 	}
 	
 	public void addTreeNodes(TreeNodes treeNode) {
-		this.getNodes().add(treeNode);
+		this.getTreeNodes().add(treeNode);
 	}
 
 	public void setTreeNodes(Set<TreeNodes> treeNode) {
-		this.nodes = treeNode;
+		this.treeNodes = treeNode;
 	}
 
 	//	public void removeTreeNodes(TreeNodes treeNode) {
