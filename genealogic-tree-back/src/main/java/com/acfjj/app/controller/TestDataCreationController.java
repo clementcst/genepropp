@@ -52,7 +52,7 @@ public class TestDataCreationController {
 	}
 	
 	@PostMapping("/test/trees")
-    public Response addTree() {
+    public Void addTree() {
 		List<Tree> Trees = new ArrayList<Tree>(Arrays.asList(new Tree[] {
             new Tree("Tree Bourhara", 1),
             new Tree("Tree Cassiet", 0),
@@ -67,7 +67,7 @@ public class TestDataCreationController {
 	
 
     @PostMapping("/test/nodes")
-    public Response addNodes() {
+    public Void addNodes() {
     	 List<Node> nodes = new ArrayList<Node>(Arrays.asList(new Node[] {
             new Node("Bourhara", "Adam", 1, LocalDate.of(2002, 04, 2), "France", "Cergy", userService.getUser(1), 1, "French", "Some Address", 12345, "Base64Image"),
             new Node("Cassiet", "Clement", 1, LocalDate.of(1899, 07, 9), "Péîs", "Tournant-En-Brie", userService.getUser(2), 2, "Peïsian", "Another Address", 54321, "Base64Image2"),
