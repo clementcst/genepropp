@@ -13,6 +13,8 @@ import com.acfjj.app.model.Node;
 import com.acfjj.app.model.Tree;
 import com.acfjj.app.model.User;
 import com.acfjj.app.service.*;
+import com.acfjj.app.utils.Response;
+
 
 @RestController
 public class TestDataCreationController {
@@ -29,7 +31,7 @@ public class TestDataCreationController {
 	
 		
 	@PostMapping("/test/users") 
-	public response addTestUsers() {
+	public Response addTestUsers() {
 		List<User> users = new ArrayList<User>(Arrays.asList(new User[] {
 			new User("Bourhara", "Adam", 1, LocalDate.of(2002, 04, 2), "France", "Cergy", "adam@mail", "password1","Sécurité socisse", "Telephone ui", "nationality", "adress", 1234, "profilPictureData64"),
 	        new User("Cassiet", "Clement", 1, LocalDate.of(1899, 07, 9), "Péîs", "Tournant-En-Brie", "clement@mail", "password2", "Sécurité socisse", "Telephone ui", "nationality", "adress", 1234, "profilPictureData64"),
@@ -37,13 +39,20 @@ public class TestDataCreationController {
 	        new User("Cerf", "Fabien", 1, LocalDate.of(2002, 03, 9), "France", "Paris", "fabien@mail", "password4", "Sécurité socisse", "Telephone ui", "nationality", "adress", 1234, "profilPictureData64"),
 	        new User("Legrand", "Joan", 1, LocalDate.of(2002, 10, 26), "France", "Paris", "joan@mail", "password5", "Sécurité socisse", "Telephone ui", "nationality", "adress", 1234, "profilPictureData64")
 	    }));
+		List<Response> responses = new ArrayList<>();
 		for (User user : users) {
-			userController.addUser(user);
+			responses.add(userController.addUser(user));
 		}
+		for (Response response : responses) {
+			if(!response.getSuccess()) {
+				return new Response(responses, "On or more failure occured", false);
+			}
+		}
+		return new Response(responses);
 	}
 	
 	@PostMapping("/test/trees")
-    public response addTree() {
+    public Response addTree() {
 		List<Tree> Trees = new ArrayList<Tree>(Arrays.asList(new Tree[] {
             new Tree("Tree Bourhara", 1),
             new Tree("Tree Cassiet", 0),
@@ -58,7 +67,7 @@ public class TestDataCreationController {
 	
 
     @PostMapping("/test/nodes")
-    public response addNodes() {
+    public Response addNodes() {
     	 List<Node> nodes = new ArrayList<Node>(Arrays.asList(new Node[] {
             new Node("Bourhara", "Adam", 1, LocalDate.of(2002, 04, 2), "France", "Cergy", userService.getUser(1), 1, "French", "Some Address", 12345, "Base64Image"),
             new Node("Cassiet", "Clement", 1, LocalDate.of(1899, 07, 9), "Péîs", "Tournant-En-Brie", userService.getUser(2), 2, "Peïsian", "Another Address", 54321, "Base64Image2"),
