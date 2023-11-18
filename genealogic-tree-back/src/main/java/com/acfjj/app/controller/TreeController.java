@@ -17,7 +17,7 @@ import java.util.List;
 @CrossOrigin(origins = "${angular.app.url}")
 public class TreeController{	
 	@Autowired
-	TreeService TreeService;
+	TreeService treeService;
 	@Autowired
     NodeService nodeService;
     @Autowired
@@ -26,17 +26,17 @@ public class TreeController{
 		
     @GetMapping("/trees")
     public List<Tree> getTrees() {
-        return TreeService.getAllTrees();
+        return treeService.getAllTrees();
     }
 
     @GetMapping("/tree/{id}")
     public Tree getTree(@PathVariable Long id) {
-        return TreeService.getTree(id);
+        return treeService.getTree(id);
     }
 
     @DeleteMapping("/tree/{id}")
     public void deleteTree(@PathVariable Long id) {
-    	TreeService.deleteTree(id);
+    	treeService.deleteTree(id);
     }
 	
     @GetMapping("/Nodes")

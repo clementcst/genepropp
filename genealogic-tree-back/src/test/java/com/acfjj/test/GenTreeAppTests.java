@@ -15,9 +15,9 @@ import com.acfjj.test.service.*;
 @SelectClasses({
 	PersonInfoTest.class,
 	UserTest.class,
-	UserServiceTest.class,
 	TreeTest.class,
 	NodeTest.class,
+	UserServiceTest.class,
 	TreeServiceTest.class,
 	NodeServiceTest.class	
 })
