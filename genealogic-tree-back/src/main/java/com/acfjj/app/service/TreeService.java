@@ -38,7 +38,7 @@ public class TreeService {
         return treeRepository.findById(id).orElse(null);
     }
 
-     public void addTree(Tree tree) {
+    public void addTree(Tree tree) {
         if(isNameTaken(tree.getName())){
         	tree.setName(tree.getName()+"2");
     	}
@@ -46,14 +46,15 @@ public class TreeService {
             if(treeNode != null)
         	treeNodesRepository.save(treeNode);
         }    
-        treeRepository.save(tree);
+        treeRepository.save(tree);        
+        return;
     }
 
     public void deleteTree(long id) {
     	Tree tree = getTree(id);
-        Set<TreeNodes> treeNodes = tree.getTreeNodes(); 
+        Set<TreeNodes> treeNodes = tree.getNodes(); 
         for (TreeNodes treeNode : treeNodes) {
-        	  removeNodeFromTree(tree, treeNode.getNode());
+        	removeNodeFromTree(tree, treeNode.getNode());
 //            nodeService.deleteNode(treeNode.getNode().getId());
         }
         treeRepository.deleteById(id);
@@ -63,7 +64,7 @@ public class TreeService {
     public void updateTree(long id, Tree tree) {
         Tree existingTree = getTree(id);
         if (existingTree != null) {
-            Set<TreeNodes> treeNodes = tree.getTreeNodes();
+            Set<TreeNodes> treeNodes = tree.getNodes();
             for (TreeNodes treeNode : treeNodes) {
             	treeNodesRepository.save(treeNode);
             }
@@ -72,12 +73,12 @@ public class TreeService {
         return;
     }
 
-    public boolean isNameTaken(String name) { 
-    	return (getTreeByName(name) == null) ? false : true;
-    }
-    
     public Tree getTreeByName(String name) {
         return treeRepository.findByName(name);
+    }
+
+    public boolean isNameTaken(String name) { 
+    	return (getTreeByName(name) == null) ? false : true;
     }
 
     public List<Tree> getPublicTrees() {
@@ -86,6 +87,7 @@ public class TreeService {
     
     public void deleteNodeFromTree(Long nodeId, Long treeId) {
         Tree tree = getTree(treeId);
+
         if (tree != null) {
         	 Set<TreeNodes> treeNodes = treeNodesRepository.findAll();
 
@@ -96,7 +98,7 @@ public class TreeService {
         				 tree = getTree(treeId);
         			 }
         			 treeNodesRepository.delete(treeNode);
-
+        			 
         		 }
         	 }
              nodeRepository.deleteById(nodeId);
@@ -105,7 +107,7 @@ public class TreeService {
         }
     }
 
-
+    
     public void addNodeToTree(Tree tree, Node node, int privacy, int depth) {
         if (tree != null && node != null) {
 
@@ -123,11 +125,11 @@ public class TreeService {
             }
         }
     }
-
+    
     public void removeNodeFromTree(Tree tree, Node node) {
     	Long treeId = tree.getId();
         if (tree != null && node != null) {
-            Set<TreeNodes> treeNodes = tree.getTreeNodes();
+            Set<TreeNodes> treeNodes = tree.getNodes();
             if (treeNodes != null) {
                 TreeNodes nodeToRemove = treeNodes.stream()
                         .filter(treeNode -> treeNode.getNode().getId().equals(node.getId()))
@@ -138,14 +140,17 @@ public class TreeService {
                 	treeNodes.remove(nodeToRemove);
                     node.setTreeNodes(treeNodes);
                     tree.setTreeNodes(treeNodes);
-
+                    
                     nodeRepository.save(node);
                     nodeToRemove.setTree(null);
                     treeNodesRepository.save(nodeToRemove);
+
                     treeRepository.save(tree);
-                     tree = getTree(treeId);
+                    tree = getTree(treeId);
                 }
             }
         }
     }
+
+
 }

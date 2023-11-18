@@ -1,14 +1,12 @@
 package com.acfjj.app.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -28,19 +26,18 @@ public class Tree implements Serializable {
 	private long viewOfMonth;
 	private long viewOfYear;
 	
-	@JsonIgnore
 	@OneToMany(mappedBy = "tree",fetch=FetchType.EAGER, cascade = CascadeType.ALL)
-	private Set<TreeNodes> treeNodes = new HashSet<>();
+	private Set<TreeNodes> nodes = new HashSet<>();
 	
 	
 	public Tree() {
 		super();
 	}
-	public Tree(String name, int privacy,  TreeNodes treeNode) {
+	public Tree(String name, int privacy,  TreeNodes nodes) {
 		this();
 		this.name=name;
 		this.privacy = privacy;
-		this.treeNodes = treeNode;
+		this.getNodes().add(nodes);
 		this.viewOfMonth = 0;
 		this.viewOfYear = 0;
 	}	
@@ -74,21 +71,21 @@ public class Tree implements Serializable {
 		this.privacy = privacy;
 	}
 	
-	public Set<TreeNodes> getTreeNodes() {
-		return treeNodes;
+	public Set<TreeNodes> getNodes() {
+		return nodes;
 	}
 	
 	public void addTreeNodes(TreeNodes treeNode) {
 		this.getNodes().add(treeNode);
 	}
-
+	
 	public void setTreeNodes(Set<TreeNodes> treeNode) {
 		this.nodes = treeNode;
 	}
-
-	//	public void removeTreeNodes(TreeNodes treeNode) {
-	//		this.getNodes().remove(treeNode);
-	//	}
+	
+//	public void removeTreeNodes(TreeNodes treeNode) {
+//		this.getNodes().remove(treeNode);
+//	}
 
 	public boolean isTreePublic() {
 		return this.getPrivacy() == 1;		
@@ -109,14 +106,7 @@ public class Tree implements Serializable {
 	public void setViewOfYear(long viewOfYear) {
 		this.viewOfYear = viewOfYear;
 	}
-	
-	public List<Node> getNodes() {
-		List<Node> nodes = new ArrayList<>();
-		for (TreeNodes treeNodes : treeNodes) {
-			nodes.add(treeNodes.getNode());
-		}
-		return nodes;
-	}
+
 
 	@Override
 	public boolean equals(Object obj) {
@@ -143,7 +133,7 @@ public class Tree implements Serializable {
 				+ ", privacy=" + privacy 
 				+ ", viewOfMonth=" + viewOfMonth
 				+ ", viewOfYear=" + viewOfYear 
-				+ ", nodes=" + treeNodes + "]";
+				+ ", nodes=" + nodes + "]";
 	}	
 	
 }

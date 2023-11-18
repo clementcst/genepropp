@@ -46,7 +46,7 @@ public class ConversationController{
 		return new Response("Success", true);
 	}
 	
-	@GetMapping("/conversation")
+	@GetMapping(value = "/conversation")
     public Response getConversation(@RequestParam long conversationId) {
         Conversation conversation = conversationService.getConversation(conversationId);
         if (Objects.isNull(conversation)) {

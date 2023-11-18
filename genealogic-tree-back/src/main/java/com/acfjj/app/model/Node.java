@@ -2,19 +2,20 @@ package com.acfjj.app.model;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 
@@ -30,6 +31,7 @@ public class Node implements Serializable {
     @OneToOne
     @JoinColumn(name = "person_info_id")
 	private PersonInfo personInfo;
+    
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "created_by_user_id")
@@ -60,7 +62,7 @@ public class Node implements Serializable {
     
     @JsonIgnore
 	@OneToMany(mappedBy = "node",fetch=FetchType.EAGER)
-	private Set<TreeNodes> treeNodes = new HashSet<>();
+	private Set<TreeNodes> trees = new HashSet<>();
 	
 	public Node() {
 		super();
@@ -112,12 +114,6 @@ public class Node implements Serializable {
 	public Node getParent1() {
 		return parent1;
 	}
-	public Long getParent1Id() {
-		if(Objects.isNull(parent1)) {
-			return null;
-		}
-		return parent1.getId();
-	}
 	public void setParent1(Node parent1) {
 		this.parent1 = parent1;
 	}
@@ -127,14 +123,8 @@ public class Node implements Serializable {
 	public void setParent2(Node parent2) {
 		this.parent2 = parent2;
 	}
-	public Long getParent1Id() {
-		if(Objects.isNull(parent2)) {
-			return null;
-		}
-		return parent2.getId();
-	}
-	public Set<TreeNodes> getTreeNodes() {
-		return treeNodes;
+	public Set<TreeNodes> getTrees() {
+		return trees;
 	}
 	public void addTreeNodes(TreeNodes nodeTree) {
 		this.trees.add(nodeTree);
@@ -142,10 +132,11 @@ public class Node implements Serializable {
 	public void setTreeNodes(Set<TreeNodes> nodeTree) {
 		this.trees = nodeTree;
 	}
-
+	
 	public void removeTreeNodes(TreeNodes treeNode) {
 		this.trees.remove(treeNode);
 	}
+
 	
 	public Node getPartner() {
 		return partner;
@@ -153,27 +144,11 @@ public class Node implements Serializable {
 	public void setPartner(Node partner) {
 		this.partner = partner;
 	}
-	public Long getPartnerId() {
-		if(Objects.isNull(partner)) {
-			return null;
-		}
-		return partner.getId();
-	}
 	public Set<Node> getExPartners() {
 		return exPartners;
 	}
 	public void addExPartners(Node exPartner) {
 		this.exPartners.add(exPartner);
-	}
-	public List<Long> getExPartnersId() {
-		if(Objects.isNull(exPartners)) {
-			return null;
-		} 
-		List<Long> exPartnersId = new ArrayList<>();
-		for (Node exPartner : exPartners) {
-			exPartnersId.add(exPartner.getId());
-		}
-		return exPartnersId;
 	}
 	public Set<Node> getSiblings() {
 		return siblings;
@@ -181,19 +156,10 @@ public class Node implements Serializable {
 	public void addSiblings(Node sibling) {
 		this.siblings.add(sibling);
 	}
-	public List<Long> getSiblingsId() {
-		if(Objects.isNull(siblings)) {
-			return null;
-		} 
-		List<Long> siblingsId = new ArrayList<>();
-		for (Node sibling : siblings) {
-			siblingsId.add(sibling.getId());
-		}
-		return siblingsId;
-	}
 	public boolean isOrphan() {
 		return (Objects.isNull(this.getParent1()) && Objects.isNull(this.getParent2()) && this.getSiblings().isEmpty() && Objects.isNull(this.getPartner()) && this.getExPartners().isEmpty());
-	}	
+	}
+	
 	public int getPrivacy() {
 		return privacy;
 	}
@@ -243,15 +209,7 @@ public class Node implements Serializable {
 	public String getProfilPictureData64() {
 	    return personInfo.getProfilPictureData64();
 	}
-	
-	@JsonIgnore
-	public List<Tree> getTree() {
-		List<Tree> trees = new ArrayList<>();
-		for (TreeNodes treeNodes : treeNodes) {
-			trees.add(treeNodes.getTree());
-		}
-		return trees;
-	}
+
 	
 	@Override
 	public boolean equals(Object obj) {
@@ -297,12 +255,12 @@ public class Node implements Serializable {
 				+ ", personInfo=" + personInfo 
 				+ ", createdBy=" + createdBy.getId()
 				+ ", privacy=" + privacy
-				+ ", parent1=" + getParent2Id()
-				+ ", parent2=" + getParent2Id()
-				+ ", partner=" + getPartnerId()
-				+ ", exPartners=" +  getExPartnersId()
-				+ ", siblings=" + getSiblingsId()
-				+ ", trees= faire getTreesId" + "]";
+				+ ", parent1=" + parent1Id
+				+ ", parent2=" + parent2Id
+				+ ", partner=" + partnerId 
+				+ ", exPartners=" + exPartners
+				+ ", siblings=" + siblings 
+				+ ", trees=" + trees + "]";
 	}
 	
 }

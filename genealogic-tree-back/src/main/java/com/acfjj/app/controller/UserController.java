@@ -34,25 +34,13 @@ public class UserController{
 	NodeService nodeService;
 			
 	@GetMapping("/users") 
-	public Response getUsers() {
-		return new Response(userService.getAllUsers());
+	public List<User> getUsers() {
+		return userService.getAllUsers();
 	}
 	
-	@GetMapping("/user") 
-	public Response getUser(@RequestParam Long userId) {
-		return new Response(userService.getUser(userId));
-	}
-	
-	@GetMapping("/login")
-	public Response login(@RequestParam String email, @RequestParam String password) {
-		User user = userService.getUserByEmail(email);
-		if(Objects.isNull(user)) {
-			return new Response("Incorrect email", false);
-		}
-		if(!user.getPassword().equals(password)) {
-			return new Response("Incorrect password", false);
-		}
-		return new Response(user.getId(), "Login Success", true);
+	@GetMapping("/user/{id}") 
+	public User getUser(@PathVariable Long id) {
+		return userService.getUser(id);
 	}
 	
 	@PostMapping("/user") 
@@ -81,10 +69,9 @@ public class UserController{
 		if(Objects.isNull(node)) {
 			return new Response("Fail to create user's node: step 3 failed", false);
 		}
-		tree.addNode(node, 1, 0);
+//		tree.addNode(node, 1, 0);
+		System.out.println(tree);
 		treeService.updateTree(tree.getId(), tree);
-		user.setMyTree(tree);
-		userService.updateUser(user.getId(), user);
 		return new Response("Success", true);
 	}
 	

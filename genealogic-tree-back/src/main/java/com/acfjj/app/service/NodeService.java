@@ -24,7 +24,7 @@ public class NodeService {
     @Autowired
     NodeRepository nodeRepository;
     @Autowired
-    PersonInfoRepository personInfoRepository;
+	PersonInfoRepository personInfoRepository;
     @Autowired
     TreeRepository treeRepository;
     @Autowired
@@ -42,7 +42,7 @@ public class NodeService {
 
     public void addNode(Node node) {
     	personInfoRepository.save(node.getPersonInfo());
-    	for (TreeNodes treeNode : node.getTreeNodes()) {
+    	for (TreeNodes treeNode : node.getTrees()) {
     		if(treeNode != null)
             treeNodesRepository.save(treeNode);
         }
@@ -78,7 +78,7 @@ public class NodeService {
     }
 
 
-   public void deleteNode(Long id) {
+    public void deleteNode(Long id) {
     	//regarder si le créateur est celui qui veux delete
         Node node = getNode(id);
         PersonInfo person = node.getPersonInfo();
@@ -107,9 +107,11 @@ public class NodeService {
     	        			parcoursNode.getSiblings().remove(Siblings);
     	        		}
     	        	}
-            		updateNode(parcoursNode.getId(), parcoursNode);
-		}
-	}
+            	updateNode(parcoursNode.getId(), parcoursNode);
+        		}
+        	}
+        		
+        	
             if (node.isOrphan()) {
                 PersonInfo personInfo = node.getPersonInfo();
                 if (personInfo != null) {
@@ -138,6 +140,7 @@ public class NodeService {
     
     
     public boolean doesNodeBelongToTree(Long nodeId, Long treeId) {
+
         Node node = getNode(nodeId);
         Tree tree = treeRepository.findById(treeId).orElse(null);
 
@@ -145,7 +148,7 @@ public class NodeService {
             return false;
         }
 
-        Set<TreeNodes> treeNodes = node.getTreeNodes();
+        Set<TreeNodes> treeNodes = node.getTrees();
         for (TreeNodes treeNode : treeNodes) {
             if (treeNode.getTree().equals(tree)) {
                 return true;
