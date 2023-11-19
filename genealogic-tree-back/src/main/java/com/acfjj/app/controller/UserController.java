@@ -64,14 +64,8 @@ public class UserController{
 		if(Objects.isNull(user)) {
 			return new Response("Fail to create user: step 1 failed", false);
 		}
-		String defaultTreeName = firstName + " " + lastName + "'s Tree";
-		Integer nameInt = 1;
-		String treeName = defaultTreeName;
-//		while() { //mettre le check de verification  si le nom du tree exite
-//			nameInt++;
-//			treeName = defaultTreeName + nameInt.toString(); 
-//		}
-		treeService.addTree(new Tree(treeName, 0));
+		String treeName = firstName + " " + lastName + "'s Tree";
+		treeName = treeService.addTree(new Tree(treeName, 0));
 		Tree tree = treeService.getTreeByName(treeName);
 		if(Objects.isNull(tree)) {
 			return new Response("Fail to create user's Tree: step 2 failed", false);

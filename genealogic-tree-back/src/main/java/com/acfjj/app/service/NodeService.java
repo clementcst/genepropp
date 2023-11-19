@@ -10,6 +10,7 @@ import com.acfjj.app.model.User;
 import com.acfjj.app.repository.PersonInfoRepository;
 import com.acfjj.app.repository.TreeNodesRepository;
 import com.acfjj.app.repository.TreeRepository;
+import com.acfjj.app.repository.UserRepository;
 import com.acfjj.app.repository.NodeRepository;
 
 import java.time.LocalDate;
@@ -29,6 +30,8 @@ public class NodeService {
     TreeRepository treeRepository;
     @Autowired
     TreeNodesRepository treeNodesRepository;
+    @Autowired
+    UserRepository userRepository;
 
     public List<Node> getAllNodes() {
         List<Node> nodes = new ArrayList<>();
@@ -39,6 +42,7 @@ public class NodeService {
     public Node getNode(Long id) {
         return nodeRepository.findById(id).orElse(null);
     }
+
 
     public void addNode(Node node) {
     	personInfoRepository.save(node.getPersonInfo());
@@ -81,10 +85,20 @@ public class NodeService {
 
 
    public void deleteNode(Long id) {
-    	//regarder si le créateur est celui qui veux delete
         Node node = getNode(id);
-        PersonInfo person = node.getPersonInfo();
-//        User user = userService.getUserByNameAndBirthInfo(person.getLastName(), person.getFirstName(), person.getDateOfBirth(), person.getCountryOfBirth(), person.getCityOfBirth());
+//        PersonInfo person = node.getPersonInfo();
+//        List<User> users = userRepository.findAll();
+//        for(User user : users) {
+//        	if(user.getPersonInfo().equals(person)) {
+//        		if(node.getCreatedBy().equals(user)) {
+//        			//faut supprimer le user avant
+//        		} else {
+//        			//pas le droit
+//        			return;
+//        		}
+//        		
+//        	}
+//        }
         if(node.getPersonInfo() != null)
         if (node != null) {
         	List<Node> nodes = getAllNodes();
