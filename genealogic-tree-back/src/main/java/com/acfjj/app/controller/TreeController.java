@@ -8,10 +8,12 @@ import com.acfjj.app.model.Tree;
 import com.acfjj.app.service.NodeService;
 import com.acfjj.app.service.TreeService;
 import com.acfjj.app.service.UserService;
+import com.acfjj.app.utils.Response;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @CrossOrigin(origins = "${angular.app.url}")
@@ -25,13 +27,13 @@ public class TreeController{
 
 		
     @GetMapping("/trees")
-    public List<Tree> getTrees() {
-        return treeService.getAllTrees();
+    public Response getTrees() {
+        return new Response(treeService.getAllTrees());
     }
 
     @GetMapping("/tree/{id}")
-    public Tree getTree(@PathVariable Long id) {
-        return treeService.getTree(id);
+    public Response getTree(@PathVariable Long id) {
+        return new Response(treeService.getTree(id));
     }
 
     @DeleteMapping("/tree/{id}")
@@ -40,13 +42,13 @@ public class TreeController{
     }
 	
     @GetMapping("/Nodes")
-    public List<Node> getNodes() {
-        return nodeService.getAllNodes();
+    public Response getNodes() {
+        return new Response(nodeService.getAllNodes());
     }
 
     @GetMapping("/Node/{id}")
-    public Node getNode(@PathVariable Long id) {
-        return nodeService.getNode(id);
+    public Response getNode(@PathVariable Long id) {
+        return new Response(nodeService.getNode(id));
     }
     
     @PutMapping("/Node/{id}/updateParent")
@@ -63,5 +65,61 @@ public class TreeController{
     @PutMapping("/Node/{id}")
     public void updateNode(@PathVariable Long id, @RequestBody Node node) {
         nodeService.updateNode(id, node);
+    }
+    
+    @PutMapping("/addNode")
+    public Response addNode(@RequestParam Node node) {
+        nodeService.addNode(node);
+        node = nodeService.getNode(node.getId());
+		if(Objects.isNull(node)) {
+			return new Response("Fail to create user's Tree: step 2 failed", false);
+		}
+		return new Response("Success", true);
+    }
+    
+    @PutMapping("/addTree")
+    public Response addTree(@RequestParam Tree tree) {
+        treeService.addTree(tree);
+        tree = treeService.getTreeByName(tree.getName());
+		if(Objects.isNull(tree)) {
+			return new Response("Fail to create user's Tree: step 2 failed", false);
+		}
+		return new Response("Success", true);
+    }
+    @PutMapping("/Node/addParent")
+    public Response addParent(@RequestParam Long treeId, @RequestParam Node node, @RequestParam Node parent, @RequestParam int privacy, @RequestParam int wichParent) {
+        treeService.addParentToNodeInTree(treeId, node, parent, privacy, wichParent);
+        node = nodeService.getNode(node.getId());
+		if(Objects.isNull(node)) {
+			return new Response("Fail to create user's Tree: step 2 failed", false);
+		}
+		return new Response("Success", true);
+    }
+    @PutMapping("/Node/addPartner")
+    public Response addPartner(@RequestParam Long treeId, @RequestParam Node node, @RequestParam Node Partner, @RequestParam int privacy) {
+    	treeService.addPartnerToNodeInTree(treeId, node, Partner, privacy);
+        node = nodeService.getNode(node.getId());
+		if(Objects.isNull(node)) {
+			return new Response("Fail to create user's Tree: step 2 failed", false);
+		}
+		return new Response("Success", true);
+    }
+    @PutMapping("/Node/addSiblings")
+    public Response addSiblings(@RequestParam Long treeId, @RequestParam Node node, @RequestParam Node sibling, @RequestParam int privacy) {
+    	treeService.addSiblingsToTree(treeId, node, sibling, privacy);
+        node = nodeService.getNode(node.getId());
+		if(Objects.isNull(node)) {
+			return new Response("Fail to create user's Tree: step 2 failed", false);
+		}
+		return new Response("Success", true);
+    }
+    @PutMapping("/Node/addExPartner")
+    public Response addExPartner(@RequestParam Long treeId, @RequestParam Node node, @RequestParam Node exPartner, @RequestParam int privacy) {
+    	treeService.addExPartnerToNodeInTree(treeId, node, exPartner, privacy);
+        node = nodeService.getNode(node.getId());
+		if(Objects.isNull(node)) {
+			return new Response("Fail to create user's Tree: step 2 failed", false);
+		}
+		return new Response("Success", true);
     }
 }
