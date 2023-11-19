@@ -118,8 +118,9 @@ public class TreeService {
             if (!associationExists) {
                 TreeNodes treeNode = new TreeNodes(tree, node, privacy, depth);
                 treeNodesRepository.save(treeNode);
-                treeNodes.add(treeNode);
-                node.setTreeNodes(treeNodes);
+                tree.addTreeNodes(treeNode);
+                node.addTreeNodes(treeNode);
+                nodeRepository.save(node);
                 treeRepository.save(tree);
             }
         }
