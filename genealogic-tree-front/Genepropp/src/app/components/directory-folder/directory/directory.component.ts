@@ -16,7 +16,7 @@ export class DirectoryComponent implements OnInit {
 
   ngOnInit(): void {
     this.userService.getUsers().subscribe((data) => {
-      this.users = data;
+      this.users = data.value; 
     });
   }
 

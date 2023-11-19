@@ -2,6 +2,12 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+interface TreeResponce {
+  value: any[];
+  message: string | null;
+  success: boolean;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -9,7 +15,7 @@ export class TreeService {
 
   constructor(private http: HttpClient) { }
 
-  getTree(id: number):Observable<any[]> {
-    return this.http.get<any[]>(`http://localhost:8080/tree/${id}`,{responseType: 'json'});
+  getTree(id: number):Observable<TreeResponce> {
+    return this.http.get<TreeResponce>(`http://localhost:8080/tree/${id}`,{responseType: 'json'});
   }
 }
