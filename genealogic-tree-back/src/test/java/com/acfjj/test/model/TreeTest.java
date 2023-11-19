@@ -57,10 +57,11 @@ public class TreeTest {
     @MethodSource("testData")
     void testTreeConstructor(String name, int privacy, TreeNodes nodes,long viewOfMonth, long viewOfYear) {
         Tree tree = new Tree(name, privacy);
-        assertTrue(tree.getTreeNodes().contains(null));
         assertAll(() -> {
             assertEquals(name, tree.getName());
             assertEquals(privacy, tree.getPrivacy());
+            assertEquals(viewOfMonth, tree.getViewOfMonth());
+            assertEquals(viewOfYear, tree.getViewOfYear());
         });
     }
 
