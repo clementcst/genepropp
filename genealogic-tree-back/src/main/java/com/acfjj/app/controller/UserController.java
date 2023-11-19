@@ -82,7 +82,7 @@ public class UserController{
 			return new Response("Fail to create user's node: step 3 failed", false);
 		}
 		treeService.addNodeToTree(tree, node, 1, 0);
-		treeService.updateTree(tree.getId(), tree);
+		tree = treeService.getTree(tree.getId());
 		user.setMyTree(tree);
 		userService.updateUser(user.getId(), user);
 		return new Response("Success", true);
