@@ -16,7 +16,7 @@ export class ProfilLeftComponent implements OnInit {
 
   ngOnInit(): void {
     this.treeService.getTree(1).subscribe((data) => {
-      this.tree = data.value;
+      this.tree = data;
       this.boxs = [
         { title: "Month views", value: this.tree.viewOfMonth },
         { title: "Annual views", value: this.tree.viewOfYear },
