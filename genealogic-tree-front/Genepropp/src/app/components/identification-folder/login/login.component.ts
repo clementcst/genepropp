@@ -21,7 +21,6 @@ export class LoginComponent {
   onSubmit() {
     this.identificationService.loginattempt(this.privatecode, this.password)
       .subscribe((response) => {
-        alert(response)
         if (response.success) {
           this.cookieService.set('userId', response.value.id);
           this.router.navigate(['homePage']);
