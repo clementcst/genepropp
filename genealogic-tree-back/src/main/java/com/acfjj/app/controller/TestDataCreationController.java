@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.acfjj.app.model.Node;
 import com.acfjj.app.model.Tree;
 import com.acfjj.app.model.User;
+import com.acfjj.app.repository.TreeRepository;
 import com.acfjj.app.service.*;
 import com.acfjj.app.utils.Response;
 
@@ -27,6 +28,8 @@ public class TestDataCreationController {
 	NodeService nodeService;
 	@Autowired
 	ConversationService conversationService;
+	@Autowired
+	TreeController treeController;
 	
 		
 	@PostMapping("/test/users") 
@@ -52,17 +55,43 @@ public class TestDataCreationController {
 	}
 	
 	@PostMapping("/test/trees")
-    public void addTree() {
-		List<Tree> Trees = new ArrayList<Tree>(Arrays.asList(new Tree[] {
-            new Tree("Tree Bourhara", 1),
-            new Tree("Tree Cassiet", 0),
-            new Tree("Tree Gautier", 0),
-            new Tree("Tree Cerf", 1),
-            new Tree("Tree Legrand", 2)
-        }));
-		for (Tree tree : Trees) {
-			treeService.addTree(tree);
+    public Response addTree() {
+            Tree tree = treeService.getTree(1);
+            Node node = nodeService.getNode((long) 1);
+            Node parent1 = nodeService.getNode((long) 2);
+            Node partner = nodeService.getNode((long) 3);
+            Node siblings = nodeService.getNode((long) 4);
+            Node exPartner = nodeService.getNode((long) 5);
+            
+    	List<Response> responses = new ArrayList<>();
+		responses.add(treeController.addParent(tree.getId(), node,parent1, 1, 1));
+		responses.add(treeController.addPartner(tree.getId(), node,partner, 0));
+		responses.add(treeController.addSiblings(tree.getId(), node,siblings, 1));
+		responses.add(treeController.addExPartner(tree.getId(), node,exPartner, 0));
+		
+		
+        Node newNode1 = new Node("Dupont", "Camille" , 0, LocalDate.of(2002, 04, 2), "Pays", "Ville", userService.getUser(1), 1, "Nationalité", "Adresse", 12345, "Base64Image");
+        nodeService.addNode(newNode1);
+	    newNode1 = nodeService.getNode((long) 6);
+	    responses.add(treeController.addParent(tree.getId(), node,newNode1, 1, 2));
+	    responses.add(treeController.addPartner(tree.getId(), newNode1,parent1, 0));
+	    Node newNode2 = new Node("Silva", "Rafael" , 1, LocalDate.of(2002, 04, 2), "Pays", "Ville", userService.getUser(1), 1, "Nationalité", "Adresse", 12345, "Base64Image");
+        nodeService.addNode(newNode2);
+        newNode2 = nodeService.getNode((long) 7);
+	    responses.add(treeController.addParent(tree.getId(), newNode1,newNode2, 1, 2));
+
+	    Node newNode3 = new Node("Petrov", "Yuri" , 1, LocalDate.of(2002, 04, 2), "Pays", "Ville", userService.getUser(1), 1, "Nationalité", "Adresse", 12345, "Base64Image");
+        nodeService.addNode(newNode3);
+        newNode3 = nodeService.getNode((long) 8);
+	    responses.add(treeController.addSiblings(tree.getId(), newNode1,newNode3, 1));
+
+
+		for (Response response : responses) {
+			if(!response.getSuccess()) {
+				return new Response(responses, "On or more failure occured", false);
+			}
 		}
+		return new Response(responses);
     }
 	
 
