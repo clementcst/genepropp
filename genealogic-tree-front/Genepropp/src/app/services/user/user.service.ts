@@ -21,6 +21,7 @@ export class UserService {
   }
 
   getUser(id: number):Observable<UserResponse> {
-    return this.http.get<UserResponse>(`http://localhost:8080/user/${id}`,{responseType: 'json'});
+    const params = { userId: id.toString() };
+    return this.http.get<UserResponse>(`http://localhost:8080/user`,{params, responseType: 'json'});
   }
 }
