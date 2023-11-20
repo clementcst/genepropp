@@ -21,7 +21,6 @@ export class ProfilRigthComponent implements OnInit {
     this.userService.getUser(this.cookieService.get('userId')).subscribe((data) => {
       this.user = data.value;
 
-      // Define inputs1 after receiving data
       this.inputs1 = [
         { label: "firstname", type: "text", fieldname: "Firstname", value: this.user.firstName, disabled: true },
         { label: "lastname", type: "text", fieldname: "Lastname", value: this.user.lastName, disabled: true },
