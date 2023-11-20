@@ -9,7 +9,7 @@ import { IdentificationService } from '../../../services/identificaton/identific
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
-  privatecode: string = '';
+  email: string = '';
   password: string = '';
 
   constructor(
@@ -19,7 +19,7 @@ export class LoginComponent {
     ) {}
 
   onSubmit() {
-    this.identificationService.loginattempt(this.privatecode, this.password)
+    this.identificationService.loginattempt(this.email, this.password)
       .subscribe((response) => {
         if (response.success) {
           this.cookieService.set('userId', response.value.id);
