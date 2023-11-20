@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { UserService } from '../../../services/user/user.service';
+import { CookieService } from 'ngx-cookie-service';
 
 @Component({
   selector: 'app-profil-rigth',
@@ -11,12 +12,13 @@ export class ProfilRigthComponent implements OnInit {
   inputs1: any[] = [];
   inputs2: any[] = [];
 
-  constructor(private userService : UserService ) { 
+  constructor(private userService : UserService, private cookieService: CookieService) { 
     this.userService = userService;
+    this.cookieService = cookieService;
   }
 
   ngOnInit(): void {
-    this.userService.getUser(2).subscribe((data) => {
+    this.userService.getUser(this.cookieService.get('userId')).subscribe((data) => {
       this.user = data.value;
 
       // Define inputs1 after receiving data

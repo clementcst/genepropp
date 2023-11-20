@@ -22,7 +22,7 @@ export class LoginComponent {
     this.identificationService.loginattempt(this.email, this.password)
       .subscribe((response) => {
         if (response.success) {
-          this.cookieService.set('userId', response.value.id);
+          this.cookieService.set('userId', response.value);
           this.router.navigate(['homePage']);
         }
         else {
