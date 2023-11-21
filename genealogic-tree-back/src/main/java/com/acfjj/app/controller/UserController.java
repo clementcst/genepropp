@@ -44,10 +44,10 @@ public class UserController{
 	}
 	
 	@GetMapping("/login")
-	public Response login(@RequestParam String email, @RequestParam String password) {
-		User user = userService.getUserByEmail(email);
+	public Response login(@RequestParam String privateCode, @RequestParam String password) {
+		User user = userService.getUserByPrivateCode(privateCode);
 		if(Objects.isNull(user)) {
-			return new Response("Incorrect email", false);
+			return new Response("Incorrect private code", false);
 		}
 		if(!user.getPassword().equals(password)) {
 			return new Response("Incorrect password", false);
