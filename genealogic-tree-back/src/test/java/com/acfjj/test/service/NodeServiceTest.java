@@ -2,13 +2,8 @@ package com.acfjj.test.service;
 
 import com.acfjj.app.GenTreeApp;
 import com.acfjj.app.model.Node;
-import com.acfjj.app.model.PersonInfo;
 import com.acfjj.app.model.Tree;
-import com.acfjj.app.model.TreeNodes;
 import com.acfjj.app.model.User;
-import com.acfjj.app.repository.NodeRepository;
-import com.acfjj.app.repository.PersonInfoRepository;
-import com.acfjj.app.repository.TreeRepository;
 import com.acfjj.app.service.NodeService;
 import com.acfjj.app.service.TreeService;
 import com.acfjj.app.service.UserService;
@@ -24,10 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -48,9 +40,6 @@ public class NodeServiceTest {
     
     @Autowired
     private TreeService treeService;
-
-    @Autowired
-    private TreeRepository treeRepository;
 
     @Test
     @Order(1)

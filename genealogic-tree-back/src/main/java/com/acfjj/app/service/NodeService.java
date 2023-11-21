@@ -6,7 +6,6 @@ import com.acfjj.app.model.Node;
 import com.acfjj.app.model.PersonInfo;
 import com.acfjj.app.model.Tree;
 import com.acfjj.app.model.TreeNodes;
-import com.acfjj.app.model.User;
 import com.acfjj.app.repository.PersonInfoRepository;
 import com.acfjj.app.repository.TreeNodesRepository;
 import com.acfjj.app.repository.TreeRepository;
@@ -42,7 +41,6 @@ public class NodeService {
     public Node getNode(Long id) {
         return nodeRepository.findById(id).orElse(null);
     }
-
 
     public void addNode(Node node) {
     	personInfoRepository.save(node.getPersonInfo());

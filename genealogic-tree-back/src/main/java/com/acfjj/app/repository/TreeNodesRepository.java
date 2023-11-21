@@ -4,7 +4,6 @@ import java.util.Set;
 
 import org.springframework.data.repository.CrudRepository;
 
-import com.acfjj.app.model.Tree;
 import com.acfjj.app.model.TreeNodes;
 
 
