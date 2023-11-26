@@ -9,7 +9,7 @@ import { IdentificationService } from '../../../services/identificaton/identific
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit{
-  email: string = '';
+  privatecode: string = '';
   password: string = '';
   authenticationError: boolean = false;
 
@@ -25,8 +25,9 @@ export class LoginComponent implements OnInit{
   }
 
   onSubmit() {
-    this.identificationService.loginattempt(this.email, this.password)
+    this.identificationService.loginattempt(this.privatecode, this.password)
       .subscribe((response) => {
+        console.log(response)
         if (response.success) {
           this.cookieService.set('userId', response.value);
           this.router.navigate(['homePage']);

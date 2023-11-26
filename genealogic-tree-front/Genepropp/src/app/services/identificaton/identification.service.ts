@@ -15,9 +15,9 @@ export class IdentificationService {
 
   constructor(private http: HttpClient) { }
 
-  loginattempt(email: string, password: string):Observable<any> {
+  loginattempt(privatecode: string, password: string):Observable<any> {
     const params = {
-      email : email,
+      privatecode : privatecode,
       password : password
     }
     return this.http.get<UserResponse>("http://localhost:8080/login", {params, responseType: 'json'});

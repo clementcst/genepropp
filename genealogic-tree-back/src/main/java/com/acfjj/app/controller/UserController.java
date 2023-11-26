@@ -44,8 +44,8 @@ public class UserController{
 	}
 	
 	@GetMapping("/login")
-	public Response login(@RequestParam String privateCode, @RequestParam String password) {
-		User user = userService.getUserByPrivateCode(privateCode);
+	public Response login(@RequestParam String privatecode, @RequestParam String password) {
+		User user = userService.getUserByPrivateCode(privatecode);
 		if(Objects.isNull(user)) {
 			return new Response("Incorrect private code", false);
 		}
