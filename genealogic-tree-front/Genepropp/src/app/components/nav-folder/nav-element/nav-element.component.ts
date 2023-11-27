@@ -7,9 +7,8 @@ import { CookieService } from 'ngx-cookie-service';
   styleUrls: ['./nav-element.component.css']
 })
 export class NavElementComponent implements OnInit {
-  @Input()
+  @Input() page!: any;
 
-  page!: any;
   constructor(private cookieService: CookieService) { }
 
   ngOnInit(): void { }
