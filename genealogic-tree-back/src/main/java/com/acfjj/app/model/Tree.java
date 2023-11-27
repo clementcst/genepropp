@@ -80,6 +80,15 @@ public class Tree implements Serializable {
 		return treeNodes;
 	}
 	
+	public TreeNodes getTreeNodesByNode(Node node) {
+		for(TreeNodes treeNodes : getTreeNodes()) {
+			if(treeNodes.getNode().equals(node)) {
+				return treeNodes;
+			}
+		}		 
+		return null;
+	}
+	
 	public void addTreeNodes(TreeNodes treeNode) {
 		this.getTreeNodes().add(treeNode);
 	}
@@ -91,9 +100,8 @@ public class Tree implements Serializable {
 	//	public void removeTreeNodes(TreeNodes treeNode) {
 	//		this.getNodes().remove(treeNode);
 	//	}
-	
-	@JsonIgnore
-	public boolean isPublic() {
+
+	public boolean isTreePublic() {
 		return this.getPrivacy() == 1;		
 	}
 	

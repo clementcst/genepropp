@@ -5,11 +5,14 @@ import org.springframework.web.bind.annotation.*;
 
 import com.acfjj.app.model.Node;
 import com.acfjj.app.model.Tree;
+import com.acfjj.app.model.User;
 import com.acfjj.app.service.NodeService;
 import com.acfjj.app.service.TreeService;
 import com.acfjj.app.service.UserService;
 import com.acfjj.app.utils.Response;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Objects;
 
 @RestController
@@ -28,39 +31,64 @@ public class TreeController{
         return new Response(treeService.getAllTrees());
     }
 
-    @GetMapping("/tree/{id}")
-    public Response getTree(@PathVariable Long id) {
+    @GetMapping("/tree")
+    public Response getTree(@RequestParam Long id) {
         return new Response(treeService.getTree(id));
     }
 
-    @DeleteMapping("/tree/{id}")
-    public void deleteTree(@PathVariable Long id) {
-    	treeService.deleteTree(id);
+    @DeleteMapping("/tree")
+    public Response deleteTree(@RequestParam Long treeId) {
+    	Tree tree = treeService.getTree(treeId);
+    	for(Node node : tree.getNodes()) {
+    		if(userService.getUserByNameAndBirthInfo(node.getLastName(), node.getFirstName(), node.getDateOfBirth(), node.getCountryOfBirth(), node.getCityOfBirth()) != null && node.getTrees().size() > 1) {
+    			treeService.removeNodeFromTree(tree, node);
+    		}
+    		else if(node.getTrees().size() == 1){
+    			return new Response("Nodes cannot be without tree, so you can't delete this tree", false);
+    		}
+    		else {
+    			deleteNodeInTree(node, treeId);
+    		}
+    	}
+    	treeService.deleteTree(treeId);
+    	return new Response("Success", true);
     }
 	
-    @GetMapping("/Nodes")
+    @GetMapping("/nodes")
     public Response getNodes() {
         return new Response(nodeService.getAllNodes());
     }
 
-    @GetMapping("/Node/{id}")
-    public Response getNode(@PathVariable Long id) {
+    @GetMapping("/node")
+    public Response getNode(@RequestParam Long id) {
         return new Response(nodeService.getNode(id));
     }
-    
-    @PutMapping("/Node/{id}/updateParent")
-    public void updateParent(@PathVariable Long id, @RequestParam Long parentId, @RequestParam int parentNumber) {
-        nodeService.updateParent(id, parentId, parentNumber);
+
+
+    @DeleteMapping("/node")
+    public Response deleteNodeInTree(@RequestParam Node node, @RequestParam Long treeId) {
+    	Tree tree = treeService.getTree(treeId);
+    	if(nodeService.doesNodeBelongToTree(node, treeId) == true) {
+    		List<User> users = userService.getAllUsers();
+    		for (User user : users) {
+    			if(node.getCreatedBy() == user) {
+    				nodeService.removeLinks(node.getId());
+    				nodeService.deleteNode(node.getId());
+    				for(Node nodes : tree.getNodes()) {
+    					if(nodes.isOrphan()) {
+    						nodeService.deleteNode(nodes.getId());
+    					}
+    				}
+    			}
+    			
+    		}
+    		return new Response("You cannot delete this node", false);
+    	}
+    	return new Response("This node is not in your tree", false);
     }
 
-
-    @DeleteMapping("/Node/{id}")
-    public void deleteNode(@PathVariable Long id) {
-        nodeService.deleteNode(id);
-    }
-
-    @PutMapping("/Node/{id}")
-    public void updateNode(@PathVariable Long id, @RequestBody Node node) {
+    @PutMapping("/updateNode")
+    public void updateNode(@RequestParam Long id, @RequestParam Node node) {
         nodeService.updateNode(id, node);
     }
     
@@ -83,40 +111,126 @@ public class TreeController{
 		}
 		return new Response("Success", true);
     }
-    @PutMapping("/Node/addParent")
-    public Response addParent(@RequestParam Long treeId, @RequestParam Node node, @RequestParam Node parent, @RequestParam int privacy, @RequestParam int wichParent) {
-        treeService.addParentToNodeInTree(treeId, node, parent, privacy, wichParent);
-        node = nodeService.getNode(node.getId());
-		if(Objects.isNull(node)) {
-			return new Response("Fail to create user's Tree: step 2 failed", false);
-		}
-		return new Response("Success", true);
+    
+    @PutMapping("/node/addNodeWithLink")
+    public Response addLinkedNode(@RequestParam Long treeId, @RequestParam long linkedNodeId, @RequestParam Node nodeToAdd, @RequestParam int privacy, @RequestParam String type, @RequestParam boolean alreadyInTree) {
+    	Node linkedNode = nodeService.getNode(linkedNodeId);
+    	if(!alreadyInTree) {
+    		if(!canCreateNodeInTree(nodeToAdd, treeId)){
+    			return new Response("Node cannot be added", false);
+    		}
+    	}
+    	if(autorizedLink(treeId, linkedNode, nodeToAdd)) {
+    		switch(type.toUpperCase()) {
+	    		case "PARENT" :
+	    			treeService.addParentToNodeInTree(treeId, linkedNode, nodeToAdd, privacy);
+	        		break;
+				case "PARTNER" :
+					treeService.addPartnerToNodeInTree(treeId, linkedNode, nodeToAdd, privacy);
+				    break;
+				case "SIBLINGS" :
+					treeService.addSiblingsToTree(treeId, linkedNode, nodeToAdd, privacy);
+	        		break;
+				case "EXPARTNER" :
+					treeService.addExPartnerToNodeInTree(treeId, linkedNode, nodeToAdd, privacy);
+	        		break;
+				default :
+					return new Response("No link founded", false);
+	        }    
+			nodeToAdd = nodeService.getNodeByNameAndBirthInfo(nodeToAdd.getLastName(), nodeToAdd.getFirstName(), nodeToAdd.getDateOfBirth(), nodeToAdd.getCountryOfBirth(), nodeToAdd.getCityOfBirth());
+			if(Objects.isNull(nodeToAdd)) {
+				return new Response("Fail to create node in Tree", false);
+			}
+			return new Response("Success", true);
+    	}   
+    	return new Response("Link not possible", false);
     }
-    @PutMapping("/Node/addPartner")
-    public Response addPartner(@RequestParam Long treeId, @RequestParam Node node, @RequestParam Node Partner, @RequestParam int privacy) {
-    	treeService.addPartnerToNodeInTree(treeId, node, Partner, privacy);
-        node = nodeService.getNode(node.getId());
-		if(Objects.isNull(node)) {
-			return new Response("Fail to create user's Tree: step 2 failed", false);
-		}
-		return new Response("Success", true);
+    
+    // faire les remove links
+    
+    public boolean canCreateNodeInTree(Node node, Long treeId) {
+    	if(nodeService.getNode(node.getId()) != null) {
+    		if(userService.getUserByNameAndBirthInfo(node.getLastName(), node.getFirstName(), node.getDateOfBirth(), node.getCountryOfBirth(), node.getCityOfBirth()) != null) {
+//    			if(C est bien lui ?){
+//	    		    if(V1)
+//	    			message à l'autre gars pour qu'il accepte de rejoindre ton arbre
+//	    				return false;
+//	    		    else if V2{
+//	    				if(le user accepte d'aller dans ton arbre){
+//	    					return true;
+//	    			    }
+//	    				else { // il accepte pas
+//	    					if(veux créer en PV){
+//	    						créer lien en PV
+//	    					} else {
+//	    							abandon, on va rien faire
+//	    					  }	
+//	    			
+//	    		        }
+//	    		    }
+//    		    } else if(bonnes infos){
+//    					
+//    				} else {
+//    						restart le process
+//    					}
+    		}    		
+    		if(nodeService.doesNodeBelongToTree(node, treeId) == true) {
+//    			message user already in tree
+    			return false;
+    		} else {
+//    			Montrer arbre de la node que tu veux ajouter, bien lui ?{
+//    				if(lier vos arbres ?) {
+//    					V1
+//    						Message au créateur pour savoir s'il est ok
+//    					V2
+//    						S'il est ok {
+//    							Lier les arbres
+//    						} else{
+//    							Créer en PV, oui non ?
+//    						}
+//    				}
+//    					Créer en pv ? oui, non
+//    			}
+//    				if(Bonnes infos){
+//    					Créer en pv ? oui, non
+//    				} else {
+//    					abandon
+//    				}    			
+    		}
+    	}
+    	return true;    	
     }
-    @PutMapping("/Node/addSiblings")
-    public Response addSiblings(@RequestParam Long treeId, @RequestParam Node node, @RequestParam Node sibling, @RequestParam int privacy) {
-    	treeService.addSiblingsToTree(treeId, node, sibling, privacy);
-        node = nodeService.getNode(node.getId());
-		if(Objects.isNull(node)) {
-			return new Response("Fail to create user's Tree: step 2 failed", false);
-		}
-		return new Response("Success", true);
-    }
-    @PutMapping("/Node/addExPartner")
-    public Response addExPartner(@RequestParam Long treeId, @RequestParam Node node, @RequestParam Node exPartner, @RequestParam int privacy) {
-    	treeService.addExPartnerToNodeInTree(treeId, node, exPartner, privacy);
-        node = nodeService.getNode(node.getId());
-		if(Objects.isNull(node)) {
-			return new Response("Fail to create user's Tree: step 2 failed", false);
-		}
-		return new Response("Success", true);
+   
+    
+    
+//    faire les sécurités des links
+    public boolean autorizedLink(Long treeId,  Node node, Node nodeToLink) {
+//    	Tree tree = treeService.getTree(treeId);
+    	if (node != null) {        	
+            if (node.getParent1() == nodeToLink) {
+         	   return false;
+            }
+            if (node.getParent2() == nodeToLink) {
+         	   return false;        	   
+            }
+            if (node.getPartner() == nodeToLink) {
+            	return false;  
+            }
+            if (node.getSiblings() != null) {
+         	   for(Node siblings : node.getSiblings()) {
+         		  if (siblings == nodeToLink) {
+                	   return false;        	   
+                   }
+         	   } 
+            }
+            if (node.getExPartners() != null) {
+         	   for(Node exPartners : node.getExPartners()) {
+         		  if (exPartners == nodeToLink) {
+               	   return false;        	   
+                  }
+         	   }
+            }
+    	}
+    	return true;
     }
 }

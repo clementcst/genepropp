@@ -11,9 +11,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.acfjj.app.model.Node;
+import com.acfjj.app.model.PersonInfo;
 import com.acfjj.app.model.Tree;
 import com.acfjj.app.model.User;
 import com.acfjj.app.repository.TreeRepository;
+import com.acfjj.app.repository.PersonInfoRepository;
 import com.acfjj.app.service.*;
 import com.acfjj.app.utils.Response;
 
@@ -31,6 +33,8 @@ public class TestDataCreationController {
 	ConversationService conversationService;
 	@Autowired
 	TreeController treeController;
+	@Autowired
+	PersonInfoRepository personInfoRepository;
 	
 		
 	@PostMapping("/test/users") 
@@ -44,7 +48,12 @@ public class TestDataCreationController {
 	    }));
 		List<Response> responses = new ArrayList<>();
 		for (User user : users) {
-			responses.add(userController.addUser(user, null));
+			//System.out.println(userService.getUserByNameAndBirthInfo(user.getLastName(), user.getFirstName(), user.getDateOfBirth(), user.getCountryOfBirth(), user.getCityOfBirth()));
+			if(!Objects.isNull(userService.getUserByNameAndBirthInfo(user.getLastName(), user.getFirstName(), user.getDateOfBirth(), user.getCountryOfBirth(), user.getCityOfBirth()))) {
+				responses.add(new Response("user " + user.getFullName() + " already exist", false));
+			} else {
+				responses.add(userController.addUser(user));
+			}
 		}
 		for (Response response : responses) {
 			if(!response.getSuccess()) {
@@ -64,26 +73,23 @@ public class TestDataCreationController {
             Node exPartner = nodeService.getNode((long) 5);
             
     	List<Response> responses = new ArrayList<>();
-		responses.add(treeController.addParent(tree.getId(), node,parent1, 1, 1));
-		responses.add(treeController.addPartner(tree.getId(), node,partner, 0));
-		responses.add(treeController.addSiblings(tree.getId(), node,siblings, 1));
-		responses.add(treeController.addExPartner(tree.getId(), node,exPartner, 0));
+		responses.add(treeController.addLinkedNode(tree.getId(), node.getId(),parent1, 1, "Parent", true));
+		responses.add(treeController.addLinkedNode(tree.getId(), node.getId(),partner, 0, "Partner", true));
+		responses.add(treeController.addLinkedNode(tree.getId(), node.getId(),siblings, 1, "Siblings", true));
+		responses.add(treeController.addLinkedNode(tree.getId(), node.getId(),exPartner, 0, "ExPartner",true));
 		
-		
-        Node newNode1 = new Node("Dupont", "Camille" , 0, LocalDate.of(2002, 04, 2), "Pays", "Ville", userService.getUser(1), 1, "Nationalité", "Adresse", 12345, "Base64Image");
-        nodeService.addNode(newNode1);
-	    newNode1 = nodeService.getNode((long) 6);
-	    responses.add(treeController.addParent(tree.getId(), node,newNode1, 1, 2));
-	    responses.add(treeController.addPartner(tree.getId(), newNode1,parent1, 0));
+		PersonInfo personInfo1 = new PersonInfo("Dupont", "Camille", 0, LocalDate.of(2002, 04, 2), "Pays", "Ville", true,  "Nationalité", "Adresse", 12345, "Base64Image");
+        Node newNode1 = new Node(personInfo1, userService.getUser(1), 1);
+        
+	    responses.add(treeController.addLinkedNode(tree.getId(), node.getId(),newNode1, 1, "Parent", true));
+	    responses.add(treeController.addLinkedNode(tree.getId(), newNode1.getId(),parent1, 1, "Partner", false));
 	    Node newNode2 = new Node("Silva", "Rafael" , 1, LocalDate.of(2002, 04, 2), "Pays", "Ville", userService.getUser(1), 1, "Nationalité", "Adresse", 12345, "Base64Image");
-        nodeService.addNode(newNode2);
-        newNode2 = nodeService.getNode((long) 7);
-	    responses.add(treeController.addParent(tree.getId(), newNode1,newNode2, 1, 2));
+	    responses.add(treeController.addLinkedNode(tree.getId(), newNode1.getId(),newNode2, 1, "Parent", true));
 
 	    Node newNode3 = new Node("Petrov", "Yuri" , 1, LocalDate.of(2002, 04, 2), "Pays", "Ville", userService.getUser(1), 1, "Nationalité", "Adresse", 12345, "Base64Image");
-        nodeService.addNode(newNode3);
-        newNode3 = nodeService.getNode((long) 8);
-	    responses.add(treeController.addSiblings(tree.getId(), newNode1,newNode3, 1));
+	    responses.add(treeController.addLinkedNode(tree.getId(), newNode1.getId(),newNode3, 1, "Siblings", true));
+	    responses.add(treeController.addLinkedNode(tree.getId(), newNode3.getId(),newNode2, 0, "Parent", true));
+
 
 
 		for (Response response : responses) {

@@ -28,6 +28,8 @@ public class Node implements Serializable {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
+    //AJOUTER UN HASCHILD
+    
     @JsonIgnore
     @OneToOne
     @JoinColumn(name = "person_info_id")
@@ -39,11 +41,11 @@ public class Node implements Serializable {
 
     private int privacy;
     @JsonIgnore
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "parent_1_node_id")
 	private Node parent1; 
     @JsonIgnore
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "parent_2_node_id")
 	private Node parent2;
     
@@ -104,14 +106,7 @@ public class Node implements Serializable {
 	public void setPersonInfo(PersonInfo personInfo) {
 		this.personInfo = personInfo;
 	}
-	@JsonIgnore
-	public String getFullName() {
-		return getLastName() + " " + getFirstName();
-	}
-	@JsonIgnore
-	public String getFullNameAndBirthInfo() {
-		return getFullName() + " : " + getCountryOfBirth() + ", " + getCityOfBirth() + ", " + getDateOfBirth().toString();
-	}
+	
 	public User getCreatedBy() {
 		return createdBy;
 	}
@@ -171,8 +166,14 @@ public class Node implements Serializable {
 	public Set<Node> getExPartners() {
 		return exPartners;
 	}
+	public void setExPartners(Set<Node> exPartner) {
+		this.exPartners = exPartner;
+	}
 	public void addExPartners(Node exPartner) {
 		this.exPartners.add(exPartner);
+	}
+	public void removeExPartners(Node exPartner) {
+		this.exPartners.remove(exPartner);
 	}
 	public List<Long> getExPartnersId() {
 		if(Objects.isNull(exPartners)) {
@@ -187,8 +188,14 @@ public class Node implements Serializable {
 	public Set<Node> getSiblings() {
 		return siblings;
 	}
+	public void setSiblings(Set<Node> sibling) {
+		this.siblings = sibling;
+	}
 	public void addSiblings(Node sibling) {
 		this.siblings.add(sibling);
+	}
+	public void removeSiblings(Node sibling) {
+		this.siblings.remove(sibling);
 	}
 	public List<Long> getSiblingsId() {
 		if(Objects.isNull(siblings)) {
@@ -208,10 +215,6 @@ public class Node implements Serializable {
 	}
 	public void setPrivacy(int privacy) {
 		this.privacy = privacy;
-	}
-	@JsonIgnore
-	public boolean isPublic() {
-		return this.getPrivacy() == 1;		
 	}
 	public String getLastName() {
 	    return personInfo.getLastName();
@@ -256,20 +259,20 @@ public class Node implements Serializable {
 	public String getProfilPictureData64() {
 	    return personInfo.getProfilPictureData64();
 	}
-	@JsonIgnore
-	public Tree getTree() {
-		for (TreeNodes treeNodes : getTreeNodes()) {
-			return treeNodes.getTree();
-		}
-		return null;
-	}
-	public Long getTreeId() {
-		Tree tree = this.getTree();
-		if(tree == null) {
-			return null;
-		}
-		return tree.getId();
-	}
+//	@JsonIgnore
+//	public Tree getTree() {
+//		for (TreeNodes treeNodes : getTreeNodes()) {
+//			return treeNodes.getTree();
+//		}
+//		return null;
+//	}
+//	public Long getTreeId() {
+//		Tree tree = this.getTree();
+//		if(tree == null) {
+//			return null;
+//		}
+//		return tree.getId();
+//	}
 	
 	
 	@JsonIgnore
@@ -303,11 +306,13 @@ public class Node implements Serializable {
 	        personInfo.equals(other.personInfo) &&
 	        createdBy.equals(other.createdBy) &&
 	        privacy == other.privacy &&
-	        parent1.equals(other.parent1) &&
-	        parent2.equals(other.parent2) &&
+	        getParent1Id().equals(other.getParent1Id()) &&
+	        getParent2Id().equals(other.getParent2Id()) &&
 	        personInfo.equals(other.personInfo) :
 	        super.equals(obj);
 	}
+	//regarder CastAsUser faire pour node
+	
 	
 	@Override
 	public String toString() {
