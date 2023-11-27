@@ -153,13 +153,13 @@ public class NodeService {
     
     public boolean doesNodeBelongToTree(Long nodeId, Long treeId) {
         Node node = getNode(nodeId);
-        if (node == null || tree == null) {
+        if (node == null || treeId == null) {
             return false;
         }
 
         Set<TreeNodes> treeNodes = node.getTreeNodes();
         for (TreeNodes treeNode : treeNodes) {
-            if (treeNode.getTree().equals(tree)) {
+            if (treeNode.getTree().getId().equals(treeId)) {
                 return true;
             }
         }
