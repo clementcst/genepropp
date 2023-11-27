@@ -49,6 +49,8 @@ public class NodeService {
             treeNodesRepository.save(treeNode);
         }
         nodeRepository.save(node);
+        node.getPersonInfo().setRelatedNode(node);
+    	personInfoRepository.save(node.getPersonInfo());
         return;
     }
     
@@ -175,5 +177,13 @@ public class NodeService {
 			nodeFound = nodeRepository.findByPersonInfo(personInfoFound);
 		}
 		return nodeFound;
+	}
+    
+    public Node getPublicNodeByNameAndBirthInfo(String lastName, String firstName, LocalDate dateOfBirth, String countryOfBirth, String cityofBirth) {
+		Node nodeFound = getNodeByNameAndBirthInfo(lastName, firstName, dateOfBirth, countryOfBirth, cityofBirth);
+		if(Objects.isNull(nodeFound)) {
+			return null;
+		}
+		return nodeFound.isPublic() ? nodeFound : null;
 	}
 }

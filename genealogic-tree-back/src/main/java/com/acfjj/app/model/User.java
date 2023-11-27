@@ -103,6 +103,9 @@ public class User implements Serializable {
 	public PersonInfo getPersonInfo() {
 		return personInfo;
 	}
+	public void setPersonInfo(PersonInfo personInfo) {
+		this.personInfo = personInfo;
+	}
 	public String getEmail() {
 		return email;
 	}

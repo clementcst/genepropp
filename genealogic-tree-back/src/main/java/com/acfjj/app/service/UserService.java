@@ -59,6 +59,8 @@ public class UserService {
 	public void addUser(User user) {
 		personInfoRepository.save(user.getPersonInfo());
 		userRepository.save(user);
+		user.getPersonInfo().setRelatedUser(user);
+		personInfoRepository.save(user.getPersonInfo());
 	}
 	
 	public void deleteUser(long id) {
