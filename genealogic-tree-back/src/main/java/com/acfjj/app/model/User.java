@@ -188,7 +188,11 @@ public class User implements Serializable {
 	}
 	@JsonIgnore
 	public String getFullName() {
-		return getPersonInfo().getLastName() + " " + getPersonInfo().getFirstName();
+		return getLastName() + " " + getFirstName();
+	}
+	@JsonIgnore
+	public String getFullNameAndBirthInfo() {
+		return getFullName() + " : " + getCountryOfBirth() + ", " + getCityOfBirth() + ", " + getDateOfBirth().toString();
 	}
 	public String getLastName() {
 		return getPersonInfo().getLastName();

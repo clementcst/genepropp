@@ -144,9 +144,10 @@ public class TreeService {
         	node.setParent1(parent);
         } else {
         	node.setParent2(parent);
+        	
         }
         addNodeToTree(tree, parent, privacy, depth+1);
-        
+        nodeRepository.save(node);
     }
     
     public void addPartnerToNodeInTree(Long treeId, Node node,Node partner, int privacy) {
