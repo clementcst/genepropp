@@ -76,7 +76,7 @@ public class Node implements Serializable {
 		this.privacy = privacy;
 	}
 	public Node(PersonInfo personInfo, User createdBy, int privacy) {
-		this(personInfo, createdBy, null, null, 0);
+		this(personInfo, createdBy, null, null, privacy);
 	}
 	public Node(String lastName, String firstname, int gender, LocalDate dateOfBirth, String countryOfBirth, String cityOfBirth, User createdBy, Node parent1, Node parent2, int privacy, String nationality, String adress, int postalCode, String profilPictureData64) {
 	    this(new PersonInfo(lastName, firstname, gender, dateOfBirth, countryOfBirth, cityOfBirth, false, nationality, adress, postalCode, profilPictureData64),
@@ -104,7 +104,14 @@ public class Node implements Serializable {
 	public void setPersonInfo(PersonInfo personInfo) {
 		this.personInfo = personInfo;
 	}
-	
+	@JsonIgnore
+	public String getFullName() {
+		return getLastName() + " " + getFirstName();
+	}
+	@JsonIgnore
+	public String getFullNameAndBirthInfo() {
+		return getFullName() + " : " + getCountryOfBirth() + ", " + getCityOfBirth() + ", " + getDateOfBirth().toString();
+	}
 	public User getCreatedBy() {
 		return createdBy;
 	}
@@ -201,6 +208,10 @@ public class Node implements Serializable {
 	}
 	public void setPrivacy(int privacy) {
 		this.privacy = privacy;
+	}
+	@JsonIgnore
+	public boolean isPublic() {
+		return this.getPrivacy() == 1;		
 	}
 	public String getLastName() {
 	    return personInfo.getLastName();

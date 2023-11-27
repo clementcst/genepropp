@@ -194,6 +194,8 @@ public class PersonInfo implements Serializable {
 	            ", adress=" + adress +
 	            ", postalCode=" + postalCode +
 	            ", profilPictureData64=" + profilPictureData64 +
+	            ", relatedUser =" + (Objects.isNull(relatedUser) ? null : relatedUser.getId()) +
+	            ", relatedNode =" + (Objects.isNull(relatedNode) ? null : relatedNode.getId()) +
 	        "]";
 	}
 

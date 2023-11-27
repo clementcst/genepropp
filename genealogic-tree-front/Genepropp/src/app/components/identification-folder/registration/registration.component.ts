@@ -10,7 +10,7 @@ import { IdentificationService } from '../../../services/identificaton/identific
 })
 export class RegistrationComponent {
   authenticationError: boolean = false;
-  step=0;
+  step=1;
   // Déclarer des variables pour stocker les valeurs des champs
   data: any = {
     firstName: '',
@@ -50,7 +50,7 @@ export class RegistrationComponent {
         }
         else {
           this.authenticationError = true;
-          console.error(response.message);
+          console.error(response);
         }
       });
 
