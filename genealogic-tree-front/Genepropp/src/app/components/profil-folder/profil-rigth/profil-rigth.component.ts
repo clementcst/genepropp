@@ -26,6 +26,7 @@ export class ProfilRigthComponent implements OnInit {
         { label: "lastname", type: "text", fieldname: "Lastname", value: this.user.lastName, disabled: true },
         { label: "secu", type: "text", fieldname: "Secu number", value: this.user.noSecu },
         { label: "phone_number", type: "tel", fieldname: "Phone number", value: this.user.noPhone, pattern: "[0-9]{2}[0-9]{2}[0-9]{2}[0-9]{2}[0-9]{2}" },
+        //{ label: "sexe", type: "text", fieldname: "sexe", value: this.user.gender },
       ];
 
       this.inputs2 = [
