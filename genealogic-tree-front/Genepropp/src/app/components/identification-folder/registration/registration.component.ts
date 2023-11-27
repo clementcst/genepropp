@@ -10,6 +10,7 @@ import { IdentificationService } from '../../../services/identificaton/identific
 })
 export class RegistrationComponent {
   authenticationError: boolean = false;
+  step=0;
   // Déclarer des variables pour stocker les valeurs des champs
   data: any = {
     firstName: '',
@@ -40,9 +41,10 @@ export class RegistrationComponent {
       return;
     }
 
-    this.identificationService.registerResquest(this.data)
+    this.identificationService.registerResquest(this.data, this.step)
       .subscribe((response) => {
         if (response.success) {
+          console.log(response)
           this.cookieService.set('userId', response.value);
           this.router.navigate(['homePage']);
         }
