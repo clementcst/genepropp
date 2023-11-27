@@ -44,7 +44,6 @@ export class RegistrationComponent {
     this.identificationService.registerResquest(this.data, this.step)
       .subscribe((response) => {
         if (response.success) {
-          console.log(response)
           this.cookieService.set('userId', response.value);
           this.router.navigate(['homePage']);
         }
