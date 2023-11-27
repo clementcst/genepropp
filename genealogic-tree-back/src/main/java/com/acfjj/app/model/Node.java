@@ -104,7 +104,14 @@ public class Node implements Serializable {
 	public void setPersonInfo(PersonInfo personInfo) {
 		this.personInfo = personInfo;
 	}
-	
+	@JsonIgnore
+	public String getFullName() {
+		return getLastName() + " " + getFirstName();
+	}
+	@JsonIgnore
+	public String getFullNameAndBirthInfo() {
+		return getFullName() + " : " + getCountryOfBirth() + ", " + getCityOfBirth() + ", " + getDateOfBirth().toString();
+	}
 	public User getCreatedBy() {
 		return createdBy;
 	}

@@ -2,6 +2,7 @@ package com.acfjj.app.controller;
 
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,30 +63,49 @@ public class UserController{
 		if(Objects.isNull(userToRegister)) {
 			return new Response("Request Body format is invalid.",	false);
 		}
+		User userFound = userService.getUserByNameAndBirthInfo(userToRegister.getLastName(), userToRegister.getFirstName(), userToRegister.getDateOfBirth(), userToRegister.getCountryOfBirth(), userToRegister.getCityOfBirth());
+		Node nodeFound = nodeService.getNodeByNameAndBirthInfo(userToRegister.getLastName(), userToRegister.getFirstName(), userToRegister.getDateOfBirth(), userToRegister.getCountryOfBirth(), userToRegister.getCityOfBirth());
+		if(!Objects.isNull(userFound)) {
+			Map<String, Object> responseValue = new LinkedHashMap<String, Object>();
+			responseValue.put("step", 1);
+			responseValue.put("frontMessage", "A user with the same names and birth informations or with same email as been found. Double account are not allowed. Please double check register information.");
+			responseValue.put("data", data);
+			return new Response(responseValue ,"User with same birth info (" + userFound.getFullNameAndBirthInfo() + ") or with same email (" + userFound.getEmail() + ") already exist", false);
+		} else if(!Objects.isNull(nodeFound)) {
+			Map<String, Object> responseValue = new LinkedHashMap<String, Object>();
+			responseValue.put("step", 1);
+			responseValue.put("frontMessage", "A node with the same names and birth informations as been found. Please double check register information and confirm that it's you. Yes/No");
+			responseValue.put("toDisplay", nodeFound.getPersonInfo());
+			responseValue.put("data", data);
+			return new Response(responseValue ,"Node with same birth info (" + nodeFound.getFullNameAndBirthInfo() + ")", true);
+		}
 		return addUser(userToRegister);
 	}
 	
 	public Response addUser(User user) {
 		if(!Objects.isNull(userService.getUserByNameAndBirthInfo(user.getLastName(), user.getFirstName(), user.getDateOfBirth(), user.getCountryOfBirth(), user.getCityOfBirth()))) {
-			return new Response("user " + user.getFullName() + " already exist", false);
+			return new Response("User with birth info (" + user.getFullNameAndBirthInfo() + ") already exist", false);
+		}
+		if(!Objects.isNull(userService.getUserByEmail(user.getEmail()))) {
+			return new Response("User with email (" + user.getEmail() + ") already exist", false);
 		}
 		userService.addUser(user);
 		String lastName = user.getLastName();
 		String firstName = user.getFirstName();
 		user = userService.getUserByNameAndBirthInfo(lastName, firstName, user.getDateOfBirth(), user.getCountryOfBirth(), user.getCityOfBirth());
 		if(Objects.isNull(user)) {
-			return new Response("Fail to create user", false);
+			return new Response("Fail to create user in DB", false);
 		}
 		String treeName = firstName + " " + lastName + "'s Tree";
 		treeName = treeService.addTree(new Tree(treeName, 0));
 		Tree tree = treeService.getTreeByName(treeName);
 		if(Objects.isNull(tree)) {
-			return new Response("Fail to create user's Tree", false);
+			return new Response("Fail to create user's Tree in DB", false);
 		}
 		nodeService.addNode(new Node(user.getPersonInfo(), user, 0));
 		Node node = nodeService.getNodeByNameAndBirthInfo(lastName, firstName, user.getDateOfBirth(), user.getCountryOfBirth(), user.getCityOfBirth());
 		if(Objects.isNull(node)) {
-			return new Response("Fail to create user's node", false);
+			return new Response("Fail to create user's Node in DB", false);
 		}
 		treeService.addNodeToTree(tree, node, 1, 0);
 		tree = treeService.getTree(tree.getId());
@@ -94,8 +114,8 @@ public class UserController{
 		return new Response("Success", true);
 	}
 	
-	@DeleteMapping("user/{id}")
-	public void deleteUser(@PathVariable Long id) {
-		userService.deleteUser(id);
+	@DeleteMapping("/user")
+	public void deleteUser(@RequestParam Long userId) {
+		userService.deleteUser(userId);
 	}
 }
