@@ -61,7 +61,7 @@ public class UserController{
 		return new Response(user.getId(), "Login Success", true);
 	}
 	
-		@PostMapping("/registration")
+	@PostMapping("/registration")
 	public Response registration(@RequestParam int step, @RequestBody LinkedHashMap<String, String> data, @RequestParam(required = false, defaultValue = "0") Boolean userResponse) {
 		User userToRegister = User.castAsUser(data);
 		if(Objects.isNull(userToRegister)) {
