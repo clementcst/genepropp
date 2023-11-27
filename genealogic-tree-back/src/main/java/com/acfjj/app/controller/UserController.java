@@ -1,5 +1,6 @@
 package com.acfjj.app.controller;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -55,25 +56,36 @@ public class UserController{
 		return new Response(user.getId(), "Login Success", true);
 	}
 	
-	@PostMapping("/user") 
-	public Response addUser(@RequestParam User user) {
+	@PostMapping("/registration")
+	public Response registration(@RequestParam int step, @RequestBody LinkedHashMap<String, String> data) {
+		User userToRegister = User.castAsUser(data);
+		if(Objects.isNull(userToRegister)) {
+			return new Response("Request Body format is invalid.",	false);
+		}
+		return addUser(userToRegister);
+	}
+	
+	public Response addUser(User user) {
+		if(!Objects.isNull(userService.getUserByNameAndBirthInfo(user.getLastName(), user.getFirstName(), user.getDateOfBirth(), user.getCountryOfBirth(), user.getCityOfBirth()))) {
+			return new Response("user " + user.getFullName() + " already exist", false);
+		}
 		userService.addUser(user);
 		String lastName = user.getLastName();
 		String firstName = user.getFirstName();
 		user = userService.getUserByNameAndBirthInfo(lastName, firstName, user.getDateOfBirth(), user.getCountryOfBirth(), user.getCityOfBirth());
 		if(Objects.isNull(user)) {
-			return new Response("Fail to create user: step 1 failed", false);
+			return new Response("Fail to create user", false);
 		}
 		String treeName = firstName + " " + lastName + "'s Tree";
 		treeName = treeService.addTree(new Tree(treeName, 0));
 		Tree tree = treeService.getTreeByName(treeName);
 		if(Objects.isNull(tree)) {
-			return new Response("Fail to create user's Tree: step 2 failed", false);
+			return new Response("Fail to create user's Tree", false);
 		}
 		nodeService.addNode(new Node(user.getPersonInfo(), user, 0));
 		Node node = nodeService.getNodeByNameAndBirthInfo(lastName, firstName, user.getDateOfBirth(), user.getCountryOfBirth(), user.getCityOfBirth());
 		if(Objects.isNull(node)) {
-			return new Response("Fail to create user's node: step 3 failed", false);
+			return new Response("Fail to create user's node", false);
 		}
 		treeService.addNodeToTree(tree, node, 1, 0);
 		tree = treeService.getTree(tree.getId());

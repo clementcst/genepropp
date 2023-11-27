@@ -27,7 +27,6 @@ export class LoginComponent implements OnInit{
   onSubmit() {
     this.identificationService.loginattempt(this.privatecode, this.password)
       .subscribe((response) => {
-        console.log(response)
         if (response.success) {
           this.cookieService.set('userId', response.value);
           this.router.navigate(['homePage']);
