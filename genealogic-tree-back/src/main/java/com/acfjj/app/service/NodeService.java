@@ -151,8 +151,8 @@ public class NodeService {
     }
     
     
-    public boolean doesNodeBelongToTree(Node node, Long treeId) {
-        Tree tree = treeRepository.findById(treeId).orElse(null);
+    public boolean doesNodeBelongToTree(Long nodeId, Long treeId) {
+        Node node = getNode(nodeId);
         if (node == null || tree == null) {
             return false;
         }
@@ -189,5 +189,13 @@ public class NodeService {
 			nodeFound = nodeRepository.findByPersonInfo(personInfoFound);
 		}
 		return nodeFound;
+	}
+
+    public Node getPublicNodeByNameAndBirthInfo(String lastName, String firstName, LocalDate dateOfBirth, String countryOfBirth, String cityofBirth) {
+		Node nodeFound = getNodeByNameAndBirthInfo(lastName, firstName, dateOfBirth, countryOfBirth, cityofBirth);
+		if(Objects.isNull(nodeFound)) {
+			return null;
+		}
+		return nodeFound.isPublic() ? nodeFound : null;
 	}
 }
