@@ -91,8 +91,9 @@ public class Tree implements Serializable {
 	//	public void removeTreeNodes(TreeNodes treeNode) {
 	//		this.getNodes().remove(treeNode);
 	//	}
-
-	public boolean isTreePublic() {
+	
+	@JsonIgnore
+	public boolean isPublic() {
 		return this.getPrivacy() == 1;		
 	}
 	

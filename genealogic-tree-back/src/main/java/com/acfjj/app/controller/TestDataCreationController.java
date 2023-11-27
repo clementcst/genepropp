@@ -44,7 +44,7 @@ public class TestDataCreationController {
 	    }));
 		List<Response> responses = new ArrayList<>();
 		for (User user : users) {
-			responses.add(userController.addUser(user));
+			responses.add(userController.addUser(user, null));
 		}
 		for (Response response : responses) {
 			if(!response.getSuccess()) {
