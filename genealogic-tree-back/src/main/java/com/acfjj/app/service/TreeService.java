@@ -97,7 +97,7 @@ public class TreeService {
     }
     
 //    public void deleteNodeFromTree(Long nodeId, Long treeId) {
-////     les vérifs sont à faire ici
+//    les vérifs sont à faire ici
 //    	//sécurité de user
 //        Tree tree = getTree(treeId);
 //        if (tree != null) {
@@ -117,17 +117,6 @@ public class TreeService {
 //
 //             treeRepository.save(tree);
 //        } 
-//    }
-    
-//    public void addNode(Node node) {
-//    	System.out.println(node.getPersonInfo());
-//    	personInfoRepository.save(node.getPersonInfo());
-//    	for (TreeNodes treeNode : node.getTreeNodes()) {
-//    		if(treeNode != null)
-//            treeNodesRepository.save(treeNode);
-//        }
-//        nodeRepository.save(node);
-//        return;
 //    }
 
     public void addNodeToTree(Tree tree, Node node, int privacy, int depth) {
