@@ -17,7 +17,7 @@ export class ContactsContentComponent implements OnInit{
 
   ngOnInit(): void {
     this.userService.getUsers().subscribe((data) => {
-      this.contacts = data;
+      this.contacts = data.value;
       this.currentContact = this.contacts[0];
     });
     

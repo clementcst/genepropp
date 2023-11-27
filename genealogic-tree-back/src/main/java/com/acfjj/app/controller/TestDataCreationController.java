@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -43,12 +44,11 @@ public class TestDataCreationController {
 	    }));
 		List<Response> responses = new ArrayList<>();
 		for (User user : users) {
-			responses.add(userController.addUser(user));
-			
+			responses.add(userController.addUser(user, null));
 		}
 		for (Response response : responses) {
 			if(!response.getSuccess()) {
-				return new Response(responses, "On or more failure occured", false);
+				return new Response(responses, "One or more failure occured", false);
 			}
 		}
 		return new Response(responses);
@@ -88,7 +88,7 @@ public class TestDataCreationController {
 
 		for (Response response : responses) {
 			if(!response.getSuccess()) {
-				return new Response(responses, "On or more failure occured", false);
+				return new Response(responses, "One or more failure occured", false);
 			}
 		}
 		return new Response(responses);

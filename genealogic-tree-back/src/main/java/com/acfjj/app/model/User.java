@@ -1,11 +1,15 @@
 package com.acfjj.app.model;
 
 import java.io.Serializable;
+import java.nio.charset.Charset;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -28,6 +32,8 @@ public class User implements Serializable {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
+    private String privateCode;  		 
     
     @JsonIgnore
     @OneToOne
@@ -83,6 +89,7 @@ public class User implements Serializable {
 		this.isAdmin = false;
 		this.noSecu = noSecu;
 		this.noPhone = noPhone;
+		this.privateCode = User.generatePrivateCode();
 		this.personInfo = new PersonInfo(lastName,firstname,gender,dateOfBirth,countryOfBirth,cityOfBirth,false,nationality,adress,postalCode,profilPictureData64);
 	}
 	
@@ -90,8 +97,14 @@ public class User implements Serializable {
 	public Long getId() {
 		return id;
 	}
+	public String getPrivateCode() {
+		return privateCode;
+	}
 	public PersonInfo getPersonInfo() {
 		return personInfo;
+	}
+	public void setPersonInfo(PersonInfo personInfo) {
+		this.personInfo = personInfo;
 	}
 	public String getEmail() {
 		return email;
@@ -175,6 +188,14 @@ public class User implements Serializable {
 	}
 	public void setNoPhone(String noPhone) {
 		this.noPhone = noPhone;
+	}
+	@JsonIgnore
+	public String getFullName() {
+		return getLastName() + " " + getFirstName();
+	}
+	@JsonIgnore
+	public String getFullNameAndBirthInfo() {
+		return getFullName() + " : " + getCountryOfBirth() + ", " + getCityOfBirth() + ", " + getDateOfBirth().toString();
 	}
 	public String getLastName() {
 		return getPersonInfo().getLastName();
@@ -272,6 +293,45 @@ public class User implements Serializable {
 	            ", noPhone=" + noPhone + 
 	        "]";
 	}
-
 	
+	public static String generatePrivateCode() {
+		int length = 128;
+		StringBuilder sequence = new StringBuilder();
+		Random random = new Random();
+		
+		for (int i = 0; i < length; i++) {
+		    char randomChar;
+		    int randomRange = random.nextInt(3);
+		    
+		    if (randomRange == 0) {
+		        randomChar = (char) (random.nextInt(10) + 48); // Chiffres ASCII [48, 57]
+		    } else if (randomRange == 1) {
+		        randomChar = (char) (random.nextInt(26) + 65); // Lettres majuscules ASCII [65, 90]
+		    } else {
+		        randomChar = (char) (random.nextInt(26) + 97); // Lettres minuscules ASCII [97, 122]
+		        }
+		        
+		        sequence.append(randomChar);
+		    }
+		 return sequence.toString();
+	}
+	
+	public static User castAsUser(LinkedHashMap<String, String> dataLHM) {
+		List<String> requiredKeys = Arrays.asList("lastName", "firstName", "gender", "dateOfBirth", "countryOfBirth", "cityOfBirth", "email", "password", "noSecu", "noPhone", "nationality", "adress", "postalCode");		
+		Set<String> keys = dataLHM.keySet();
+		if(keys.containsAll(requiredKeys)) {
+			int gender;
+			int postalCode;
+			LocalDate dateOfBirth;
+			try {
+				gender = Integer.parseInt(dataLHM.get("gender"));
+				postalCode = Integer.parseInt(dataLHM.get("postalCode"));
+				dateOfBirth = LocalDate.parse(dataLHM.get("dateOfBirth"));
+			} catch (Exception e) {
+				return null;
+			}
+			return new User(dataLHM.get("lastName"), dataLHM.get("firstName"), gender, dateOfBirth, dataLHM.get("countryOfBirth"), dataLHM.get("cityOfBirth"), dataLHM.get("email"), dataLHM.get("password"), dataLHM.get("noSecu"), dataLHM.get("noPhone"), dataLHM.get("nationality"), dataLHM.get("adress"), postalCode, null);
+		}
+		return null;
+	}
 }

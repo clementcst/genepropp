@@ -6,7 +6,6 @@ import com.acfjj.app.model.Node;
 import com.acfjj.app.model.PersonInfo;
 import com.acfjj.app.model.Tree;
 import com.acfjj.app.model.TreeNodes;
-import com.acfjj.app.model.User;
 import com.acfjj.app.repository.PersonInfoRepository;
 import com.acfjj.app.repository.TreeNodesRepository;
 import com.acfjj.app.repository.TreeRepository;
@@ -43,7 +42,6 @@ public class NodeService {
         return nodeRepository.findById(id).orElse(null);
     }
 
-
     public void addNode(Node node) {
     	personInfoRepository.save(node.getPersonInfo());
     	for (TreeNodes treeNode : node.getTreeNodes()) {
@@ -51,6 +49,8 @@ public class NodeService {
             treeNodesRepository.save(treeNode);
         }
         nodeRepository.save(node);
+        node.getPersonInfo().setRelatedNode(node);
+    	personInfoRepository.save(node.getPersonInfo());
         return;
     }
     
@@ -177,5 +177,13 @@ public class NodeService {
 			nodeFound = nodeRepository.findByPersonInfo(personInfoFound);
 		}
 		return nodeFound;
+	}
+    
+    public Node getPublicNodeByNameAndBirthInfo(String lastName, String firstName, LocalDate dateOfBirth, String countryOfBirth, String cityofBirth) {
+		Node nodeFound = getNodeByNameAndBirthInfo(lastName, firstName, dateOfBirth, countryOfBirth, cityofBirth);
+		if(Objects.isNull(nodeFound)) {
+			return null;
+		}
+		return nodeFound.isPublic() ? nodeFound : null;
 	}
 }

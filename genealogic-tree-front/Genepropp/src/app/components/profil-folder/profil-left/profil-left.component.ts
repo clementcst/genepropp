@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { TreeService } from '../../../services/tree/tree.service';
+import { CookieService } from 'ngx-cookie-service';
 
 @Component({
   selector: 'app-profil-left',
@@ -10,13 +11,14 @@ export class ProfilLeftComponent implements OnInit {
   tree: any = {};
   boxs: any[] = [];
 
-  constructor(private treeService : TreeService ) { 
+  constructor(private treeService : TreeService, private cookieService: CookieService) { 
     this.treeService = treeService;
+    this.cookieService = cookieService;
   }
 
   ngOnInit(): void {
-    this.treeService.getTree(1).subscribe((data) => {
-      this.tree = data;
+    this.treeService.getTree(this.cookieService.get('userId')).subscribe((data) => {
+      this.tree = data.value;
       this.boxs = [
         { title: "Month views", value: this.tree.viewOfMonth },
         { title: "Annual views", value: this.tree.viewOfYear },

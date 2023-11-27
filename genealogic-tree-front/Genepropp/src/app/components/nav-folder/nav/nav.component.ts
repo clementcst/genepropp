@@ -13,7 +13,8 @@ export class NavComponent {
     {link:"/myTreePage", displayName:"My Tree"},
     {link:"/contactPage", displayName:"Contacts"},
     {link:"/directoryPage", displayName:"Directory"},
-    {link:"/profilPage", displayName:"Profil"}
+    {link:"/profilPage", displayName:"Profil"},
+    { link: "/", displayName: "Log out"}
   ]
 
   constructor() { }
