@@ -1,0 +1,7 @@
+{"properties": [
+  {
+    "name": "angular.app.url",
+    "type": "java.lang.String",
+    "description": "adress and port num of the front angular application"
+  }
+]}
