@@ -28,7 +28,6 @@ export class IdentificationService {
     const params = new HttpParams()
       .set('step', step)
       .set('userResponse', 'false');
-      console.log(params)
     const data = { lastName: user.lastName, firstName: user.firstName, gender: user.sexe, dateOfBirth: user.birthDate, countryOfBirth: user.countryofbirth, cityOfBirth: user.cityofbirth, email: user.email, password: user.password, noSecu: user.ssn, noPhone: user.phn, nationality: user.nationality, adress: user.adress, postalCode: user.postalCode }
     return this.http.post<any[]>("http://localhost:8080/registration", data, {params, responseType: 'json'});
   }
