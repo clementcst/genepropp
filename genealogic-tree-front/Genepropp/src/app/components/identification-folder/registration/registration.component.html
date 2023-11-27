@@ -26,6 +26,30 @@
                     <input id="ssn" name="ssn" type="text" autocomplete="ssn" required class="w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
                 </div>
             </div>
+
+            <div class="sm:flex sm:flex-wrap -mx-3">
+                <div class="sm:w-1/2 px-3">
+                    <label for="sexe" class="block mb-4 text-sm font-medium text-gray-900 dark:text-black">Sexe</label>
+                    <div class="flex">
+                        <div class="flex items-center mr-4">
+                            <input type="radio" id="man"
+                                class="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-300 bg-gray-300 dark:border-gray-600 dark:value-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                value="" name="Sexe_choice">
+                            <label for="man" class="ml-2 text-sm font-medium">Man</label>
+                        </div>
+                        <div class="flex items-center mr-4">
+                            <input type="radio" id="woman"
+                                class="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-300 bg-gray-300 dark:border-gray-600 dark:value-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                value="" name="Sexe_choice">
+                            <label for="woman" class="ml-2 text-sm font-medium">Woman</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="sm:w-1/2 px-3">
+                    <label for="phn" class="block text-sm font-medium leading-6 text-gray-900">Phone Number</label>
+                    <input id="phn" name="phn" type="text" autocomplete="phn" required class="w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                </div>
+            </div>
             <!-- Les 4 derniers champs d'inscription ici -->
 
             <div class="sm:flex sm:flex-wrap -mx-3">
@@ -40,12 +64,22 @@
             </div>
             <div class="sm:flex sm:flex-wrap -mx-3">
                 <div class="sm:w-1/2 px-3">
+                    <label for="adress" class="block text-sm font-medium leading-6 text-gray-900">address</label>
+                    <input id="adress" name="adress" type="text" autocomplete="adress" required class="w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                </div>
+                <div class="sm:w-1/2 px-3">
                     <label for="postalCode" class="block text-sm font-medium leading-6 text-gray-900">Postal Code</label>
                     <input id="postalCode" name="postalCode" type="text" required class="w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
                 </div>
+            </div>
+            <div class="sm:flex sm:flex-wrap -mx-3">
                 <div class="sm:w-1/2 px-3">
                     <label for="password" class="block text-sm font-medium leading-6 text-gray-900">Password</label>
                     <input id="password" name="password" type="password" autocomplete="new-password" required class="w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                </div>
+                <div class="sm:w-1/2 px-3">
+                    <label for="Confirm_password" class="block text-sm font-medium leading-6 text-gray-900">Confirm password</label>
+                    <input id="Confirm_password" name="Confirm_password" type="password" autocomplete="new-password" required class="w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
                 </div>
             </div>
 

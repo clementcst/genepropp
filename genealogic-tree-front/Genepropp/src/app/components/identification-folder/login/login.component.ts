@@ -20,7 +20,6 @@ export class LoginComponent implements OnInit{
     ) {}
 
   ngOnInit(): void {
-    // Initialisez la variable d'erreur à false au chargement du composant
     this.authenticationError = false;
   }
 
