@@ -26,7 +26,7 @@
         </div>
 
         <div *ngIf="authenticationError" class="text-red-500 mt-2">
-          Identifiants incorrects, veuillez réessayer.
+          {{ errorMessage }}
         </div>
 
         <div>

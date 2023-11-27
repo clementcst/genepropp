@@ -12,6 +12,7 @@ export class LoginComponent implements OnInit{
   privatecode: string = '';
   password: string = '';
   authenticationError: boolean = false;
+  errorMessage: string = '';
 
   constructor(
     private identificationService: IdentificationService,
@@ -32,7 +33,7 @@ export class LoginComponent implements OnInit{
         }
         else {
           this.authenticationError = true;
-          console.error(response.message);
+          this.errorMessage = response.message;
         }
       });
   }
