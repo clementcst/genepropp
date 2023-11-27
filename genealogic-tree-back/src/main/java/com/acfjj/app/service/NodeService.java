@@ -11,6 +11,7 @@ import com.acfjj.app.repository.TreeNodesRepository;
 import com.acfjj.app.repository.TreeRepository;
 import com.acfjj.app.repository.UserRepository;
 import com.acfjj.app.repository.NodeRepository;
+import com.acfjj.app.utils.Misc;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -44,13 +45,11 @@ public class NodeService {
 
     public void addNode(Node node) {
     	personInfoRepository.save(node.getPersonInfo());
-    	for (TreeNodes treeNode : node.getTreeNodes()) {
+        nodeRepository.save(node);
+        for (TreeNodes treeNode : node.getTreeNodes()) {
     		if(treeNode != null)
             treeNodesRepository.save(treeNode);
         }
-        nodeRepository.save(node);
-        node.getPersonInfo().setRelatedNode(node);
-    	personInfoRepository.save(node.getPersonInfo());
         return;
     }
     
@@ -61,8 +60,6 @@ public class NodeService {
     	        } else if (node.getParent2() == null) {
     	            node.setParent2(parentNode);
     	        }
-//    	        TreeNodes TNChild = new treeNodes();
-//    	        node.addTreeNodes();
     	        updateNode(node.getId(), node);
     	    }
     	 return;
@@ -86,56 +83,57 @@ public class NodeService {
 
    public void deleteNode(Long id) {
         Node node = getNode(id);
-//        PersonInfo person = node.getPersonInfo();
-//        List<User> users = userRepository.findAll();
-//        for(User user : users) {
-//        	if(user.getPersonInfo().equals(person)) {
-//        		if(node.getCreatedBy().equals(user)) {
-//        			//faut supprimer le user avant
-//        		} else {
-//        			//pas le droit
-//        			return;
-//        		}
-//        		
-//        	}
-//        }
-        if(node.getPersonInfo() != null)
-        if (node != null) {
-        	List<Node> nodes = getAllNodes();
-        	for(Node parcoursNode : nodes) {
-        		if(parcoursNode.getId() != id) {
-        			if(parcoursNode.getParent1() != null && parcoursNode.getParent1().getId() == id) {
-            			parcoursNode.setParent1(null);
-            		}
-    	        	if(parcoursNode.getParent2() != null && parcoursNode.getParent2().getId() == id) {
-    	    			parcoursNode.setParent2(null);
-    	    		}
-    	        	if(parcoursNode.getPartner() != null && parcoursNode.getPartner().getId() == id) {
-            			parcoursNode.setPartner(null);
-            		}
-    	        	for(Node exPartners : parcoursNode.getExPartners()) {
-    	        		if(exPartners.getId() == id) {
-    	        			parcoursNode.getExPartners().remove(exPartners);
-    	        		}
-    	        	}
-    	        	for(Node Siblings : parcoursNode.getSiblings()) {
-    	        		if(Siblings.getId() == id) {
-    	        			parcoursNode.getSiblings().remove(Siblings);
-    	        		}
-    	        	}
-            		updateNode(parcoursNode.getId(), parcoursNode);
-		}
-	}
+        if (node != null) {        	
             if (node.isOrphan()) {
                 PersonInfo personInfo = node.getPersonInfo();
                 if (personInfo != null) {
+                	nodeRepository.deleteById(id);
                     personInfoRepository.deleteById(personInfo.getId());
+                    return;
                 }
             }
             nodeRepository.deleteById(id);
         }
         return;
     }
+   
+   public void removeLinks(Long id) {
+       Node node = getNode(id);
+       if (node != null) {        	
+           if (node.getParent1() != null) {
+        	   node.setParent1(null);
+        	   updateNode(node.getId(),node);
+           }
+           if (node.getParent2() != null) {
+        	   node.setParent2(null);
+        	   updateNode(node.getId(),node);        	   
+           }
+           if (node.getPartner() != null) {
+        	   Node partner = node.getPartner();
+        	   node.setPartner(null);
+        	   updateNode(node.getId(),node);  
+        	   partner.setPartner(null);
+        	   updateNode(partner.getId(),partner); 
+           }
+           if (node.getSiblings() != null) {
+        	   for(Node siblings : node.getSiblings()) {
+        		   siblings.removeSiblings(node);
+        		   updateNode(siblings.getId(),siblings); 
+        	   }
+        	   node.setSiblings(null);
+        	   updateNode(node.getId(),node);  
+           }
+           if (node.getExPartners() != null) {
+        	   for(Node exPartners : node.getExPartners()) {
+        		   exPartners.removeExPartners(node);
+        		   updateNode(exPartners.getId(),exPartners); 
+        	   }
+        	   node.setExPartners(null);
+        	   updateNode(node.getId(),node);  
+           }
+       }
+
+   }
 
     public void updateNode(Long id, Node node) {
         if (getNode(id) != null && node.getId() == id) {
@@ -155,8 +153,6 @@ public class NodeService {
     
     public boolean doesNodeBelongToTree(Long nodeId, Long treeId) {
         Node node = getNode(nodeId);
-        Tree tree = treeRepository.findById(treeId).orElse(null);
-
         if (node == null || tree == null) {
             return false;
         }
@@ -170,6 +166,22 @@ public class NodeService {
         return false;
     }
     
+    public Integer getGenerationGap(Node node1, Node node2) {
+    	List<Tree> trees1 = node1.getTrees();
+    	List<Tree> trees2 = node2.getTrees();
+    	trees1.retainAll(trees2);
+    	List<Integer> diffList = new ArrayList<>();
+    	for(Tree tree : trees1) {
+    		diffList.add(tree.getTreeNodesByNode(node1).getDepth() - tree.getTreeNodesByNode(node2).getDepth());
+    	}
+    	Integer diff = Misc.findMaxFrequency(diffList);
+
+    	//tous tree avec 2 nodes
+    	//différence prof des 2 
+    	//celle qui apparait plus souvent comme prof
+    	return null;
+    }
+    
     public Node getNodeByNameAndBirthInfo(String lastName, String firstName, LocalDate dateOfBirth, String countryOfBirth, String cityofBirth) {
 		Node nodeFound = null;
 		PersonInfo personInfoFound = personInfoRepository.findByLastNameAndFirstNameAndDateOfBirthAndCountryOfBirthAndCityOfBirth(lastName, firstName, dateOfBirth, countryOfBirth, cityofBirth); 
@@ -178,7 +190,7 @@ public class NodeService {
 		}
 		return nodeFound;
 	}
-    
+
     public Node getPublicNodeByNameAndBirthInfo(String lastName, String firstName, LocalDate dateOfBirth, String countryOfBirth, String cityofBirth) {
 		Node nodeFound = getNodeByNameAndBirthInfo(lastName, firstName, dateOfBirth, countryOfBirth, cityofBirth);
 		if(Objects.isNull(nodeFound)) {

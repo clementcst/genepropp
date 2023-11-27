@@ -157,21 +157,6 @@ public void testUpdateTree() {
     assertTrue(updatedTree.getNodes().stream().anyMatch(treeNode -> treeNode.equals(node)));
     assertTrue(updatedTree.getNodes().stream().anyMatch(treeNode -> treeNode.getId().equals(nodeService.getNode((long) 1).getId())));
 }
-
-//    @Test
-//    @Order(7)
-//    public void testDeleteNodeFromTree() {
-//        Tree tree = treeService.getTree(2);
-//        Node node = nodeService.getNode((long) 2);
-//
-//        treeService.deleteNodeFromTree(node.getId(), tree.getId());
-//
-//        Tree retrievedTree = treeService.getTree(tree.getId());
-//        assertNotNull(retrievedTree);
-//        assertFalse(retrievedTree.getNodes().stream().anyMatch(treeNode -> treeNode.getTreeNodes().equals(node)));
-//        assertFalse(nodeService.getAllNodes().contains(node));
-//
-//    }
     
     
   @Test
