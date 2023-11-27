@@ -68,7 +68,7 @@ public class TreeController{
     @DeleteMapping("/node")
     public Response deleteNodeInTree(@RequestParam Node node, @RequestParam Long treeId) {
     	Tree tree = treeService.getTree(treeId);
-    	if(nodeService.doesNodeBelongToTree(node, treeId) == true) {
+    	if(nodeService.doesNodeBelongToTree(node.getId(), treeId) == true) {
     		List<User> users = userService.getAllUsers();
     		for (User user : users) {
     			if(node.getCreatedBy() == user) {
@@ -174,7 +174,7 @@ public class TreeController{
 //    						restart le process
 //    					}
     		}    		
-    		if(nodeService.doesNodeBelongToTree(node, treeId) == true) {
+    		if(nodeService.doesNodeBelongToTree(node.getId(), treeId) == true) {
 //    			message user already in tree
     			return false;
     		} else {

@@ -162,8 +162,8 @@ public class NodeServiceTest {
         node = nodeService.getNode((long) 1);        
         
         Node node2 = nodeService.getNode((long) 2);
-        boolean belongsToTree = nodeService.doesNodeBelongToTree(node, tree.getId());
-        boolean belongsToTree2 = nodeService.doesNodeBelongToTree(node2, tree.getId());
+        boolean belongsToTree = nodeService.doesNodeBelongToTree(node.getId(), tree.getId());
+        boolean belongsToTree2 = nodeService.doesNodeBelongToTree(node2.getId(), tree.getId());
 
 
         assertTrue(belongsToTree);
