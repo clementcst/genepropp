@@ -44,12 +44,7 @@ public class TestDataCreationController {
 	    }));
 		List<Response> responses = new ArrayList<>();
 		for (User user : users) {
-			//System.out.println(userService.getUserByNameAndBirthInfo(user.getLastName(), user.getFirstName(), user.getDateOfBirth(), user.getCountryOfBirth(), user.getCityOfBirth()));
-			if(!Objects.isNull(userService.getUserByNameAndBirthInfo(user.getLastName(), user.getFirstName(), user.getDateOfBirth(), user.getCountryOfBirth(), user.getCityOfBirth()))) {
-				responses.add(new Response("user " + user.getFullName() + " already exist", false));
-			} else {
-				responses.add(userController.addUser(user));
-			}
+			responses.add(userController.addUser(user));
 		}
 		for (Response response : responses) {
 			if(!response.getSuccess()) {

@@ -4,7 +4,9 @@ import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
@@ -305,5 +307,24 @@ public class User implements Serializable {
 		        sequence.append(randomChar);
 		    }
 		 return sequence.toString();
+	}
+	
+	public static User castAsUser(LinkedHashMap<String, String> dataLHM) {
+		List<String> requiredKeys = Arrays.asList("lastName", "firstName", "gender", "dateOfBirth", "countryOfBirth", "cityOfBirth", "email", "password", "noSecu", "noPhone", "nationality", "adress", "postalCode");		
+		Set<String> keys = dataLHM.keySet();
+		if(keys.containsAll(requiredKeys)) {
+			int gender;
+			int postalCode;
+			LocalDate dateOfBirth;
+			try {
+				gender = Integer.parseInt(dataLHM.get("gender"));
+				postalCode = Integer.parseInt(dataLHM.get("postalCode"));
+				dateOfBirth = LocalDate.parse(dataLHM.get("dateOfBirth"));
+			} catch (Exception e) {
+				return null;
+			}
+			return new User(dataLHM.get("lastName"), dataLHM.get("firstName"), gender, dateOfBirth, dataLHM.get("countryOfBirth"), dataLHM.get("cityOfBirth"), dataLHM.get("email"), dataLHM.get("password"), dataLHM.get("noSecu"), dataLHM.get("noPhone"), dataLHM.get("nationality"), dataLHM.get("adress"), postalCode, null);
+		}
+		return null;
 	}
 }
