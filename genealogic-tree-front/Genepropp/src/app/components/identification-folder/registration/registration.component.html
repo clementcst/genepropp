@@ -3,6 +3,12 @@
         <img class="mx-auto h-22 w-auto" src="../assets/media/logo_genepropp.png" alt="Genepropp Logo">
         <br>
 
+        <div class="text-center">
+            <div *ngIf="authenticationError" class="text-red-500 mt-2 p-4 bg-red-100 rounded-md inline-block">
+                An error occurred, please contact support
+            </div>
+        </div>
+
         <form class="space-y-6" (submit)="onSubmit()">
             <div class="sm:flex sm:flex-wrap -mx-3">
                 <div class="sm:w-1/2 px-3">
