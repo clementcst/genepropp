@@ -66,7 +66,6 @@ export class RegistrationComponent {
         }
         else {
           this.authenticationError = true;
-          console.error(response);
         }
       });
 
