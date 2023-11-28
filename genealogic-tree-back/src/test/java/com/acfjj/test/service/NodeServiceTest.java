@@ -4,6 +4,7 @@ import com.acfjj.app.GenTreeApp;
 import com.acfjj.app.model.Node;
 import com.acfjj.app.model.Tree;
 import com.acfjj.app.model.User;
+import com.acfjj.app.model.PersonInfo;
 import com.acfjj.app.service.NodeService;
 import com.acfjj.app.service.TreeService;
 import com.acfjj.app.service.UserService;
@@ -94,20 +95,23 @@ public class NodeServiceTest {
         assertEquals(parentNode.getId(), retrievedChildNode.getParent1().getId());
     }
 
-//    @Test
+    @Test
     @Order(6)
     public void testDeleteNode() {
-        Node parent2 = nodeService.getNodeByNameAndBirthInfo("User2", "FirstName2", LocalDate.of(2001, 2, 2), "Country2", "City2");
+    	PersonInfo person = new PersonInfo("person4", "FirstName4", 1, LocalDate.of(2004, 1, 1), "Country4", "City4", false, "Nationality1", "Address1", 12345, "Base64Image1");
+        User user3 = userService.getUserByNameAndBirthInfo("User3","FirstName3", LocalDate.of(2003, 1, 1), "Country3", "City3");
+        Node nodeToDel = new Node(person, user3, null, null, 0);
+        nodeService.addNode(nodeToDel);
+        nodeToDel = nodeService.getNodeByNameAndBirthInfo("person4", "FirstName4", LocalDate.of(2004, 1, 1), "Country4", "City4");
 
-        Long parent2Id = parent2.getId();
-        nodeService.deleteNode(parent2Id);
+        
+        
+        Long nodeToDelId = nodeToDel.getId();
+        assertNotNull(nodeToDel);
+        nodeService.deleteNode(nodeToDelId);
 
-        Node retrievedNode = nodeService.getNode(parent2Id);
-        Node node = nodeService.getNode((long) 1);
-
+        Node retrievedNode = nodeService.getNode(nodeToDelId);
         assertNull(retrievedNode);
-        assertNull(node.getParent2());
-
     }
 
     @Test
@@ -164,6 +168,22 @@ public class NodeServiceTest {
 
         assertTrue(belongsToTree);
         assertFalse(belongsToTree2);
+    }
+    
+    @Test
+    @Order(8)
+    public void testRemoveLinks() {
+        Node node = nodeService.getNode((long) 1);
+
+        assertNotNull(node.getParent1());
+        assertNotNull(node.getParent2());
+        
+        nodeService.removeLinks(node.getId());
+        node = nodeService.getNode((long) 1);
+        
+        assertNull(node.getParent1());
+        assertNull(node.getParent2());
+
     }
 
     private Node createTestNode() {

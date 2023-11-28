@@ -97,8 +97,8 @@ public class TreeTest {
         Tree publicTree = new Tree("PublicTree", 1, nodes);
         Tree privateTree = new Tree("PrivateTree", 0, nodes);
 
-        assertTrue(publicTree.isTreePublic());
-        assertFalse(privateTree.isTreePublic());
+        assertTrue(publicTree.isPublic());
+        assertFalse(privateTree.isPublic());
     }
 
 }
