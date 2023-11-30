@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
 import { IdentificationService } from '../../../services/identificaton/identification.service';
+import { MatDialog } from '@angular/material/dialog';
+import { YourPopupComponentComponent } from '../../your-popup-component/your-popup-component.component'
 
 @Component({
   selector: 'app-registration',
@@ -49,7 +51,8 @@ export class RegistrationComponent {
   constructor(
     private identificationService: IdentificationService,
     private router: Router,
-    private cookieService: CookieService
+    private cookieService: CookieService,
+    public dialog: MatDialog
   ) {}
 
   onSubmit() {
@@ -59,17 +62,34 @@ export class RegistrationComponent {
 
     this.identificationService.registerResquest(this.data, this.step)
       .subscribe((response) => {
+
+        if (response.step === 2) {
+          // Ouvrir la pop-up ici
+          this.openPopup();
+        }
+
         console.log(response)
         if (response.success) {
           this.cookieService.set('userId', response.value);
           this.router.navigate(['homePage']);
         }
         else {
+          this.openPopup();
           this.authenticationError = true;
         }
       });
-
   }
+
+  openPopup() {
+    const dialogRef = this.dialog.open(YourPopupComponentComponent, {
+      data: {inputs: this.data},
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+        console.log(`Popup closed with result: ${result}`);
+        // Actions à effectuer après la fermeture de la pop-up
+    });
+}
 
   checkErrors() {
     if (this.data.firstName == "") {
