@@ -14,15 +14,14 @@ export class YourPopupComponentComponent {
     ) {}
 
   editer() {
-    console.log(this.data)
     console.log('Editer');
     this.dialogRef.close({action: 'Edit'});
   }
 
   valider() {
-    // Logique pour le bouton "Valider"
     console.log('Valider');
-    this.dialogRef.close({action: 'Submit'}); // Vous pouvez également envoyer une valeur de retour à la fermeture de la pop-up
+    this.dialogRef.close({action: 'Submit'});
+    
   }
 
 }

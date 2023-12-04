@@ -7,6 +7,9 @@
             <div *ngIf="authenticationError" class="text-red-500 mt-2 p-4 bg-red-100 rounded-md inline-block">
                 An error occurred, please contact support
             </div>
+            <div *ngIf="errors.step1error" class="text-red-500 mt-2 p-4 bg-red-100 rounded-md inline-block">
+                {{ data.message_error_step1 }}
+            </div>
         </div>
 
         <form class="space-y-6" (submit)="onSubmit()">

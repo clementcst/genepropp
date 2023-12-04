@@ -3,7 +3,8 @@ import { Router } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
 import { IdentificationService } from '../../../services/identificaton/identification.service';
 import { MatDialog } from '@angular/material/dialog';
-import { YourPopupComponentComponent } from '../../your-popup-component/your-popup-component.component'
+import { YourPopupComponentComponent } from '../../PopUps/registration-popup/your-popup-component.component'
+import { ShowPrivateCodeComponent } from '../../PopUps/show-private-code-popup/show-private-code.component'
 
 @Component({
   selector: 'app-registration',
@@ -13,6 +14,7 @@ import { YourPopupComponentComponent } from '../../your-popup-component/your-pop
 export class RegistrationComponent {
   authenticationError: boolean = false;
   step = 1;
+  userResponse = 0;
   // Déclarer des variables pour stocker les valeurs des champs
   data: any = {
     firstName: '',
@@ -28,7 +30,8 @@ export class RegistrationComponent {
     adress: '',
     postalCode: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    message_error_step1: '',
   };
   errors: any = {
     isdetected: false,
@@ -45,7 +48,8 @@ export class RegistrationComponent {
     adress: false,
     postalCode: false,
     password: false,
-    confirmPassword: false
+    confirmPassword: false,
+    step1error: false,
   };
 
   constructor(
@@ -60,38 +64,53 @@ export class RegistrationComponent {
     this.checkErrors();
     if (this.errors.isdetected) return;
 
-    this.identificationService.registerResquest(this.data, this.step)
+    this.identificationService.registerResquest(this.data, this.step, this.userResponse)
       .subscribe((response) => {
-
-        if (response.step === 2) {
-          //Ouvrir la pop-up ici, quand le back renverra bien step == 2
-          this.openPopup(response);
-        }
+        console.log(response);
         if (response.success) {
-          this.cookieService.set('userId', response.value);
+          if (response.value.nextStep === 1) {
+            this.errors.step1error = true;
+            this.data.message_error_step1 = response.value.frontMessage;
+            return;
+          }
+          if (response.value.nextStep === 2) {
+            this.step = 2;
+            this.userResponse = 1;
+            this.openRegistrationPopup(response, response.nextStep);
+            return;
+          }
+          this.openPrivateCodePopup(response.value.privateCode);
+          this.cookieService.set('userId', response.value.userId);
           this.router.navigate(['homePage']);
         }
         else {
-          console.log(response);
-          this.openPopup(response.value.data); //A sup quand le back renverra true, tester avec step == 2
-          this.authenticationError = true; //A garder, quand le back bug
+          this.authenticationError = true;
+          return;
         }
       });
+
+
   }
 
-  openPopup(response: any) {
+  openRegistrationPopup(response: any, step: any) {
     const dialogRef = this.dialog.open(YourPopupComponentComponent, {
       data: { data: response },
     });
-
     dialogRef.afterClosed().subscribe(result => {
-      console.log(`Popup closed with result: ${result.action}`);
-
       if (result.action == "Submit") {
-        this.step == 2
+        this.step == step;
         this.onSubmit();
       }
-      // Actions à effectuer après la fermeture de la pop-up
+    });
+  }
+
+  openPrivateCodePopup(privateCode: any) {
+    const dialogRef = this.dialog.open(ShowPrivateCodeComponent, {
+      data: { data: privateCode },
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+
     });
   }
 

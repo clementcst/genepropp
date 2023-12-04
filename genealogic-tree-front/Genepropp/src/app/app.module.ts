@@ -37,7 +37,8 @@ import { TreeContentComponent } from './components/tree-folder/tree-content/tree
 import { TreeNodeComponent } from './components/tree-folder/tree-node/tree-node.component';
 
 import { HttpClientModule } from '@angular/common/http';
-import { YourPopupComponentComponent } from './components/your-popup-component/your-popup-component.component';
+import { YourPopupComponentComponent } from './components/PopUps/registration-popup/your-popup-component.component';
+import { ShowPrivateCodeComponent } from './components/PopUps/show-private-code-popup/show-private-code.component';
 
 
 
@@ -73,6 +74,7 @@ import { YourPopupComponentComponent } from './components/your-popup-component/y
     TreeContentComponent,
     TreeNodeComponent,
     YourPopupComponentComponent,
+    ShowPrivateCodeComponent,
   ],
   imports: [
     BrowserModule,
