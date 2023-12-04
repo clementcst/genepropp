@@ -12,7 +12,7 @@ import { YourPopupComponentComponent } from '../../your-popup-component/your-pop
 })
 export class RegistrationComponent {
   authenticationError: boolean = false;
-  step=1;
+  step = 1;
   // Déclarer des variables pour stocker les valeurs des champs
   data: any = {
     firstName: '',
@@ -53,43 +53,47 @@ export class RegistrationComponent {
     private router: Router,
     private cookieService: CookieService,
     public dialog: MatDialog
-  ) {}
+  ) { }
 
   onSubmit() {
     this.resetErrors();
     this.checkErrors();
-    if(this.errors.isdetected) return;
+    if (this.errors.isdetected) return;
 
     this.identificationService.registerResquest(this.data, this.step)
       .subscribe((response) => {
 
         if (response.step === 2) {
-          // Ouvrir la pop-up ici
-          this.openPopup();
+          //Ouvrir la pop-up ici, quand le back renverra bien step == 2
+          this.openPopup(response);
         }
-
-        console.log(response)
         if (response.success) {
           this.cookieService.set('userId', response.value);
           this.router.navigate(['homePage']);
         }
         else {
-          this.openPopup();
-          this.authenticationError = true;
+          console.log(response);
+          this.openPopup(response.value.data); //A sup quand le back renverra true, tester avec step == 2
+          this.authenticationError = true; //A garder, quand le back bug
         }
       });
   }
 
-  openPopup() {
+  openPopup(response: any) {
     const dialogRef = this.dialog.open(YourPopupComponentComponent, {
-      data: {inputs: this.data},
+      data: { data: response },
     });
 
     dialogRef.afterClosed().subscribe(result => {
-        console.log(`Popup closed with result: ${result}`);
-        // Actions à effectuer après la fermeture de la pop-up
+      console.log(`Popup closed with result: ${result.action}`);
+
+      if (result.action == "Submit") {
+        this.step == 2
+        this.onSubmit();
+      }
+      // Actions à effectuer après la fermeture de la pop-up
     });
-}
+  }
 
   checkErrors() {
     if (this.data.firstName == "") {
@@ -166,5 +170,5 @@ export class RegistrationComponent {
     this.errors.postalCode = false;
     this.errors.password = false;
     this.errors.confirmPassword = false;
-}
+  }
 }
