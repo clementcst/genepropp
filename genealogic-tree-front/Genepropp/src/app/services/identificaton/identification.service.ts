@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-interface UserResponse {
+interface inputsResponse {
   value: any[];
   message: string | null;
   success: boolean;
@@ -16,19 +16,19 @@ export class IdentificationService {
 
   constructor(private http: HttpClient) { }
 
-  loginattempt(privatecode: string, password: string):Observable<any> {
+  loginattempt(inputs: any):Observable<any> {
     const params = {
-      privatecode : privatecode,
-      password : password
+      privateCode : inputs.privatecode,
+      password : inputs.password
     }
-    return this.http.get<UserResponse>("http://localhost:8080/login", {params, responseType: 'json'});
+    return this.http.get<inputsResponse>("http://localhost:8080/login", {params, responseType: 'json'});
   }
 
-  registerResquest(user: any, step: number):Observable<any> {
+  registerResquest(inputs: any, step: number, userResponse: number):Observable<any> {
     const params = new HttpParams()
       .set('step', step)
-      .set('userResponse', 'false');
-    const data = { lastName: user.lastName, firstName: user.firstName, gender: user.sexe, dateOfBirth: user.birthDate, countryOfBirth: user.countryofbirth, cityOfBirth: user.cityofbirth, email: user.email, password: user.password, noSecu: user.ssn, noPhone: user.phn, nationality: user.nationality, adress: user.adress, postalCode: user.postalCode }
+      .set('userResponse', userResponse);
+    const data = { lastName: inputs.lastName, firstName: inputs.firstName, gender: inputs.sexe, dateOfBirth: inputs.birthDate, countryOfBirth: inputs.countryofbirth, cityOfBirth: inputs.cityofbirth, email: inputs.email, password: inputs.password, noSecu: inputs.ssn, noPhone: inputs.phn, nationality: inputs.nationality, adress: inputs.adress, postalCode: inputs.postalCode }
     return this.http.post<any[]>("http://localhost:8080/registration", data, {params, responseType: 'json'});
   }
 }

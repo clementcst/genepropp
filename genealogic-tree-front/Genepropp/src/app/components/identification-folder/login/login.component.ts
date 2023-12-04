@@ -9,8 +9,15 @@ import { IdentificationService } from '../../../services/identificaton/identific
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit{
-  privatecode: string = '';
-  password: string = '';
+  data: any = {
+    privatecode: '',
+    password: ''
+  }
+  errors: any = {
+    isdetected: false,
+    privatecode: false,
+    password: false
+  }
   authenticationError: boolean = false;
   errorMessage: string = '';
 
@@ -25,7 +32,11 @@ export class LoginComponent implements OnInit{
   }
 
   onSubmit() {
-    this.identificationService.loginattempt(this.privatecode, this.password)
+    this.resetErrors();
+    this.checkErrors();
+    if(this.errors.isdetected) return;
+
+    this.identificationService.loginattempt(this.data)
       .subscribe((response) => {
         if (response.success) {
           this.cookieService.set('userId', response.value);
@@ -36,5 +47,22 @@ export class LoginComponent implements OnInit{
           this.errorMessage = response.message;
         }
       });
+  }
+
+  checkErrors() {
+    if (this.data.privatecode == "") {
+      this.errors.privatecode = true;
+      this.errors.isdetected = true;
+    }
+    if (this.data.password == "") {
+      this.errors.password = true;
+      this.errors.isdetected = true;
+    }
+  }
+
+  resetErrors() {
+    this.errors.isdetected = false;
+    this.errors.privatecode = false;
+    this.errors.password = false;
   }
 }

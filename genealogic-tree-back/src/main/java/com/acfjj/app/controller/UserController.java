@@ -77,9 +77,9 @@ public class UserController{
 		default:
 			return new Response("Unexpected parameter: " + step, false);
 		}
-		
+
 	}
-	
+
 	public Response addUser(User user, Node existingNode) {
 		//security
 		if(!Objects.isNull(userService.getUserByNameAndBirthInfo(user.getLastName(), user.getFirstName(), user.getDateOfBirth(), user.getCountryOfBirth(), user.getCityOfBirth()))) {
@@ -98,7 +98,8 @@ public class UserController{
 		}
 		//User's Tree
 		String treeName = firstName + " " + lastName + "'s Tree";
-		treeName = treeService.addTree(new Tree(treeName, 1));
+		treeName = treeService.getUniqueName(new Tree(treeName, 0));
+		treeService.addTree(new Tree(treeName, 0));
 		Tree tree = treeService.getTreeByName(treeName);
 		if(Objects.isNull(tree)) {
 			return new Response("Fail to create user's Tree in DB", false);
@@ -124,7 +125,7 @@ public class UserController{
 		responseValue.put("privateCode", user.getPrivateCode());
 		return new Response(responseValue, "Success", true);
 	}
-	
+
 	private Response registrationStep1(User userToRegister, LinkedHashMap<String, String> data) {
 		User userFound = userService.getUserByNameAndBirthInfo(userToRegister.getLastName(), userToRegister.getFirstName(), userToRegister.getDateOfBirth(), userToRegister.getCountryOfBirth(), userToRegister.getCityOfBirth());
 		Node nodeFound = nodeService.getPublicNodeByNameAndBirthInfo(userToRegister.getLastName(), userToRegister.getFirstName(), userToRegister.getDateOfBirth(), userToRegister.getCountryOfBirth(), userToRegister.getCityOfBirth());
@@ -133,7 +134,7 @@ public class UserController{
 			responseValue.put("nextStep", 1);
 			responseValue.put("frontMessage", "A user with the same names and birth informations or with same email as been found. Double account are not allowed. Please double check register information.");
 			responseValue.put("data", data);
-			return new Response(responseValue ,"User with same birth info (" + userFound.getFullNameAndBirthInfo() + ") or with same email (" + userFound.getEmail() + ") already exist", false);
+			return new Response(responseValue ,"User with same birth info (" + userFound.getFullNameAndBirthInfo() + ") or with same email (" + userFound.getEmail() + ") already exist", true);
 		} else if(!Objects.isNull(nodeFound)) {
 			Map<String, Object> responseValue = new LinkedHashMap<String, Object>();
 			responseValue.put("nextStep", 2);
@@ -145,7 +146,7 @@ public class UserController{
 			return addUser(userToRegister, null);
 		}
 	}
-	
+
 	private Response registrationStep2(User userToRegister, LinkedHashMap<String, String> data, Boolean userResponse) {
 		if(userResponse) {
 			Node nodeFound = nodeService.getPublicNodeByNameAndBirthInfo(userToRegister.getLastName(), userToRegister.getFirstName(), userToRegister.getDateOfBirth(), userToRegister.getCountryOfBirth(), userToRegister.getCityOfBirth());
@@ -158,7 +159,7 @@ public class UserController{
 			return registrationStep1(userToRegister, data);
 		}
 	}
-	
+
 	private PersonInfo mergeNodeToUserPI(Node node, User user) {
 		PersonInfo nodePI = node.getPersonInfo();
 		PersonInfo userPI = user.getPersonInfo();

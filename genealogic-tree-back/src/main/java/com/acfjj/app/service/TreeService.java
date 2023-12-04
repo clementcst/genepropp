@@ -7,6 +7,7 @@ import com.acfjj.app.model.Node;
 import com.acfjj.app.model.Tree;
 import com.acfjj.app.model.TreeNodes;
 import com.acfjj.app.repository.NodeRepository;
+import com.acfjj.app.repository.PersonInfoRepository;
 import com.acfjj.app.repository.TreeNodesRepository;
 import com.acfjj.app.repository.TreeRepository;
 
@@ -27,6 +28,9 @@ public class TreeService {
     
     @Autowired
     TreeNodesRepository treeNodesRepository;
+    
+    @Autowired
+    PersonInfoRepository personInfoRepository;
 
     public List<Tree> getAllTrees() {
         List<Tree> trees = new ArrayList<>();
@@ -38,21 +42,23 @@ public class TreeService {
         return treeRepository.findById(id).orElse(null);
     }
 
-     public String addTree(Tree tree) {
-    	 // voir pour mettre à part le newname
-        String treeName = tree.getName();
-        Integer nameInt = 1;
-        while(isNameTaken(tree.getName())) { 
-			nameInt++;
-			tree.setName(treeName + nameInt.toString());
-		}
+     public void addTree(Tree tree) {    	
         for (TreeNodes treeNode : tree.getTreeNodes()) {
             if(treeNode != null)
         	treeNodesRepository.save(treeNode);
         }    
-        treeRepository.save(tree);
-        return tree.getName();
+        treeRepository.save(tree);        
     }
+     
+   public String getUniqueName(Tree tree) {
+       String treeName = tree.getName();
+       Integer nameInt = 1;
+       while(isNameTaken(tree.getName())) { 
+			nameInt++;
+			tree.setName(treeName + nameInt.toString());
+		}
+       return tree.getName();
+   }
 
     public void deleteTree(long id) {
     	Tree tree = getTree(id);
@@ -91,11 +97,11 @@ public class TreeService {
     }
     
 //    public void deleteNodeFromTree(Long nodeId, Long treeId) {
-    // les vérifs sont à faire ici
+//    les vérifs sont à faire ici
 //    	//sécurité de user
 //        Tree tree = getTree(treeId);
 //        if (tree != null) {
-//        	 Set<TreeNodes> treeNodes = treeNodesRepository.findAll();
+//        	 Set<TreeNodes> treeNodes = tree.getTreeNodes();
 //
 //        	 for (TreeNodes treeNode : treeNodes) {
 //        		 if(treeNode.getNode().getId().equals(nodeId)) {
@@ -113,16 +119,16 @@ public class TreeService {
 //        } 
 //    }
 
-
     public void addNodeToTree(Tree tree, Node node, int privacy, int depth) {
         if (tree != null && node != null) {
-
             Set<TreeNodes> treeNodes = tree.getTreeNodes();
             if (treeNodes.contains(null) || treeNodes == null ) {
                 treeNodes = new HashSet<>();
             }
             boolean associationExists = treeNodes.stream().anyMatch(treeNode -> treeNode.getNode().equals(node));
             if (!associationExists) {
+            	personInfoRepository.save(node.getPersonInfo());
+            	nodeRepository.save(node);
                 TreeNodes treeNode = new TreeNodes(tree, node, privacy, depth);
                 treeNodesRepository.save(treeNode);
                 tree.addTreeNodes(treeNode);
@@ -130,23 +136,27 @@ public class TreeService {
                 nodeRepository.save(node);
                 treeRepository.save(tree);
             }
+            return;
         }
     }
     
-    public void addParentToNodeInTree(Long treeId, Node node,Node parent, int privacy, int wichParent) {
+    public void addParentToNodeInTree(Long treeId, Node node,Node parent, int privacy) {
         Tree tree = getTree(treeId);
         int depth = 0;
         for(TreeNodes treeNode : node.getTreeNodes()) {
         	if(treeNode.getTree().getId() == treeId)
         	depth = treeNode.getDepth();
         }
-        if(wichParent == 1) {
-        	node.setParent1(parent);
-        } else {
-        	node.setParent2(parent);
-        	
-        }
         addNodeToTree(tree, parent, privacy, depth+1);
+        if(node.getParent1() == null || node.getParent1Id().equals(parent.getId())) {
+        	node.setParent1(parent);
+        } else if(node.getParent2() == null || node.getParent2Id().equals(parent.getId())) {
+        	node.setParent2(parent);
+        } else {
+        	return;
+        }
+    	System.out.println("Parent " + parent);
+    	System.out.println("Enfant " + node);
         nodeRepository.save(node);
     }
     
@@ -160,11 +170,10 @@ public class TreeService {
         partner.setPartner(node);
         addNodeToTree(tree, partner, privacy, depth);
         node.setPartner(partner);
-        nodeRepository.save(node);
-        
+        nodeRepository.save(node);        
     }
     
-    public void addSiblingsToTree(Long treeId, Node node,Node sibling, int privacy) {
+    public void addSiblingsToTree(Long treeId, Node node, Node sibling, int privacy) {
         Tree tree = getTree(treeId);
         int depth = 0;
         for(TreeNodes treeNode : node.getTreeNodes()) {
@@ -172,16 +181,16 @@ public class TreeService {
         	depth = treeNode.getDepth();
         }
         for(Node otherSibling : sibling.getSiblings()){
-        	node.addSiblings(otherSibling);
+        	sibling.addSiblings(otherSibling);
         }
-        node.addSiblings(sibling);
         
-        addNodeToTree(tree, node, privacy, depth);
+        addNodeToTree(tree, sibling, privacy, depth);
         for(Node nodeSiblings : node.getSiblings()){
         	nodeSiblings.addSiblings(node);
         	nodeRepository.save(nodeSiblings);
         }
-        
+        node.addSiblings(sibling);
+        nodeRepository.save(node);        
     }
     
     public void addExPartnerToNodeInTree(Long treeId, Node node,Node partner, int privacy) {
@@ -197,6 +206,8 @@ public class TreeService {
         nodeRepository.save(node);
         
     }
+    
+    //Faire les removes links
 
     public void removeNodeFromTree(Tree tree, Node node) {
     	Long treeId = tree.getId();
