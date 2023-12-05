@@ -1,5 +1,7 @@
 package com.acfjj.app.model;
 
+import java.util.Objects;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -44,12 +46,18 @@ public class TreeNodes {
 			this.id = id;
 		}
 		public Tree getTree() {
+			if(Objects.isNull(tree)) {
+				return null;
+			}
 			return tree;
 		}
 		public void setTree(Tree tree) {
 			this.tree = tree;
 		}
 		public Node getNode() {
+			if(Objects.isNull(node)) {
+				return null;
+			}
 			return node;
 		}
 		public void setNode(Node node) {

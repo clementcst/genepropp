@@ -134,7 +134,7 @@ public class UserController{
 			responseValue.put("nextStep", 1);
 			responseValue.put("frontMessage", "A user with the same names and birth informations or with same email as been found. Double account are not allowed. Please double check register information.");
 			responseValue.put("data", data);
-			return new Response(responseValue ,"User with same birth info (" + userFound.getFullNameAndBirthInfo() + ") or with same email (" + userFound.getEmail() + ") already exist", true);
+			return new Response(responseValue ,"User with same birth info (" + userFound.getFullNameAndBirthInfo() + ") or with same email (" + userFound.getEmail() + ") already exist", false);
 		} else if(!Objects.isNull(nodeFound)) {
 			Map<String, Object> responseValue = new LinkedHashMap<String, Object>();
 			responseValue.put("nextStep", 2);
