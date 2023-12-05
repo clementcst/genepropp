@@ -142,6 +142,12 @@ public class User implements Serializable {
 		}
 		return myTree.getId();
 	}
+	public Long getRelatedNodeId() {
+		if(Objects.isNull(getPersonInfo().getRelatedNode())) {
+			return null;
+		}
+		return getPersonInfo().getRelatedNode().getId();
+	}
 	@JsonIgnore
 	public Set<Conversation> getConversations() {
 		Set<Conversation> conversations = new HashSet<>(conversations1);

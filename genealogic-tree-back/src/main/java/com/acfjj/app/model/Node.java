@@ -55,15 +55,15 @@ public class Node implements Serializable {
 	private Node partner;
     
     @JsonIgnore
-    @OneToMany(fetch=FetchType.EAGER)
+    @OneToMany
 	private Set<Node> exPartners = new HashSet<>();
     
     @JsonIgnore
-    @OneToMany(fetch=FetchType.EAGER)
+    @OneToMany
 	private Set<Node> siblings = new HashSet<>();
     
     @JsonIgnore
-	@OneToMany(mappedBy = "node",fetch=FetchType.EAGER)
+	@OneToMany(mappedBy = "node")
 	private Set<TreeNodes> treeNodes = new HashSet<>();
 	
 	public Node() {
@@ -185,7 +185,7 @@ public class Node implements Serializable {
 		this.exPartners.remove(exPartner);
 	}
 	public List<Long> getExPartnersId() {
-		if(Objects.isNull(exPartners)) {
+		if(exPartners.isEmpty()) {
 			return null;
 		} 
 		List<Long> exPartnersId = new ArrayList<>();
@@ -207,7 +207,7 @@ public class Node implements Serializable {
 		this.siblings.remove(sibling);
 	}
 	public List<Long> getSiblingsId() {
-		if(Objects.isNull(siblings)) {
+		if(siblings.isEmpty()) {
 			return null;
 		} 
 		List<Long> siblingsId = new ArrayList<>();
@@ -332,7 +332,7 @@ public class Node implements Serializable {
 	public String toString() {
 		return "Node [id=" + id 
 				+ ", personInfo=" + personInfo 
-				+ ", createdBy=" + createdBy.getId()
+				+ ", createdById=" + createdBy.getId()
 				+ ", privacy=" + privacy
 				+ ", parent1=" + getParent1Id()
 				+ ", parent2=" + getParent2Id()
