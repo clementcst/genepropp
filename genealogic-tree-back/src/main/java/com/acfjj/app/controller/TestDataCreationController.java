@@ -4,19 +4,21 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.acfjj.app.model.Node;
 import com.acfjj.app.model.PersonInfo;
 import com.acfjj.app.model.Tree;
 import com.acfjj.app.model.User;
-import com.acfjj.app.repository.TreeRepository;
 import com.acfjj.app.repository.PersonInfoRepository;
-import com.acfjj.app.service.*;
+import com.acfjj.app.service.ConversationService;
+import com.acfjj.app.service.NodeService;
+import com.acfjj.app.service.TreeService;
+import com.acfjj.app.service.UserService;
 import com.acfjj.app.utils.Response;
 
 @RestController
@@ -37,7 +39,7 @@ public class TestDataCreationController {
 	PersonInfoRepository personInfoRepository;
 
 	@PostMapping("/test/users")
-	public Response addTestUsers() {
+	public Response addTestUsers(@RequestParam(required = false, defaultValue = "1") Boolean validated) {
 		List<User> users = new ArrayList<User>(Arrays.asList(new User[] {
 				new User("Bourhara", "Adam", 1, LocalDate.of(2002, 04, 2), "France", "Cergy", "adam@mail", "password1",
 						"Sécurité socisse", "Telephone ui", "nationality", "adress", 1234, "profilPictureData64"),
@@ -53,6 +55,9 @@ public class TestDataCreationController {
 						"Sécurité socisse", "Telephone ui", "nationality", "adress", 1234, "profilPictureData64") }));
 		List<Response> responses = new ArrayList<>();
 		for (User user : users) {
+			user = userService.getUserByEmail(user.getEmail());
+			user.setValidated(validated);
+			userService.updateUser(user.getId(), user);
 			responses.add(userController.addUser(user, null));
 		}
 		for (Response response : responses) {
@@ -60,9 +65,9 @@ public class TestDataCreationController {
 				return new Response(responses, "One or more failure occured", false);
 			}
 		}
-		return new Response(responses);
+		return new Response("All test users have successfully been created", true);
 	}
-
+	
 	@PostMapping("/test/trees")
 	public Response addTree() {
 		Tree tree = treeService.getTree(1);
@@ -110,6 +115,7 @@ public class TestDataCreationController {
 		User userTest = new User("Martin", "Y", 1, LocalDate.of(2002, 04, 2), "France", "Cergy", "test@mail",
 				"password1", "Sécurité socisse", "Telephone ui", "nationality", "adress", 1234,
 				"https://99designs-blog.imgix.net/blog/wp-content/uploads/2016/03/web-images.jpg?auto=format&q=60&w=1600&h=824&fit=crop&crop=faces");
+		userTest.setValidated(true);
 		responses.add(userController.addUser(userTest, null));
 
 		Tree tree = userTest.getMyTree();
@@ -131,8 +137,8 @@ public class TestDataCreationController {
 		responses.add(treeController.addLinkedNode(tree.getId(), newNode1.getId(), newNode3, 1, "Parent", false));
 		responses.add(treeController.addLinkedNode(tree.getId(), newNode3.getId(), newNode2, 1, "exPartner", true));
 
-		Node newNode4 = new Node("Rossi", "A", 1, LocalDate.of(1988, 9, 10), "Italie", "Rome", userTest, 1,
-				"Italien", "Via del Corso", 75001,
+		Node newNode4 = new Node("Rossi", "A", 1, LocalDate.of(1988, 9, 10), "Italie", "Rome", userTest, 1, "Italien",
+				"Via del Corso", 75001,
 				"https://img.freepik.com/premium-photo/3d-cartoon-fish-shark-portrait-wearing-clothes-glasses-hat-jacket-standing-front_741910-1595.jpg");
 		responses.add(treeController.addLinkedNode(tree.getId(), newNode3.getId(), newNode4, 1, "Partner", false));
 
@@ -149,8 +155,8 @@ public class TestDataCreationController {
 		responses.add(treeController.addLinkedNode(tree.getId(), newNode3.getId(), newNode6, 1, "Child", true));
 		responses.add(treeController.addLinkedNode(tree.getId(), newNode6.getId(), newNode5, 1, "siblings", true));
 
-		Node newNode7 = new Node("Fernandez", "G", 2, LocalDate.of(1982, 6, 14), "Argentine", "Buenos Aires",
-				userTest, 1, "Argentine", "456 Avenida 9 de Julio", 75001,
+		Node newNode7 = new Node("Fernandez", "G", 2, LocalDate.of(1982, 6, 14), "Argentine", "Buenos Aires", userTest,
+				1, "Argentine", "456 Avenida 9 de Julio", 75001,
 				"https://img.freepik.com/photos-premium/licorne-bande-dessinee-corne-criniere_81048-17810.jpg");
 		responses.add(treeController.addLinkedNode(tree.getId(), newNode4.getId(), newNode7, 1, "siblings", false));
 
