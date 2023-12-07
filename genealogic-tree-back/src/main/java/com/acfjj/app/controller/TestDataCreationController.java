@@ -55,10 +55,10 @@ public class TestDataCreationController {
 						"Sécurité socisse", "Telephone ui", "nationality", "adress", 1234, "profilPictureData64") }));
 		List<Response> responses = new ArrayList<>();
 		for (User user : users) {
+			responses.add(userController.addUser(user, null));
 			user = userService.getUserByEmail(user.getEmail());
 			user.setValidated(validated);
 			userService.updateUser(user.getId(), user);
-			responses.add(userController.addUser(user, null));
 		}
 		for (Response response : responses) {
 			if (!response.getSuccess()) {
