@@ -5,19 +5,24 @@ import java.util.List;
 import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import com.acfjj.app.repository.ConversationRepository;
 import com.acfjj.app.repository.MessageRepository;
 import com.acfjj.app.repository.UserRepository;
-import com.acfjj.app.utils.ValidationType;
 import com.acfjj.app.model.Conversation;
 import com.acfjj.app.model.Message;
 import com.acfjj.app.model.User;
 
 @Service
-@Scope("singleton")
-public class ConversationService extends AbstractService {
+public class ConversationService {
+
+    @Autowired
+    ConversationRepository conversationRepository;
+    @Autowired
+    MessageRepository messageRepository;
+    @Autowired 
+    UserRepository userRepository;
+    
     public Conversation getConversation(long id) {
 		return conversationRepository.findById(id).orElse(null);
 	}
@@ -60,12 +65,6 @@ public class ConversationService extends AbstractService {
 		}
     }
     
-    public void updateMessage(long id, Message message) {
-    	if(getMessage(id) != null && message.getId() == id) {
-			messageRepository.save(message);
-		}
-    }
-    
     public void addMessageToConversation(Message message, Conversation conversation) {
     	messageRepository.save(message);
     	conversation.addMessage(message);
@@ -73,17 +72,5 @@ public class ConversationService extends AbstractService {
     	updateConversation(conversation.getId(), conversation);
     }
     
-    public List<Message> getUserValidationsOfConcernedUser(User concernedUser, ValidationType validationType) {
-    	return messageRepository.findByConcernedUserIdAndValidationType(concernedUser.getId(), validationType);
-    }
-    
-    public Message getMessage(Long msgId) {
-    	return messageRepository.findById(msgId).orElse(null);
-    }
-    
-    public void disableValidation(Message msg) {
-    	msg.disableValidation();
-    	updateMessage(msg.getId(), msg);
-    }
  
 }

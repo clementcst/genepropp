@@ -51,9 +51,9 @@ public class PersonInfoTest {
         String nationality,
         String address,
         int postalCode,
-        String profilPictureUrl
+        String profilPictureData64
     ) {
-        PersonInfo personInfo = new PersonInfo(lastName, firstName, gender, dateOfBirth, countryOfBirth, cityOfBirth, isDead, nationality, address, postalCode, profilPictureUrl);
+        PersonInfo personInfo = new PersonInfo(lastName, firstName, gender, dateOfBirth, countryOfBirth, cityOfBirth, isDead, nationality, address, postalCode, profilPictureData64);
         assertAll(() -> {
             assertEquals(lastName, personInfo.getLastName());
             assertEquals(firstName, personInfo.getFirstName());
@@ -65,7 +65,7 @@ public class PersonInfoTest {
             assertEquals(nationality, personInfo.getNationality());
             assertEquals(address, personInfo.getAdress());
             assertEquals(postalCode, personInfo.getPostalCode());
-            assertEquals(profilPictureUrl, personInfo.getProfilPictureUrl());
+            assertEquals(profilPictureData64, personInfo.getProfilPictureData64());
             assertTrue(personInfo.isOrphan());
         });
     }
@@ -83,7 +83,7 @@ public class PersonInfoTest {
         String nationality,
         String address,
         int postalCode,
-        String profilPictureUrl
+        String profilPictureData64
     ) {
         String lastNameTest = "lastNameTest";
         String firstNameTest = "firstNameTest";
@@ -95,9 +95,9 @@ public class PersonInfoTest {
         String nationalityTest = "nationalityTest";
         String addressTest = "addressTest";
         int postalCodeTest = 54321;
-        String profilPictureUrlTest = "newBase64Image";
+        String profilPictureData64Test = "newBase64Image";
 
-        PersonInfo personInfo = new PersonInfo(lastName, firstName, gender, dateOfBirth, countryOfBirth, cityOfBirth, isDead, nationality, address, postalCode, profilPictureUrl);
+        PersonInfo personInfo = new PersonInfo(lastName, firstName, gender, dateOfBirth, countryOfBirth, cityOfBirth, isDead, nationality, address, postalCode, profilPictureData64);
 
         personInfo.setLastName(lastNameTest);
         assertEquals(lastNameTest, personInfo.getLastName());
@@ -129,7 +129,7 @@ public class PersonInfoTest {
         personInfo.setPostalCode(postalCodeTest);
         assertEquals(postalCodeTest, personInfo.getPostalCode());
 
-        personInfo.setProfilPictureUrl(profilPictureUrlTest);
-        assertEquals(profilPictureUrlTest, personInfo.getProfilPictureUrl());
+        personInfo.setProfilPictureData64(profilPictureData64Test);
+        assertEquals(profilPictureData64Test, personInfo.getProfilPictureData64());
     }
 }

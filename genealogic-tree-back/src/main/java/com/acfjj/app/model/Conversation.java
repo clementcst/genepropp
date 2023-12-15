@@ -1,5 +1,6 @@
 package com.acfjj.app.model;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -13,8 +14,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 
+@SuppressWarnings("serial")
 @Entity
-public class Conversation {
+public class Conversation implements Serializable {
 	 	@Id
 	    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	    private Long id;
@@ -42,7 +44,7 @@ public class Conversation {
 	 		this.user2 = user2;
 		}
 	    public Conversation(User user1, User user2) {
-	 		this(user1, user2, new HashSet<Message>());
+	 		this(user1, user2, null);
 	 	}
 	    
 		/*Getters & Setters*/
@@ -56,7 +58,7 @@ public class Conversation {
 			return messages;
 		}
 		public void addMessage(Message message) {
-			getMessages().add(message);
+			this.messages.add(message);
 			message.setConversation(this);
 		}
 		public User getUser1() {

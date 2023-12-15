@@ -1,20 +1,20 @@
 package com.acfjj.app.model;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Objects;
 
-import com.acfjj.app.utils.Constants;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 
+@SuppressWarnings("serial")
 @Entity
-public class PersonInfo {
+public class PersonInfo implements Serializable {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -29,8 +29,7 @@ public class PersonInfo {
 	private String nationality;
 	private String adress;
 	private int postalCode;
-	@Column(length = Constants.MAX_STRING_LENGTH)
-	private String profilPictureUrl;
+	private String profilPictureData64;
 	@JsonIgnore
 	@OneToOne(mappedBy = "personInfo", optional = true, targetEntity = User.class)
 	private User relatedUser;
@@ -44,7 +43,7 @@ public class PersonInfo {
 	}
 	public PersonInfo(
 			String lastName, String firstname, int gender, LocalDate dateOfBirth, String countryOfBirth,
-			String cityOfBirth, Boolean isDead, String nationality, String adress, int postalCode, String profilPictureUrl) {
+			String cityOfBirth, Boolean isDead, String nationality, String adress, int postalCode, String profilPictureData64) {
 		this();
 		this.lastName = lastName;
 		this.firstName = firstname;
@@ -58,7 +57,7 @@ public class PersonInfo {
 		this.nationality = nationality;
 		this.adress = adress;
 		this.postalCode = postalCode;
-		this.profilPictureUrl = profilPictureUrl;
+		this.profilPictureData64 = profilPictureData64;
 	}
 
 	
@@ -127,11 +126,11 @@ public class PersonInfo {
 	public void setPostalCode(int postalCode) {
 		this.postalCode = postalCode;
 	}
-	public String getProfilPictureUrl() {
-		return profilPictureUrl;
+	public String getProfilPictureData64() {
+		return profilPictureData64;
 	}
-	public void setProfilPictureUrl(String profilPictureUrl) {
-		this.profilPictureUrl = profilPictureUrl;
+	public void setProfilPictureData64(String profilPictureData64) {
+		this.profilPictureData64 = profilPictureData64;
 	}
 	public User getRelatedUser() {
 		return relatedUser;
@@ -155,27 +154,6 @@ public class PersonInfo {
 		return Objects.isNull(getRelatedUser()) && Objects.isNull(getRelatedNode());
 	}
 	
-	public static PersonInfo mergeUserPersonInfoWithNode(Node node, User user) {
-		PersonInfo nodePI = node.getPersonInfo();
-		PersonInfo userPI = user.getPersonInfo();
-		PersonInfo finalPI = new PersonInfo();
-		finalPI.setId(nodePI.getId());
-		finalPI.setLastName(userPI.getLastName());
-		finalPI.setFirstName(userPI.getFirstName());
-		finalPI.setDateOfBirth(userPI.getDateOfBirth());
-		finalPI.setCountryOfBirth(userPI.getCountryOfBirth());
-		finalPI.setCityOfBirth(userPI.getCityOfBirth());
-		finalPI.setGender(userPI.getGender());
-		finalPI.setIsDead(userPI.isDead());
-		finalPI.setAdress(Objects.isNull(userPI.getAdress()) ? nodePI.getAdress() : userPI.getAdress());
-		finalPI.setNationality(
-				Objects.isNull(userPI.getNationality()) ? nodePI.getNationality() : userPI.getNationality());
-		finalPI.setPostalCode(Objects.isNull(userPI.getPostalCode()) ? nodePI.getPostalCode() : userPI.getPostalCode());
-		finalPI.setProfilPictureUrl(Objects.isNull(userPI.getProfilPictureUrl()) ? nodePI.getProfilPictureUrl()
-				: userPI.getProfilPictureUrl());
-		return finalPI;
-	}
-	
 	@Override
 	public boolean equals(Object obj) {
 	    if (this == obj) {
@@ -197,7 +175,7 @@ public class PersonInfo {
 	        nationality.equals(otherInfo.nationality) &&
 	        adress.equals(otherInfo.adress) &&
 	        postalCode == otherInfo.postalCode &&
-	        Objects.equals(profilPictureUrl, otherInfo.profilPictureUrl) :
+	        Objects.equals(profilPictureData64, otherInfo.profilPictureData64) :
 	        super.equals(obj);
 	}
 
@@ -215,7 +193,7 @@ public class PersonInfo {
 	            ", nationality=" + nationality +
 	            ", adress=" + adress +
 	            ", postalCode=" + postalCode +
-	            ", profilPictureUrl=" + profilPictureUrl +
+	            ", profilPictureData64=" + profilPictureData64 +
 	            ", relatedUser =" + (Objects.isNull(relatedUser) ? null : relatedUser.getId()) +
 	            ", relatedNode =" + (Objects.isNull(relatedNode) ? null : relatedNode.getId()) +
 	        "]";

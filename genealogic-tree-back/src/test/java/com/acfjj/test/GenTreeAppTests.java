@@ -1,5 +1,6 @@
 package com.acfjj.test;
 
+
 import org.junit.jupiter.api.Test;
 import org.junit.platform.suite.api.SelectClasses;
 import org.junit.platform.suite.api.Suite;
@@ -25,5 +26,5 @@ import com.acfjj.test.service.*;
 public class GenTreeAppTests {		
 	@Test
 	void contextLoader() {
-	}	
+	}
 }

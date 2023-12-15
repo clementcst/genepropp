@@ -54,7 +54,7 @@ public class NodeTest {
     @MethodSource("testData")
     void testNodeConstructor(
         PersonInfo personInfo, User createdBy, Node parent1, Node parent2,
-        int privacy, String nationality, String address, int postalCode, String profilPictureUrl, TreeNodes treeNodes
+        int privacy, String nationality, String address, int postalCode, String profilPictureData64, TreeNodes treeNodes
     ) {
         Node node = new Node(personInfo, createdBy, parent1, parent2, privacy);
         assertAll(() -> {
@@ -66,7 +66,7 @@ public class NodeTest {
             assertEquals(nationality, node.getNationality());
             assertEquals(address, node.getAdress());
             assertEquals(postalCode, node.getPostalCode());
-            assertEquals(profilPictureUrl, node.getProfilPictureUrl());
+            assertEquals(profilPictureData64, node.getProfilPictureData64());
         });
     }
 
@@ -75,7 +75,7 @@ public class NodeTest {
     @MethodSource("testData")
     void testNodeSetters(
         PersonInfo personInfo, User createdBy, Node parent1, Node parent2,
-        int privacy, String nationality, String address, int postalCode, String profilPictureUrl, TreeNodes treeNodes
+        int privacy, String nationality, String address, int postalCode, String profilPictureData64, TreeNodes treeNodes
     ) {
         Node node = new Node(personInfo, createdBy, parent1, parent2, privacy);
         PersonInfo newPersonInfo = new PersonInfo("NewLastName", "NewFirstName", 1, LocalDate.of(2000, 1, 1), "NewCountry", "NewCity", false, "NewNationality", "NewAddress", 99999, "NewBase64Image");
@@ -121,7 +121,7 @@ public class NodeTest {
     @MethodSource("testData")
     void testIsOrphan(
         PersonInfo personInfo, User createdBy, Node parent1, Node parent2,
-        int privacy, String nationality, String address, int postalCode, String profilPictureUrl, TreeNodes treeNodes
+        int privacy, String nationality, String address, int postalCode, String profilPictureData64, TreeNodes treeNodes
     ) {
         Node nodeWithParents = new Node(personInfo, createdBy, parent1, parent2, privacy);
         Node nodeWithoutParents = new Node(personInfo, createdBy, null, null, privacy);
