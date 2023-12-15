@@ -1,30 +1,20 @@
 package com.acfjj.app.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.web.bind.annotation.*;
 
 import com.acfjj.app.model.Node;
 import com.acfjj.app.model.Tree;
 import com.acfjj.app.model.User;
-import com.acfjj.app.service.NodeService;
-import com.acfjj.app.service.TreeService;
-import com.acfjj.app.service.UserService;
 import com.acfjj.app.utils.Response;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
 @RestController
 @CrossOrigin(origins = "${angular.app.url}")
-public class TreeController {
-	@Autowired
-	TreeService treeService;
-	@Autowired
-	NodeService nodeService;
-	@Autowired
-	UserService userService;
-
+@Scope("singleton")
+public class TreeController extends AbstractController {
 	@GetMapping("/trees")
 	public Response getTrees() {
 		return new Response(treeService.getAllTrees());
