@@ -1,6 +1,6 @@
 package com.acfjj.app.model;
 
-import java.io.Serializable;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -16,9 +16,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 
-@SuppressWarnings("serial")
 @Entity
-public class Tree implements Serializable {
+public class Tree {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
