@@ -1,6 +1,5 @@
 package com.acfjj.app.model;
 
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,9 +21,8 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 
-@SuppressWarnings("serial")
 @Entity
-public class User implements Serializable {
+public class User {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -66,7 +64,7 @@ public class User implements Serializable {
 
 	public User(String lastName, String firstname, int gender, LocalDate dateOfBirth, String countryOfBirth,
 			String cityOfBirth, String email, String password, String noSecu, String noPhone, String nationality,
-			String adress, int postalCode, String profilPictureData64) {
+			String adress, int postalCode, String profilPictureUrl) {
 		this();
 		this.email = email;
 		this.password = password;
@@ -76,7 +74,7 @@ public class User implements Serializable {
 		this.noPhone = noPhone;
 		this.privateCode = User.generatePrivateCode();
 		this.personInfo = new PersonInfo(lastName, firstname, gender, dateOfBirth, countryOfBirth, cityOfBirth, false,
-				nationality, adress, postalCode, profilPictureData64);
+				nationality, adress, postalCode, profilPictureUrl);
 	}
 
 	/* Getters & Setters */
@@ -86,6 +84,10 @@ public class User implements Serializable {
 
 	public String getPrivateCode() {
 		return privateCode;
+	}
+
+	public void setPrivateCode(String privateCode) {
+		this.privateCode = privateCode;
 	}
 
 	public PersonInfo getPersonInfo() {
@@ -141,13 +143,6 @@ public class User implements Serializable {
 			return null;
 		}
 		return myTree.getId();
-	}
-
-	public Long getRelatedNodeId() {
-		if (Objects.isNull(getPersonInfo().getRelatedNode())) {
-			return null;
-		}
-		return getPersonInfo().getRelatedNode().getId();
 	}
 
 	@JsonIgnore
@@ -291,12 +286,16 @@ public class User implements Serializable {
 		getPersonInfo().setPostalCode(postalCode);
 	}
 
-	public String getProfilPictureData64() {
-		return getPersonInfo().getProfilPictureData64();
+	public String getProfilPictureUrl() {
+		return getPersonInfo().getProfilPictureUrl();
 	}
 
-	public void setProfilPictureData64(String profilPictureData64) {
-		getPersonInfo().setProfilPictureData64(profilPictureData64);
+	public void setProfilPictureUrl(String profilPictureUrl) {
+		getPersonInfo().setProfilPictureUrl(profilPictureUrl);
+	}
+	
+	public Long getRelatedNodeId() {
+		return Objects.isNull(getPersonInfo().getRelatedNode()) ? null : getPersonInfo().getRelatedNode().getId();
 	}
 
 	@Override
@@ -347,6 +346,7 @@ public class User implements Serializable {
 		List<String> requiredKeys = Arrays.asList("lastName", "firstName", "gender", "dateOfBirth", "countryOfBirth",
 				"cityOfBirth", "email", "password", "noSecu", "noPhone", "nationality", "adress", "postalCode");
 		Set<String> keys = dataLHM.keySet();
+		String ppUrl = dataLHM.containsKey("profilPictureUrl") ? dataLHM.get("profilPictureUrl") : null;
 		if (keys.containsAll(requiredKeys)) {
 			int gender;
 			int postalCode;
@@ -361,7 +361,7 @@ public class User implements Serializable {
 			return new User(dataLHM.get("lastName"), dataLHM.get("firstName"), gender, dateOfBirth,
 					dataLHM.get("countryOfBirth"), dataLHM.get("cityOfBirth"), dataLHM.get("email"),
 					dataLHM.get("password"), dataLHM.get("noSecu"), dataLHM.get("noPhone"), dataLHM.get("nationality"),
-					dataLHM.get("adress"), postalCode, null);
+					dataLHM.get("adress"), postalCode, ppUrl);
 		}
 		return null;
 	}
