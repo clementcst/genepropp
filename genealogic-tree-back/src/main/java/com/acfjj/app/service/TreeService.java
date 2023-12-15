@@ -6,6 +6,11 @@ import org.springframework.stereotype.Service;
 import com.acfjj.app.model.Node;
 import com.acfjj.app.model.Tree;
 import com.acfjj.app.model.TreeNodes;
+import com.acfjj.app.repository.NodeRepository;
+import com.acfjj.app.repository.PersonInfoRepository;
+import com.acfjj.app.repository.TreeNodesRepository;
+import com.acfjj.app.repository.TreeRepository;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -15,7 +20,6 @@ import java.util.Set;
 @Service
 @Scope("singleton")
 public class TreeService extends AbstractService {
-	
 	public List<Tree> getAllTrees() {
 		List<Tree> trees = new ArrayList<>();
 		treeRepository.findAll().forEach(trees::add);
@@ -106,10 +110,10 @@ public class TreeService extends AbstractService {
 	public void addNodeToTree(Tree tree, Node node, int privacy, int depth) {
 		if (tree != null && node != null) {
 			Set<TreeNodes> treeNodes = tree.getTreeNodes();
-			if (treeNodes.contains(null) || treeNodes == null) {
+			if (treeNodes == null || treeNodes.size()== 1) {
 				treeNodes = new HashSet<>();
 			}
-			boolean associationExists = treeNodes.stream().anyMatch(treeNode -> treeNode.getNode().equals(node));
+			boolean associationExists = treeNodes.stream().anyMatch(treeNode -> !Objects.isNull(treeNode) && treeNode.getNode().equals(node));
 			if (!associationExists) {
 				personInfoRepository.save(node.getPersonInfo());
 				nodeRepository.save(node);
@@ -131,6 +135,7 @@ public class TreeService extends AbstractService {
 			if (treeNode.getTree().getId() == treeId)
 				depth = treeNode.getDepth();
 		}
+		System.out.println();
 		addNodeToTree(tree, parent, privacy, depth + 1);
 		if (node.getParent1() == null || node.getParent1Id().equals(parent.getId())) {
 			node.setParent1(parent);

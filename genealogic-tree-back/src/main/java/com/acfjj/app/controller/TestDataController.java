@@ -167,7 +167,7 @@ public class TestDataController extends AbstractController {
 				return new Response(responses, "One or more failure occured", false);
 			}
 		}
-		return new Response(responses);
+		return new Response("All test trees2 have successfully been created", true);
 	}
 
 	@PostMapping("/nodes")
