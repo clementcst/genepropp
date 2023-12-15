@@ -1,11 +1,16 @@
 package com.acfjj.app.service;
 
-import org.springframework.context.annotation.Scope;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.acfjj.app.model.Node;
 import com.acfjj.app.model.PersonInfo;
 import com.acfjj.app.model.Tree;
 import com.acfjj.app.model.TreeNodes;
+import com.acfjj.app.repository.PersonInfoRepository;
+import com.acfjj.app.repository.TreeNodesRepository;
+import com.acfjj.app.repository.TreeRepository;
+import com.acfjj.app.repository.UserRepository;
+import com.acfjj.app.repository.NodeRepository;
 import com.acfjj.app.utils.Misc;
 
 import java.time.LocalDate;
@@ -15,10 +20,20 @@ import java.util.Objects;
 import java.util.Set;
 
 @Service
-@Scope("singleton")
-public class NodeService extends AbstractService {
+public class NodeService {
 
-	public List<Node> getAllNodes() {
+    @Autowired
+    NodeRepository nodeRepository;
+    @Autowired
+    PersonInfoRepository personInfoRepository;
+    @Autowired
+    TreeRepository treeRepository;
+    @Autowired
+    TreeNodesRepository treeNodesRepository;
+    @Autowired
+    UserRepository userRepository;
+
+    public List<Node> getAllNodes() {
         List<Node> nodes = new ArrayList<>();
         nodeRepository.findAll().forEach(nodes::add);
         return nodes;

@@ -1,5 +1,6 @@
 package com.acfjj.app.model;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,8 +22,9 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 
+@SuppressWarnings("serial")
 @Entity
-public class User {
+public class User implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -64,7 +66,7 @@ public class User {
 
 	public User(String lastName, String firstname, int gender, LocalDate dateOfBirth, String countryOfBirth,
 			String cityOfBirth, String email, String password, String noSecu, String noPhone, String nationality,
-			String adress, int postalCode, String profilPictureUrl) {
+			String adress, int postalCode, String profilPictureData64) {
 		this();
 		this.email = email;
 		this.password = password;
@@ -74,7 +76,7 @@ public class User {
 		this.noPhone = noPhone;
 		this.privateCode = User.generatePrivateCode();
 		this.personInfo = new PersonInfo(lastName, firstname, gender, dateOfBirth, countryOfBirth, cityOfBirth, false,
-				nationality, adress, postalCode, profilPictureUrl);
+				nationality, adress, postalCode, profilPictureData64);
 	}
 
 	/* Getters & Setters */
@@ -84,10 +86,6 @@ public class User {
 
 	public String getPrivateCode() {
 		return privateCode;
-	}
-
-	public void setPrivateCode(String privateCode) {
-		this.privateCode = privateCode;
 	}
 
 	public PersonInfo getPersonInfo() {
@@ -143,6 +141,13 @@ public class User {
 			return null;
 		}
 		return myTree.getId();
+	}
+
+	public Long getRelatedNodeId() {
+		if (Objects.isNull(getPersonInfo().getRelatedNode())) {
+			return null;
+		}
+		return getPersonInfo().getRelatedNode().getId();
 	}
 
 	@JsonIgnore
@@ -286,16 +291,12 @@ public class User {
 		getPersonInfo().setPostalCode(postalCode);
 	}
 
-	public String getProfilPictureUrl() {
-		return getPersonInfo().getProfilPictureUrl();
+	public String getProfilPictureData64() {
+		return getPersonInfo().getProfilPictureData64();
 	}
 
-	public void setProfilPictureUrl(String profilPictureUrl) {
-		getPersonInfo().setProfilPictureUrl(profilPictureUrl);
-	}
-	
-	public Long getRelatedNodeId() {
-		return Objects.isNull(getPersonInfo().getRelatedNode()) ? null : getPersonInfo().getRelatedNode().getId();
+	public void setProfilPictureData64(String profilPictureData64) {
+		getPersonInfo().setProfilPictureData64(profilPictureData64);
 	}
 
 	@Override
@@ -346,7 +347,6 @@ public class User {
 		List<String> requiredKeys = Arrays.asList("lastName", "firstName", "gender", "dateOfBirth", "countryOfBirth",
 				"cityOfBirth", "email", "password", "noSecu", "noPhone", "nationality", "adress", "postalCode");
 		Set<String> keys = dataLHM.keySet();
-		String ppUrl = dataLHM.containsKey("profilPictureUrl") ? dataLHM.get("profilPictureUrl") : null;
 		if (keys.containsAll(requiredKeys)) {
 			int gender;
 			int postalCode;
@@ -361,7 +361,7 @@ public class User {
 			return new User(dataLHM.get("lastName"), dataLHM.get("firstName"), gender, dateOfBirth,
 					dataLHM.get("countryOfBirth"), dataLHM.get("cityOfBirth"), dataLHM.get("email"),
 					dataLHM.get("password"), dataLHM.get("noSecu"), dataLHM.get("noPhone"), dataLHM.get("nationality"),
-					dataLHM.get("adress"), postalCode, ppUrl);
+					dataLHM.get("adress"), postalCode, null);
 		}
 		return null;
 	}
