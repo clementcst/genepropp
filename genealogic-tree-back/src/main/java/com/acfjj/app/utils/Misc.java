@@ -5,6 +5,8 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class Misc {
@@ -29,5 +31,12 @@ public class Misc {
 	public static boolean isOneMonthOld(LocalDateTime dateTime) {
         long differenceInMonths = ChronoUnit.MONTHS.between(dateTime, getLocalDateTime());
         return differenceInMonths >= 1;
+    }
+	
+	public static boolean isLink(String input) {
+        String regex = "^(http|https|ftp)://[a-zA-Z0-9-]+(\\.[a-zA-Z]{2,})+(/[^\\s]*)?$";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(input);
+        return matcher.matches();
     }
 }

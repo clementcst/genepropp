@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 
+import com.acfjj.app.utils.Constants;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Entity;
@@ -234,6 +235,11 @@ public class User {
 		return getPersonInfo().getDateOfBirth();
 	}
 
+	
+	public void setDateOfBirth(LocalDate dateOfBirth) {
+		getPersonInfo().setDateOfBirth(dateOfBirth);
+	}
+	
 	public void setDateOfBirth(int year, int month, int day) {
 		getPersonInfo().setDateOfBirth(year, month, day);
 	}
@@ -293,7 +299,7 @@ public class User {
 	public void setProfilPictureUrl(String profilPictureUrl) {
 		getPersonInfo().setProfilPictureUrl(profilPictureUrl);
 	}
-	
+
 	public Long getRelatedNodeId() {
 		return Objects.isNull(getPersonInfo().getRelatedNode()) ? null : getPersonInfo().getRelatedNode().getId();
 	}
@@ -336,33 +342,85 @@ public class User {
 			} else {
 				randomChar = (char) (random.nextInt(26) + 97); // Lettres minuscules ASCII [97, 122]
 			}
-
 			sequence.append(randomChar);
 		}
 		return sequence.toString();
 	}
 
-	public static User castAsUser(LinkedHashMap<String, String> dataLHM) {
-		List<String> requiredKeys = Arrays.asList("lastName", "firstName", "gender", "dateOfBirth", "countryOfBirth",
-				"cityOfBirth", "email", "password", "noSecu", "noPhone", "nationality", "adress", "postalCode");
-		Set<String> keys = dataLHM.keySet();
-		String ppUrl = dataLHM.containsKey("profilPictureUrl") ? dataLHM.get("profilPictureUrl") : null;
-		if (keys.containsAll(requiredKeys)) {
-			int gender;
-			int postalCode;
-			LocalDate dateOfBirth;
-			try {
-				gender = Integer.parseInt(dataLHM.get("gender"));
-				postalCode = Integer.parseInt(dataLHM.get("postalCode"));
-				dateOfBirth = LocalDate.parse(dataLHM.get("dateOfBirth"));
-			} catch (Exception e) {
-				return null;
-			}
-			return new User(dataLHM.get("lastName"), dataLHM.get("firstName"), gender, dateOfBirth,
-					dataLHM.get("countryOfBirth"), dataLHM.get("cityOfBirth"), dataLHM.get("email"),
-					dataLHM.get("password"), dataLHM.get("noSecu"), dataLHM.get("noPhone"), dataLHM.get("nationality"),
-					dataLHM.get("adress"), postalCode, ppUrl);
+	public Boolean updateWithLHM(LinkedHashMap<String, String> dataLHM) {
+		if(!isUpdatableUsing(dataLHM)) {
+			return false;
 		}
-		return null;
+		Set<String> keys = dataLHM.keySet();
+		try {
+			this.setLastName(keys.contains("lastname") ? dataLHM.get("lastname") : this.getLastName());
+			this.setFirstName(keys.contains("firstname") ? dataLHM.get("firstname") : this.getFirstName());
+			this.setGender(keys.contains("gender") ? Integer.parseInt(dataLHM.get("gender")) : this.getGender());
+			this.setDateOfBirth(keys.contains("dateOfBirth") ? LocalDate.parse(dataLHM.get("dateOfBirth")) : this.getDateOfBirth());
+			this.setCountryOfBirth(keys.contains("countryOfBirth") ? dataLHM.get("countryOfBirth") : this.getCountryOfBirth());
+			this.setCityOfBirth(keys.contains("cityOfBirth") ? dataLHM.get("cityOfBirth") : this.getCityOfBirth());
+			this.setEmail(keys.contains("email") ? dataLHM.get("email") : this.getEmail());
+			this.setPassword(keys.contains("password") ? dataLHM.get("password") : this.getPassword());
+			this.setNoSecu(keys.contains("noSecu") ? dataLHM.get("noSecu") : this.getNoSecu());
+			this.setNoPhone(keys.contains("noPhone") ? dataLHM.get("noPhone") : this.getNoPhone());
+			this.setNationality(keys.contains("nationality") ? dataLHM.get("nationality") : this.getNationality());
+			this.setAdress(keys.contains("adress") ? dataLHM.get("adress") : this.getAdress());
+			this.setPostalCode(keys.contains("postalCode") ? Integer.parseInt(dataLHM.get("postalCode")) : this.getPostalCode());
+			this.setProfilPictureUrl(keys.contains("profilPictureUrl") ? dataLHM.get("profilPictureUrl") : (Objects.isNull(this.getProfilPictureUrl()) ? Constants.DEFAULT_PP_URL : this.getProfilPictureUrl())); 
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+	
+	public static User castLHMAsUser(LinkedHashMap<String, String> dataLHM) {
+		if(!isCastableUsing(dataLHM)) {
+			return null;
+		}
+		Set<String> keys = dataLHM.keySet();
+		try {
+			String lastname = dataLHM.get("lastname");
+			String firstname = dataLHM.get("firstname");
+			int gender = Integer.parseInt(dataLHM.get("gender"));
+			LocalDate dateOfBirth = LocalDate.parse(dataLHM.get("dateOfBirth"));
+			String countryOfBirth = dataLHM.get("countryOfBirth");
+			String cityOfBirth = dataLHM.get("cityOfBirth");
+			String email = dataLHM.get("email");
+			String password = dataLHM.get("password");
+			String noSecu = keys.contains("noSecu") ? dataLHM.get("noSecu") : null;
+			String noPhone = keys.contains("noPhone") ? dataLHM.get("noPhone") : null;
+			String nationality = keys.contains("nationality") ? dataLHM.get("nationality") : null;
+			String adress = keys.contains("adress") ? dataLHM.get("adress") : null;
+			int postalCode = keys.contains("postalCode") ? Integer.parseInt(dataLHM.get("postalCode")) : null;
+			String ppUrl = keys.contains("profilPictureUrl") ? dataLHM.get("profilPictureUrl")
+					: Constants.DEFAULT_PP_URL;
+
+			return new User(lastname, firstname, gender, dateOfBirth, countryOfBirth, cityOfBirth, email, password,
+					noSecu, noPhone, nationality, adress, postalCode, ppUrl);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+	
+	public static Boolean isCastableUsing(LinkedHashMap<String, String> dataLHM) {
+		List<String> requiredKeys = Arrays.asList("lastName", "firstName", "gender", "dateOfBirth", "countryOfBirth",
+				"cityOfBirth", "email", "password");
+		if (!dataLHM.keySet().containsAll(requiredKeys)) {
+			return false;
+		}
+		return isUpdatableUsing(dataLHM);
+	}
+	
+	public static boolean isUpdatableUsing(LinkedHashMap<String, String> dataLHM) {
+		List<String> possibleKeys = Arrays.asList("lastName", "firstName", "gender", "dateOfBirth", "countryOfBirth",
+				"cityOfBirth", "email", "password", "noSecu", "noPhone", "nationality", "adress", "postalCode",
+				"profilPictureUrl");
+		Set<String> keys = dataLHM.keySet();
+		for (String key : keys) {
+			if (!possibleKeys.contains(key)) {
+				return false;
+			}
+		}
+		return true;
 	}
 }

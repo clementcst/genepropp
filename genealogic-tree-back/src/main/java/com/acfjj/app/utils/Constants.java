@@ -6,6 +6,7 @@ import java.util.Locale;
 
 public class Constants {
 	public static final int MAX_STRING_LENGTH = 4096;
+	public static final String DEFAULT_PP_URL = "https://i.pinimg.com/originals/a4/af/12/a4af1288eab8714320fa8453f72d79fd.jpg";
 	public static final String SYSTEM_ADMIN_PRIVATE_CODE = "TheSystemAdmin";
 	public static final String SYSTEM_ADMIN_EMAIL = "system.admin.account@gmail.com";
 	@SuppressWarnings("serial")

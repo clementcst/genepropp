@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -57,7 +56,7 @@ public class AccountController extends AbstractController {
 			} else {
 				frontMsg += "\nPlease retry later or contact support to get more info.";
 			}
-			return new Response( frontMsg, false);
+			return new Response(frontMsg, false);
 		}
 		return new Response(user.getId(), "Login Success", true);
 	}
@@ -65,7 +64,7 @@ public class AccountController extends AbstractController {
 	@PostMapping("/registration")
 	public Response registration(@RequestParam int step, @RequestBody LinkedHashMap<String, String> data,
 			@RequestParam(required = false, defaultValue = "0") Boolean userResponse) {
-		User userToRegister = User.castAsUser(data);
+		User userToRegister = User.castLHMAsUser(data);
 		if (Objects.isNull(userToRegister)) {
 			return new Response("Request Body format is invalid.", false);
 		}
@@ -79,7 +78,6 @@ public class AccountController extends AbstractController {
 		default:
 			return new Response("Unexpected parameter: " + step, false);
 		}
-
 	}
 
 	public Response registerUser(User user, Node existingNode) {

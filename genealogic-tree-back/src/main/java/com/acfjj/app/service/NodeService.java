@@ -161,9 +161,9 @@ public class NodeService extends AbstractService {
     	}
     	Integer diff = Misc.findMaxFrequency(diffList);
 
-    	//tous tree avec 2 nodes
+    	//tous tree avec les 2 nodes
     	//différence prof des 2 
-    	//celle qui apparait plus souvent comme prof
+    	//prendre la difference qui apparait le plus en tant que gap 
     	return null;
     }
     
