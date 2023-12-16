@@ -4,12 +4,6 @@ import java.util.LinkedHashMap;
 
 import com.acfjj.app.model.Message;
 import com.acfjj.app.model.User;
-import com.acfjj.app.service.AbstractService;
-import com.acfjj.app.service.UserService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import jakarta.xml.ws.Service;
 
 public enum ValidationType {
 	USER_VALIDATION("A new user as been created and request a validation") {

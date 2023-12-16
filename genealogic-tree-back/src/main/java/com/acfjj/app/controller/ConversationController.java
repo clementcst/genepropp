@@ -3,7 +3,6 @@ package com.acfjj.app.controller;
 import java.util.List;
 import java.util.Objects;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -15,10 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.acfjj.app.model.Conversation;
 import com.acfjj.app.model.Message;
 import com.acfjj.app.model.User;
-import com.acfjj.app.service.ConversationService;
-import com.acfjj.app.service.UserService;
 import com.acfjj.app.utils.Constants;
-import com.acfjj.app.utils.Misc;
 import com.acfjj.app.utils.Response;
 import com.acfjj.app.utils.ValidationType;
 

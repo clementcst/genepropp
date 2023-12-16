@@ -1,12 +1,18 @@
 package com.acfjj.app.controller;
 
+import java.util.LinkedHashMap;
+import java.util.Objects;
+
 import org.springframework.context.annotation.Scope;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.acfjj.app.model.User;
 import com.acfjj.app.utils.Response;
 
 @RestController
@@ -24,4 +30,25 @@ public class UserController extends AbstractController {
 	public Response getUser(@RequestParam Long userId) {
 		return new Response(userService.getUser(userId));
 	}
-}
+	
+	@PostMapping("/profil/update")
+	public Response updateProfil(@RequestParam Long userId, @RequestBody LinkedHashMap<String,String> dataLHM) {
+		if(!User.isUpdatableUsing(dataLHM)) {
+			return new Response("Request Body format is invalid.", false);
+		}
+		if(dataLHM.containsKey("email") && !Objects.isNull(userService.getUserByEmail(dataLHM.get("email")))) {
+			return new Response("Email already exist.", false);
+		}
+		User user = userService.getUser(userId);
+		if(Objects.isNull(user)) {
+			return new Response("User not Found.", false);
+		}
+		if(user.updateWithLHM(dataLHM)) {
+			userService.updateUser(userId, user);
+			return new Response("User profil updated successfully", true);
+		} else {
+			return new Response("A Request Body value format is invalid.", false);
+		}
+	}
+		
+	}

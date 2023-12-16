@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 import com.acfjj.app.utils.Constants;
+import com.acfjj.app.utils.Misc;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
@@ -16,9 +17,10 @@ import jakarta.persistence.OneToOne;
 @Entity
 public class PersonInfo {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+
 	private String lastName;
 	private String firstName;
 	private int gender;
@@ -38,13 +40,13 @@ public class PersonInfo {
 	@OneToOne(mappedBy = "personInfo", optional = true, targetEntity = Node.class)
 	private Node relatedNode;
 
-	
 	public PersonInfo() {
 		super();
 	}
-	public PersonInfo(
-			String lastName, String firstname, int gender, LocalDate dateOfBirth, String countryOfBirth,
-			String cityOfBirth, Boolean isDead, String nationality, String adress, int postalCode, String profilPictureUrl) {
+
+	public PersonInfo(String lastName, String firstname, int gender, LocalDate dateOfBirth, String countryOfBirth,
+			String cityOfBirth, Boolean isDead, String nationality, String adress, int postalCode,
+			String profilPictureUrl) {
 		this();
 		this.lastName = lastName;
 		this.firstName = firstname;
@@ -58,103 +60,131 @@ public class PersonInfo {
 		this.nationality = nationality;
 		this.adress = adress;
 		this.postalCode = postalCode;
-		this.profilPictureUrl = profilPictureUrl;
+		this.profilPictureUrl = Misc.isLink(profilPictureUrl) ? profilPictureUrl : Constants.DEFAULT_PP_URL;
 	}
 
-	
-	/*Getters & Setters*/
+	/* Getters & Setters */
 	public int getGender() {
 		return gender;
 	}
+
 	public void setGender(int gender) {
 		this.gender = gender;
 	}
+
 	public LocalDate getDateOfBirth() {
 		return dateOfBirth;
 	}
+
 	public void setDateOfBirth(LocalDate dateOfBirth) {
 		this.dateOfBirth = dateOfBirth;
 	}
+
 	public void setDateOfBirth(int year, int month, int day) {
 		setDateOfBirth(LocalDate.of(year, month, day));
 	}
+
 	public String getCityOfBirth() {
 		return cityOfBirth;
 	}
+
 	public void setCityOfBirth(String cityOfBirth) {
 		this.cityOfBirth = cityOfBirth;
 	}
+
 	public Boolean isDead() {
 		return isDead;
 	}
+
 	public void setIsDead(Boolean isDead) {
 		this.isDead = isDead;
 	}
+
 	public Long getId() {
 		return id;
 	}
+
 	public void setId(Long id) {
 		this.id = id;
 	}
+
 	public String getLastName() {
 		return lastName;
 	}
+
 	public void setLastName(String name) {
 		this.lastName = name;
 	}
+
 	public String getFirstName() {
 		return firstName;
 	}
+
 	public void setFirstName(String firstname) {
 		this.firstName = firstname;
 	}
-	
+
 	public String getNationality() {
 		return nationality;
 	}
+
 	public void setNationality(String nationality) {
 		this.nationality = nationality;
 	}
+
 	public String getAdress() {
 		return adress;
 	}
+
 	public void setAdress(String adress) {
 		this.adress = adress;
 	}
+
 	public int getPostalCode() {
 		return postalCode;
 	}
+
 	public void setPostalCode(int postalCode) {
 		this.postalCode = postalCode;
 	}
+
 	public String getProfilPictureUrl() {
 		return profilPictureUrl;
 	}
+
 	public void setProfilPictureUrl(String profilPictureUrl) {
-		this.profilPictureUrl = profilPictureUrl;
+		this.profilPictureUrl = Misc.isLink(profilPictureUrl) ? profilPictureUrl
+				: (Objects.isNull(profilPictureUrl) ? Constants.DEFAULT_PP_URL : this.getProfilPictureUrl());
 	}
+
 	public User getRelatedUser() {
 		return relatedUser;
 	}
+
 	public void setRelatedUser(User relatedUser) {
 		this.relatedUser = relatedUser;
 	}
+
 	public Node getRelatedNode() {
 		return relatedNode;
 	}
+
 	public void setRelatedNode(Node relatedNode) {
 		this.relatedNode = relatedNode;
 	}
+
 	public String getCountryOfBirth() {
 		return countryOfBirth;
 	}
+
 	public void setCountryOfBirth(String countryOfBirth) {
 		this.countryOfBirth = countryOfBirth;
 	}
+
 	public Boolean isOrphan() {
 		return Objects.isNull(getRelatedUser()) && Objects.isNull(getRelatedNode());
 	}
-	
+
 	public static PersonInfo mergeUserPersonInfoWithNode(Node node, User user) {
 		PersonInfo nodePI = node.getPersonInfo();
 		PersonInfo userPI = user.getPersonInfo();
@@ -175,50 +205,33 @@ public class PersonInfo {
 				: userPI.getProfilPictureUrl());
 		return finalPI;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
-	    if (this == obj) {
-	        return true;
-	    }
-	    if (obj == null || getClass() != obj.getClass()) {
-	        return false;
-	    }
-	    PersonInfo otherInfo = (PersonInfo) obj;
-	    return (id != null && otherInfo.id != null) ? 
-	        id.equals(otherInfo.id) &&
-	        lastName.equals(otherInfo.lastName) &&
-	        firstName.equals(otherInfo.firstName) &&
-	        gender == otherInfo.gender &&
-	        dateOfBirth.equals(otherInfo.dateOfBirth) &&
-	        countryOfBirth.equals(otherInfo.countryOfBirth) &&
-	        cityOfBirth.equals(otherInfo.cityOfBirth) &&
-	        Objects.equals(isDead, otherInfo.isDead) &&
-	        nationality.equals(otherInfo.nationality) &&
-	        adress.equals(otherInfo.adress) &&
-	        postalCode == otherInfo.postalCode &&
-	        Objects.equals(profilPictureUrl, otherInfo.profilPictureUrl) :
-	        super.equals(obj);
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null || getClass() != obj.getClass()) {
+			return false;
+		}
+		PersonInfo otherInfo = (PersonInfo) obj;
+		return (id != null && otherInfo.id != null) ? id.equals(otherInfo.id) && lastName.equals(otherInfo.lastName)
+				&& firstName.equals(otherInfo.firstName) && gender == otherInfo.gender
+				&& dateOfBirth.equals(otherInfo.dateOfBirth) && countryOfBirth.equals(otherInfo.countryOfBirth)
+				&& cityOfBirth.equals(otherInfo.cityOfBirth) && Objects.equals(isDead, otherInfo.isDead)
+				&& nationality.equals(otherInfo.nationality) && adress.equals(otherInfo.adress)
+				&& postalCode == otherInfo.postalCode && Objects.equals(profilPictureUrl, otherInfo.profilPictureUrl)
+				: super.equals(obj);
 	}
 
 	@Override
 	public String toString() {
-	    return "PersonInfo [" +
-	            "id=" + id + 
-	            ", lastName=" + lastName + 
-	            ", firstName=" + firstName +
-	            ", gender=" + gender + 
-	            ", dateOfBirth=" + dateOfBirth + 
-	            ", countryOfBirth=" + countryOfBirth + 
-	            ", cityOfBirth=" + cityOfBirth + 
-	            ", isDead=" + isDead + 
-	            ", nationality=" + nationality +
-	            ", adress=" + adress +
-	            ", postalCode=" + postalCode +
-	            ", profilPictureUrl=" + profilPictureUrl +
-	            ", relatedUser =" + (Objects.isNull(relatedUser) ? null : relatedUser.getId()) +
-	            ", relatedNode =" + (Objects.isNull(relatedNode) ? null : relatedNode.getId()) +
-	        "]";
+		return "PersonInfo [" + "id=" + id + ", lastName=" + lastName + ", firstName=" + firstName + ", gender="
+				+ gender + ", dateOfBirth=" + dateOfBirth + ", countryOfBirth=" + countryOfBirth + ", cityOfBirth="
+				+ cityOfBirth + ", isDead=" + isDead + ", nationality=" + nationality + ", adress=" + adress
+				+ ", postalCode=" + postalCode + ", profilPictureUrl=" + profilPictureUrl + ", relatedUser ="
+				+ (Objects.isNull(relatedUser) ? null : relatedUser.getId()) + ", relatedNode ="
+				+ (Objects.isNull(relatedNode) ? null : relatedNode.getId()) + "]";
 	}
 
 }
