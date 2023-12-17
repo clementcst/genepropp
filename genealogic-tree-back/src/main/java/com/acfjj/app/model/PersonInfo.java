@@ -1,20 +1,20 @@
 package com.acfjj.app.model;
 
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Objects;
 
+import com.acfjj.app.utils.Constants;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 
-@SuppressWarnings("serial")
 @Entity
-public class PersonInfo implements Serializable {
+public class PersonInfo {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -29,7 +29,8 @@ public class PersonInfo implements Serializable {
 	private String nationality;
 	private String adress;
 	private int postalCode;
-	private String profilPictureData64;
+	@Column(length = Constants.MAX_STRING_LENGTH)
+	private String profilPictureUrl;
 	@JsonIgnore
 	@OneToOne(mappedBy = "personInfo", optional = true, targetEntity = User.class)
 	private User relatedUser;
@@ -43,7 +44,7 @@ public class PersonInfo implements Serializable {
 	}
 	public PersonInfo(
 			String lastName, String firstname, int gender, LocalDate dateOfBirth, String countryOfBirth,
-			String cityOfBirth, Boolean isDead, String nationality, String adress, int postalCode, String profilPictureData64) {
+			String cityOfBirth, Boolean isDead, String nationality, String adress, int postalCode, String profilPictureUrl) {
 		this();
 		this.lastName = lastName;
 		this.firstName = firstname;
@@ -57,7 +58,7 @@ public class PersonInfo implements Serializable {
 		this.nationality = nationality;
 		this.adress = adress;
 		this.postalCode = postalCode;
-		this.profilPictureData64 = profilPictureData64;
+		this.profilPictureUrl = profilPictureUrl;
 	}
 
 	
@@ -126,11 +127,11 @@ public class PersonInfo implements Serializable {
 	public void setPostalCode(int postalCode) {
 		this.postalCode = postalCode;
 	}
-	public String getProfilPictureData64() {
-		return profilPictureData64;
+	public String getProfilPictureUrl() {
+		return profilPictureUrl;
 	}
-	public void setProfilPictureData64(String profilPictureData64) {
-		this.profilPictureData64 = profilPictureData64;
+	public void setProfilPictureUrl(String profilPictureUrl) {
+		this.profilPictureUrl = profilPictureUrl;
 	}
 	public User getRelatedUser() {
 		return relatedUser;
@@ -154,6 +155,27 @@ public class PersonInfo implements Serializable {
 		return Objects.isNull(getRelatedUser()) && Objects.isNull(getRelatedNode());
 	}
 	
+	public static PersonInfo mergeUserPersonInfoWithNode(Node node, User user) {
+		PersonInfo nodePI = node.getPersonInfo();
+		PersonInfo userPI = user.getPersonInfo();
+		PersonInfo finalPI = new PersonInfo();
+		finalPI.setId(nodePI.getId());
+		finalPI.setLastName(userPI.getLastName());
+		finalPI.setFirstName(userPI.getFirstName());
+		finalPI.setDateOfBirth(userPI.getDateOfBirth());
+		finalPI.setCountryOfBirth(userPI.getCountryOfBirth());
+		finalPI.setCityOfBirth(userPI.getCityOfBirth());
+		finalPI.setGender(userPI.getGender());
+		finalPI.setIsDead(userPI.isDead());
+		finalPI.setAdress(Objects.isNull(userPI.getAdress()) ? nodePI.getAdress() : userPI.getAdress());
+		finalPI.setNationality(
+				Objects.isNull(userPI.getNationality()) ? nodePI.getNationality() : userPI.getNationality());
+		finalPI.setPostalCode(Objects.isNull(userPI.getPostalCode()) ? nodePI.getPostalCode() : userPI.getPostalCode());
+		finalPI.setProfilPictureUrl(Objects.isNull(userPI.getProfilPictureUrl()) ? nodePI.getProfilPictureUrl()
+				: userPI.getProfilPictureUrl());
+		return finalPI;
+	}
+	
 	@Override
 	public boolean equals(Object obj) {
 	    if (this == obj) {
@@ -175,7 +197,7 @@ public class PersonInfo implements Serializable {
 	        nationality.equals(otherInfo.nationality) &&
 	        adress.equals(otherInfo.adress) &&
 	        postalCode == otherInfo.postalCode &&
-	        Objects.equals(profilPictureData64, otherInfo.profilPictureData64) :
+	        Objects.equals(profilPictureUrl, otherInfo.profilPictureUrl) :
 	        super.equals(obj);
 	}
 
@@ -193,7 +215,7 @@ public class PersonInfo implements Serializable {
 	            ", nationality=" + nationality +
 	            ", adress=" + adress +
 	            ", postalCode=" + postalCode +
-	            ", profilPictureData64=" + profilPictureData64 +
+	            ", profilPictureUrl=" + profilPictureUrl +
 	            ", relatedUser =" + (Objects.isNull(relatedUser) ? null : relatedUser.getId()) +
 	            ", relatedNode =" + (Objects.isNull(relatedNode) ? null : relatedNode.getId()) +
 	        "]";
