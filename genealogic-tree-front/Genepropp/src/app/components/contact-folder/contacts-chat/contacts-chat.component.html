@@ -3,7 +3,7 @@
       <!-- En-tête de la conversation -->
       <div class="flex items-center mb-4">
         <img
-          [src]="contact.url_photo"
+          [src]="contact.profilPictureUrl"
           alt="Photo de {{ contact.firstName }} {{ contact.lastName }}"
           class="w-12 h-12 rounded-full"
         />
@@ -20,11 +20,13 @@
       <!-- Barre pour le message -->
       <div class="flex items-center border-t mt-4 pt-2 rounded-lg">
         <input
+          #messageInput
           type="text"
           class="flex-1 p-2 rounded-l border"
           placeholder="Tapez votre message..."
+          (keydown.enter)="sendMessage()"
         />
-        <button class="px-4 py-2 bg-green-900 text-white rounded-r">Envoyer</button>
+        <button (click)="sendMessage()" class="px-4 py-2 bg-green-900 text-white rounded-r">Envoyer</button>
       </div>
     </div>
   </div>
