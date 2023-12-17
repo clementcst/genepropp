@@ -58,6 +58,9 @@ public class ConversationController extends AbstractController {
 			return new Response("Message content is to big, cannot create message", false);
 		}
 		Conversation conversation = conversationService.getConversationOfUsers(sender, receiver);
+		if(Objects.isNull(conversation)) {
+		    return new Response("Conversation not found or doesn't exist.", false);
+		}
 		conversationService.addMessageToConversation(new Message(sender, receiver, content), conversation);
 		return new Response("Success", true);
 	}

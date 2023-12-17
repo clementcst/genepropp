@@ -58,7 +58,7 @@ public class Message {
 			this.conversation = null;
 			this.validationType = validationType;
 			this.messageDateTime = Misc.getLocalDateTime();	
-			this.concernedUserId = concernedUser.getId();
+			this.concernedUserId = Objects.isNull(concernedUser) ? null : concernedUser.getId();
 			this.setContent(Objects.isNull(validationType) ? content : validationType.getValidationMsg(concernedUser));
 		}
 	 	
