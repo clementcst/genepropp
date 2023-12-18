@@ -29,9 +29,10 @@ public class PersonInfo {
 	private String cityOfBirth;
 	private Boolean isDead;
 	private String nationality;
+	@Column(length = Constants.MAX_LONG_STRING_LENGTH)
 	private String adress;
 	private int postalCode;
-	@Column(length = Constants.MAX_STRING_LENGTH)
+	@Column(length = Constants.MAX_LONG_STRING_LENGTH)
 	private String profilPictureUrl;
 	@JsonIgnore
 	@OneToOne(mappedBy = "personInfo", optional = true, targetEntity = User.class)
@@ -48,19 +49,19 @@ public class PersonInfo {
 			String cityOfBirth, Boolean isDead, String nationality, String adress, int postalCode,
 			String profilPictureUrl) {
 		this();
-		this.lastName = lastName;
-		this.firstName = firstname;
-		this.gender = gender;
-		this.dateOfBirth = dateOfBirth;
-		this.countryOfBirth = countryOfBirth;
-		this.cityOfBirth = cityOfBirth;
+		this.setLastName(lastName);
+		this.setFirstName(firstname);
+		this.setGender(gender);
+		this.setDateOfBirth(dateOfBirth);
+		this.setCountryOfBirth(countryOfBirth);
+		this.setCityOfBirth(cityOfBirth);
 		this.isDead = isDead;
 		this.relatedUser = null;
 		this.relatedNode = null;
-		this.nationality = nationality;
-		this.adress = adress;
-		this.postalCode = postalCode;
-		this.profilPictureUrl = Misc.isLink(profilPictureUrl) ? profilPictureUrl : Constants.DEFAULT_PP_URL;
+		this.setNationality(nationality);
+		this.setAdress(adress);
+		this.setPostalCode(postalCode);
+		this.setProfilPictureUrl(profilPictureUrl);
 	}
 
 	/* Getters & Setters */
@@ -69,7 +70,7 @@ public class PersonInfo {
 	}
 
 	public void setGender(int gender) {
-		this.gender = gender;
+		this.gender = Constants.GENDER_LIST.contains(gender) ? gender : Constants.DEFAULT_GENDER;
 	}
 
 	public LocalDate getDateOfBirth() {
@@ -77,7 +78,7 @@ public class PersonInfo {
 	}
 
 	public void setDateOfBirth(LocalDate dateOfBirth) {
-		this.dateOfBirth = dateOfBirth;
+		this.dateOfBirth = Misc.isDateOfBirthAcceptable(dateOfBirth) ? dateOfBirth : Constants.DEFAULT_DATEOFBIRTH;
 	}
 
 	public void setDateOfBirth(int year, int month, int day) {
@@ -89,7 +90,7 @@ public class PersonInfo {
 	}
 
 	public void setCityOfBirth(String cityOfBirth) {
-		this.cityOfBirth = cityOfBirth;
+		this.cityOfBirth = Misc.truncateString(cityOfBirth, Constants.MAX_STRING_LENGTH);
 	}
 
 	public Boolean isDead() {
@@ -112,8 +113,8 @@ public class PersonInfo {
 		return lastName;
 	}
 
-	public void setLastName(String name) {
-		this.lastName = name;
+	public void setLastName(String lastName) {
+		this.lastName = Misc.truncateString(lastName, Constants.MAX_STRING_LENGTH);
 	}
 
 	public String getFirstName() {
@@ -121,7 +122,7 @@ public class PersonInfo {
 	}
 
 	public void setFirstName(String firstname) {
-		this.firstName = firstname;
+		this.firstName = Misc.truncateString(firstname, Constants.MAX_STRING_LENGTH);
 	}
 
 	public String getNationality() {
@@ -129,7 +130,7 @@ public class PersonInfo {
 	}
 
 	public void setNationality(String nationality) {
-		this.nationality = nationality;
+		this.nationality = Misc.truncateString(nationality, Constants.MAX_STRING_LENGTH);
 	}
 
 	public String getAdress() {
@@ -137,7 +138,7 @@ public class PersonInfo {
 	}
 
 	public void setAdress(String adress) {
-		this.adress = adress;
+		this.adress = Misc.truncateString(adress, Constants.MAX_LONG_STRING_LENGTH);
 	}
 
 	public int getPostalCode() {
@@ -145,7 +146,7 @@ public class PersonInfo {
 	}
 
 	public void setPostalCode(int postalCode) {
-		this.postalCode = postalCode;
+		this.postalCode = Misc.isPostalCodeAcceptable(postalCode) ? postalCode : Constants.DEFAULT_POSTAL_CODE;
 	}
 
 	public String getProfilPictureUrl() {
@@ -153,8 +154,8 @@ public class PersonInfo {
 	}
 
 	public void setProfilPictureUrl(String profilPictureUrl) {
-		this.profilPictureUrl = Misc.isLink(profilPictureUrl) ? profilPictureUrl
-				: (Objects.isNull(profilPictureUrl) ? Constants.DEFAULT_PP_URL : this.getProfilPictureUrl());
+		String ppUrl = Misc.truncateString(profilPictureUrl, Constants.MAX_LONG_STRING_LENGTH);
+		this.profilPictureUrl = Misc.isLink(ppUrl) && !Objects.isNull(ppUrl) ? ppUrl : Constants.DEFAULT_PP_URL;
 	}
 
 	public User getRelatedUser() {
@@ -178,7 +179,7 @@ public class PersonInfo {
 	}
 
 	public void setCountryOfBirth(String countryOfBirth) {
-		this.countryOfBirth = countryOfBirth;
+		this.countryOfBirth = Misc.truncateString(countryOfBirth, Constants.MAX_STRING_LENGTH);
 	}
 
 	public Boolean isOrphan() {

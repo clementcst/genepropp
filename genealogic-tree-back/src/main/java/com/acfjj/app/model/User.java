@@ -11,8 +11,10 @@ import java.util.Random;
 import java.util.Set;
 
 import com.acfjj.app.utils.Constants;
+import com.acfjj.app.utils.Misc;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -53,9 +55,11 @@ public class User {
 	private Set<Conversation> conversations2 = new HashSet<>();
 
 	private String email;
+	@Column(length = Constants.MAX_LONG_STRING_LENGTH)
 	private String password;
 	private Boolean validated;
 	private Boolean isAdmin;
+	@Column(length = Constants.MAX_LONG_STRING_LENGTH)
 	private String noSecu;
 	private String noPhone;
 
@@ -71,8 +75,8 @@ public class User {
 		this.password = password;
 		this.validated = false;
 		this.isAdmin = false;
-		this.noSecu = noSecu;
-		this.noPhone = noPhone;
+		this.setNoSecu(noSecu);
+		this.setNoPhone(noPhone);
 		this.privateCode = User.generatePrivateCode();
 		this.personInfo = new PersonInfo(lastName, firstname, gender, dateOfBirth, countryOfBirth, cityOfBirth, false,
 				nationality, adress, postalCode, profilPictureUrl);
@@ -145,6 +149,13 @@ public class User {
 		}
 		return myTree.getId();
 	}
+	
+	public Boolean getIsMyTreePublic() {
+		if (Objects.isNull(myTree)) {
+			return null;
+		}
+		return myTree.isPublic();
+	}
 
 	@JsonIgnore
 	public Set<Conversation> getConversations() {
@@ -193,7 +204,8 @@ public class User {
 	}
 
 	public void setNoSecu(String noSecu) {
-		this.noSecu = noSecu;
+		noSecu = Misc.truncateString(noSecu, Constants.MAX_LONG_STRING_LENGTH);
+		this.noSecu = Misc.isSocialSecurityNumberAcceptable(noSecu) ? noSecu : Constants.DEFAULT_NO_SECU; 
 	}
 
 	public String getNoPhone() {
@@ -201,7 +213,8 @@ public class User {
 	}
 
 	public void setNoPhone(String noPhone) {
-		this.noPhone = noPhone;
+		noPhone = Misc.truncateString(noPhone, Constants.MAX_STRING_LENGTH);
+		this.noPhone = Misc.isPhoneNumberAcceptable(noPhone) ? noPhone : Constants.DEFAULT_NO_PHONE;
 	}
 
 	@JsonIgnore
@@ -353,8 +366,8 @@ public class User {
 		}
 		Set<String> keys = dataLHM.keySet();
 		try {
-			this.setLastName(keys.contains("lastname") ? dataLHM.get("lastname") : this.getLastName());
-			this.setFirstName(keys.contains("firstname") ? dataLHM.get("firstname") : this.getFirstName());
+			this.setLastName(keys.contains("lastaNme") ? dataLHM.get("lastName") : this.getLastName());
+			this.setFirstName(keys.contains("firstName") ? dataLHM.get("firstName") : this.getFirstName());
 			this.setGender(keys.contains("gender") ? Integer.parseInt(dataLHM.get("gender")) : this.getGender());
 			this.setDateOfBirth(keys.contains("dateOfBirth") ? LocalDate.parse(dataLHM.get("dateOfBirth")) : this.getDateOfBirth());
 			this.setCountryOfBirth(keys.contains("countryOfBirth") ? dataLHM.get("countryOfBirth") : this.getCountryOfBirth());
@@ -366,7 +379,7 @@ public class User {
 			this.setNationality(keys.contains("nationality") ? dataLHM.get("nationality") : this.getNationality());
 			this.setAdress(keys.contains("adress") ? dataLHM.get("adress") : this.getAdress());
 			this.setPostalCode(keys.contains("postalCode") ? Integer.parseInt(dataLHM.get("postalCode")) : this.getPostalCode());
-			this.setProfilPictureUrl(keys.contains("profilPictureUrl") ? dataLHM.get("profilPictureUrl") : (Objects.isNull(this.getProfilPictureUrl()) ? Constants.DEFAULT_PP_URL : this.getProfilPictureUrl())); 
+			this.setProfilPictureUrl(keys.contains("profilPictureUrl") ? dataLHM.get("profilPictureUrl") : (Objects.isNull(this.getProfilPictureUrl()) ? Constants.DEFAULT_PP_URL : this.getProfilPictureUrl()));
 			return true;
 		} catch (Exception e) {
 			return false;
@@ -379,8 +392,8 @@ public class User {
 		}
 		Set<String> keys = dataLHM.keySet();
 		try {
-			String lastname = dataLHM.get("lastname");
-			String firstname = dataLHM.get("firstname");
+			String lastname = dataLHM.get("lastName");
+			String firstname = dataLHM.get("firstName");
 			int gender = Integer.parseInt(dataLHM.get("gender"));
 			LocalDate dateOfBirth = LocalDate.parse(dataLHM.get("dateOfBirth"));
 			String countryOfBirth = dataLHM.get("countryOfBirth");
@@ -403,21 +416,22 @@ public class User {
 	}
 	
 	public static Boolean isCastableUsing(LinkedHashMap<String, String> dataLHM) {
-		List<String> requiredKeys = Arrays.asList("lastName", "firstName", "gender", "dateOfBirth", "countryOfBirth",
-				"cityOfBirth", "email", "password");
-		if (!dataLHM.keySet().containsAll(requiredKeys)) {
+		Set<String> keys = dataLHM.keySet();
+		if (!keys.containsAll(Constants.USER_LHM_REQUIRED_KEYS)) {
 			return false;
 		}
-		return isUpdatableUsing(dataLHM);
+		for (String key : keys) {
+			if (!Constants.POSSIBLE_LHM_KEYS.contains(key)) {
+				return false;
+			}
+		}
+		return true;
 	}
 	
 	public static boolean isUpdatableUsing(LinkedHashMap<String, String> dataLHM) {
-		List<String> possibleKeys = Arrays.asList("lastName", "firstName", "gender", "dateOfBirth", "countryOfBirth",
-				"cityOfBirth", "email", "password", "noSecu", "noPhone", "nationality", "adress", "postalCode",
-				"profilPictureUrl");
 		Set<String> keys = dataLHM.keySet();
 		for (String key : keys) {
-			if (!possibleKeys.contains(key)) {
+			if (!Constants.POSSIBLE_LHM_KEYS.contains(key) || Constants.PROFIL_UPDATE_FORBIDDEN_KEYS.contains(key)) {
 				return false;
 			}
 		}
