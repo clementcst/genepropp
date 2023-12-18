@@ -32,15 +32,10 @@ public class ConversationService extends AbstractService {
     	return conversationResult;
     }
     
-    public String addConversation(User user1, User user2) {
-    	List<User> users = new ArrayList<>();
-    	for (Conversation conversation : user1.getConversations()) { 
-        	users.add(conversation.getUser1());
-        	users.add(conversation.getUser2());
-			if(users.contains(user1) || users.contains(user2)) {
-				return "Conversation already exist";
-			}		
-		}
+    public String addConversation(User user1, User user2) {    	
+    	if(!Objects.isNull(user1.getConversationWith(user2))) {
+    		return "Conversation already exist";
+    	}
     	Conversation conversation = new Conversation(user1, user2);
     	conversationRepository.save(conversation);
     	user1.addConversation1(conversation);

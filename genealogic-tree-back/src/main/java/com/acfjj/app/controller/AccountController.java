@@ -42,7 +42,7 @@ public class AccountController extends AbstractController {
 		if (Objects.isNull(user)) {
 			return new Response("Incorrect private code", false);
 		}
-		if (!user.getPassword().equals(password)) {
+		if (!passwordCompare(user, password)) {
 			return new Response("Incorrect password", false);
 		}
 		if (!user.isValidated()) {
@@ -62,18 +62,25 @@ public class AccountController extends AbstractController {
 	}
 
 	@PostMapping("/registration")
-	public Response registration(@RequestParam int step, @RequestBody LinkedHashMap<String, String> data,
+	public Response registration(@RequestParam int step, @RequestBody LinkedHashMap<String, String> dataLHM,
 			@RequestParam(required = false, defaultValue = "0") Boolean userResponse) {
-		User userToRegister = User.castLHMAsUser(data);
-		if (Objects.isNull(userToRegister)) {
+		if(User.isCastableUsing(dataLHM)) {
 			return new Response("Request Body format is invalid.", false);
+		}
+		Response LHMCheckResponse = Misc.LHMCheck(dataLHM);
+		if(!LHMCheckResponse.getSuccess()) {
+			return LHMCheckResponse;
+		}
+		User userToRegister = User.castLHMAsUser(dataLHM);
+		if (Objects.isNull(userToRegister)) {
+			return new Response("A Request Body value format is invalid.", false);
 		}
 		switch (step) {
 		case 1: {
-			return registrationStep1(userToRegister, data);
+			return registrationStep1(userToRegister, dataLHM);
 		}
 		case 2: {
-			return registrationStep2(userToRegister, data, userResponse);
+			return registrationStep2(userToRegister, dataLHM, userResponse);
 		}
 		default:
 			return new Response("Unexpected parameter: " + step, false);
@@ -223,5 +230,9 @@ public class AccountController extends AbstractController {
 		} else {
 			return new Response(regResponse.getMessage(), "Fail to register System Admin account", false);
 		}
+	}
+	
+	private Boolean passwordCompare(User user, String password) {
+		return user.getPassword().equals(password);
 	}
 }
