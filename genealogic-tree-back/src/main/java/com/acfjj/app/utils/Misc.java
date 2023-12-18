@@ -110,7 +110,7 @@ public class Misc {
 				return new Response("Error key : " + key + " cannot be checked by LHMcheck: key not registered.",
 						false);
 			}
-			prevResponseStr = responseStr;
+			prevResponseStr = String.copyValueOf(responseStr.toCharArray());
 			String value = LHM.get(key);
 			responseStr += isStringSafe(value) ? "" : "XSS tentative on field" + key + ", user reported.\n";
 			String endWasStr =  "\n" + key + " was " + value + "\n||\n";
@@ -190,7 +190,7 @@ public class Misc {
 			default:
 				break;
 			}
-			if(prevResponseStr.equals(responseStr)) {
+			if(!prevResponseStr.equals(responseStr)) {
 				responseValue.add(key);
 			}
 		}
