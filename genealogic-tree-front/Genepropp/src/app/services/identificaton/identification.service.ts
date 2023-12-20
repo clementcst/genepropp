@@ -29,6 +29,6 @@ export class IdentificationService {
       .set('step', step)
       .set('userResponse', userResponse);
     const data = { lastName: inputs.lastName, firstName: inputs.firstName, gender: inputs.sexe, dateOfBirth: inputs.birthDate, countryOfBirth: inputs.countryofbirth, cityOfBirth: inputs.cityofbirth, email: inputs.email, password: inputs.password, noSecu: inputs.ssn, noPhone: inputs.phn, nationality: inputs.nationality, adress: inputs.adress, postalCode: inputs.postalCode }
-    return this.http.post<any[]>("http://localhost:8080/account/register", data, {params, responseType: 'json'});
+    return this.http.post<any[]>("http://localhost:8080/account/registration", data, {params, responseType: 'json'});
   }
 }
