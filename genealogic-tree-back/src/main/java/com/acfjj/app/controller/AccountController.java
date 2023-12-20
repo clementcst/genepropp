@@ -64,7 +64,7 @@ public class AccountController extends AbstractController {
 	@PostMapping("/registration")
 	public Response registration(@RequestParam int step, @RequestBody LinkedHashMap<String, String> dataLHM,
 			@RequestParam(required = false, defaultValue = "0") Boolean userResponse) {
-		if(User.isCastableUsing(dataLHM)) {
+		if(!User.isCastableUsing(dataLHM)) {
 			return new Response("Request Body format is invalid.", false);
 		}
 		Response LHMCheckResponse = Misc.LHMCheck(dataLHM);
