@@ -117,7 +117,7 @@ public class AccountController extends AbstractController {
 		if (!Objects.isNull(existingNode)) {
 			nodeService.updateNode(existingNode.getId(), existingNode);
 		} else {
-			nodeService.addNode(new Node(user.getPersonInfo(), user, 1));
+			nodeService.addNode(new Node(user.getPersonInfo(), user, 2));
 		}
 		Node node = nodeService.getPublicNodeByNameAndBirthInfo(lastName, firstName, user.getDateOfBirth(),
 				user.getCountryOfBirth(), user.getCityOfBirth());
@@ -147,10 +147,14 @@ public class AccountController extends AbstractController {
 		User userFound = userService.getUserByNameAndBirthInfo(userToRegister.getLastName(),
 				userToRegister.getFirstName(), userToRegister.getDateOfBirth(), userToRegister.getCountryOfBirth(),
 				userToRegister.getCityOfBirth());
+		User userFound2 = userService.getUserByEmail(userToRegister.getEmail());
 		Node nodeFound = nodeService.getPublicNodeByNameAndBirthInfo(userToRegister.getLastName(),
 				userToRegister.getFirstName(), userToRegister.getDateOfBirth(), userToRegister.getCountryOfBirth(),
 				userToRegister.getCityOfBirth());
-		if (!Objects.isNull(userFound)) {
+		System.out.println(userFound);
+		System.out.println(userFound2);
+		if (!Objects.isNull(userFound) || !Objects.isNull(userFound2)) {
+			userFound = Objects.isNull(userFound) ? userFound2 : userFound;
 			Map<String, Object> responseValue = new LinkedHashMap<String, Object>();
 			responseValue.put("nextStep", 1);
 			responseValue.put("frontMessage",
