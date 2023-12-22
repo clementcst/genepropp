@@ -73,7 +73,6 @@ export class ContactsContentComponent implements OnInit {
         this.contactsComponent.showUsersNotInConversation(usersNotInConv);
       }
     });
-    
   }
 
   openChat(contact: any) {
@@ -86,6 +85,7 @@ export class ContactsContentComponent implements OnInit {
         this.newConversationId = response.value;
         let newContact = { senderInfo: user, convId: this.newConversationId};
         this.contactsForFront.push(newContact);
+        this.idAlreadyInConv.push(user.id)
         this.openChat(newContact);
       });
   }

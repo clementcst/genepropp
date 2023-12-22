@@ -29,5 +29,14 @@ export class ContactsComponent {
 
   selectUser(user: any) {
     this.selectUserClick.emit(user);
+    this.showUsersNotInConv = false;
+    this.removeUserFromList(user);
+  }
+
+  private removeUserFromList(user: any) {
+    const index = this.usersNotInConv.indexOf(user);
+    if (index !== -1) {
+      this.usersNotInConv.splice(index, 1);
+    }
   }
 }
