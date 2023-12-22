@@ -26,6 +26,21 @@ public class TestDataController extends AbstractController {
 	AccountController accountController;
 	@Autowired
 	TreeController treeController;
+	
+	@PostMapping
+	public Response allTest() {
+		List<Response> responses = new ArrayList<>();
+		responses.add(addTestUsers(true));
+		responses.add(addTestTree());
+		responses.add(addTestTree2());
+		addTestNodes();
+		for (Response response : responses) {
+			if (!response.getSuccess()) {
+				return new Response(responses, "One or more failure occured", false);
+			}
+		}
+		return new Response("All Test Data successfully created in DB", true);
+	}
 
 	@PostMapping("/users")
 	public Response addTestUsers(@RequestParam(required = false, defaultValue = "1") Boolean validated) {
@@ -94,7 +109,7 @@ public class TestDataController extends AbstractController {
 				return new Response(responses, "One or more failure occured", false);
 			}
 		}
-		return new Response(responses);
+		return new Response("Test tree 1 have successfully been created", true);
 	}
 	
 	@PostMapping("/tree2")
@@ -167,7 +182,7 @@ public class TestDataController extends AbstractController {
 				return new Response(responses, "One or more failure occured", false);
 			}
 		}
-		return new Response("All test trees2 have successfully been created", true);
+		return new Response("Test tree 2 have successfully been created", true);
 	}
 
 	@PostMapping("/nodes")
@@ -187,5 +202,4 @@ public class TestDataController extends AbstractController {
 			nodeService.addNode(node);
 		}
 	}
-
 }

@@ -16,7 +16,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 
 @Entity
@@ -40,7 +39,7 @@ public class Message {
 	 	@JoinColumn(name = "conversation_id")
 	 	private Conversation conversation;
 	 	
-	 	@Column(length = Constants.MAX_STRING_LENGTH)
+	 	@Column(length = Constants.MAX_LONG_STRING_LENGTH)
 	 	private String content;
 	 	
 	 	private ValidationType validationType;
@@ -90,10 +89,7 @@ public class Message {
 		}
 		
 		public void setContent(String content) {
-			if(content.length() > Constants.MAX_STRING_LENGTH)
-				this.content = "Message content was to big and has been truncated";
-			else
-				this.content = content;
+				this.content = Misc.truncateString(content, Constants.MAX_LONG_STRING_LENGTH);
 		}
 		public Long getSenderId() {
 			return sender.getId();

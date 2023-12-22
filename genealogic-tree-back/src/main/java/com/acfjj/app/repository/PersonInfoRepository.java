@@ -13,5 +13,5 @@ public interface PersonInfoRepository extends CrudRepository<PersonInfo, Long>{
 	List<PersonInfo> findByCityOfBirth(String cityName);
 	List<PersonInfo> findByCountryOfBirth(String countryName);
 	List<PersonInfo> findByDateOfBirth(LocalDate dateOfBirth);
-	PersonInfo findByLastNameAndFirstNameAndDateOfBirthAndCountryOfBirthAndCityOfBirth(String lastName, String firstName, LocalDate dateOfBirth, String countryOfBirth, String cityofBirth);
+	List<PersonInfo> findByLastNameAndFirstNameAndDateOfBirthAndCountryOfBirthAndCityOfBirth(String lastName, String firstName, LocalDate dateOfBirth, String countryOfBirth, String cityofBirth);
 }

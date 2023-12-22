@@ -161,16 +161,17 @@ public class NodeService extends AbstractService {
     	}
     	Integer diff = Misc.findMaxFrequency(diffList);
 
-    	//tous tree avec 2 nodes
+    	//tous tree avec les 2 nodes
     	//différence prof des 2 
-    	//celle qui apparait plus souvent comme prof
+    	//prendre la difference qui apparait le plus en tant que gap 
     	return null;
     }
     
     public Node getNodeByNameAndBirthInfo(String lastName, String firstName, LocalDate dateOfBirth, String countryOfBirth, String cityofBirth) {
 		Node nodeFound = null;
-		PersonInfo personInfoFound = personInfoRepository.findByLastNameAndFirstNameAndDateOfBirthAndCountryOfBirthAndCityOfBirth(lastName, firstName, dateOfBirth, countryOfBirth, cityofBirth); 
-		if(!Objects.isNull(personInfoFound)) {
+		List<PersonInfo> personInfoFounds = personInfoRepository.findByLastNameAndFirstNameAndDateOfBirthAndCountryOfBirthAndCityOfBirth(lastName, firstName, dateOfBirth, countryOfBirth, cityofBirth); 
+		if(!personInfoFounds.isEmpty()) {
+			PersonInfo personInfoFound = personInfoFounds.get(0);
 			nodeFound = nodeRepository.findByPersonInfo(personInfoFound);
 		}
 		return nodeFound;

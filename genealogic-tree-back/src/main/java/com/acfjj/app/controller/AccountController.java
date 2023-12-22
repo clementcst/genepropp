@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,7 +42,7 @@ public class AccountController extends AbstractController {
 		if (Objects.isNull(user)) {
 			return new Response("Incorrect private code", false);
 		}
-		if (!user.getPassword().equals(password)) {
+		if (!passwordCompare(user, password)) {
 			return new Response("Incorrect password", false);
 		}
 		if (!user.isValidated()) {
@@ -57,29 +56,35 @@ public class AccountController extends AbstractController {
 			} else {
 				frontMsg += "\nPlease retry later or contact support to get more info.";
 			}
-			return new Response( frontMsg, false);
+			return new Response(frontMsg, false);
 		}
 		return new Response(user.getId(), "Login Success", true);
 	}
 
 	@PostMapping("/registration")
-	public Response registration(@RequestParam int step, @RequestBody LinkedHashMap<String, String> data,
+	public Response registration(@RequestParam int step, @RequestBody LinkedHashMap<String, String> dataLHM,
 			@RequestParam(required = false, defaultValue = "0") Boolean userResponse) {
-		User userToRegister = User.castAsUser(data);
-		if (Objects.isNull(userToRegister)) {
+		if(!User.isCastableUsing(dataLHM)) {
 			return new Response("Request Body format is invalid.", false);
+		}
+		Response LHMCheckResponse = Misc.LHMCheck(dataLHM);
+		if(!LHMCheckResponse.getSuccess()) {
+			return LHMCheckResponse;
+		}
+		User userToRegister = User.castLHMAsUser(dataLHM);
+		if (Objects.isNull(userToRegister)) {
+			return new Response("A Request Body value format is invalid.", false);
 		}
 		switch (step) {
 		case 1: {
-			return registrationStep1(userToRegister, data);
+			return registrationStep1(userToRegister, dataLHM);
 		}
 		case 2: {
-			return registrationStep2(userToRegister, data, userResponse);
+			return registrationStep2(userToRegister, dataLHM, userResponse);
 		}
 		default:
 			return new Response("Unexpected parameter: " + step, false);
 		}
-
 	}
 
 	public Response registerUser(User user, Node existingNode) {
@@ -112,7 +117,7 @@ public class AccountController extends AbstractController {
 		if (!Objects.isNull(existingNode)) {
 			nodeService.updateNode(existingNode.getId(), existingNode);
 		} else {
-			nodeService.addNode(new Node(user.getPersonInfo(), user, 1));
+			nodeService.addNode(new Node(user.getPersonInfo(), user, 2));
 		}
 		Node node = nodeService.getPublicNodeByNameAndBirthInfo(lastName, firstName, user.getDateOfBirth(),
 				user.getCountryOfBirth(), user.getCityOfBirth());
@@ -142,10 +147,14 @@ public class AccountController extends AbstractController {
 		User userFound = userService.getUserByNameAndBirthInfo(userToRegister.getLastName(),
 				userToRegister.getFirstName(), userToRegister.getDateOfBirth(), userToRegister.getCountryOfBirth(),
 				userToRegister.getCityOfBirth());
+		User userFound2 = userService.getUserByEmail(userToRegister.getEmail());
 		Node nodeFound = nodeService.getPublicNodeByNameAndBirthInfo(userToRegister.getLastName(),
 				userToRegister.getFirstName(), userToRegister.getDateOfBirth(), userToRegister.getCountryOfBirth(),
 				userToRegister.getCityOfBirth());
-		if (!Objects.isNull(userFound)) {
+		System.out.println(userFound);
+		System.out.println(userFound2);
+		if (!Objects.isNull(userFound) || !Objects.isNull(userFound2)) {
+			userFound = Objects.isNull(userFound) ? userFound2 : userFound;
 			Map<String, Object> responseValue = new LinkedHashMap<String, Object>();
 			responseValue.put("nextStep", 1);
 			responseValue.put("frontMessage",
@@ -225,5 +234,9 @@ public class AccountController extends AbstractController {
 		} else {
 			return new Response(regResponse.getMessage(), "Fail to register System Admin account", false);
 		}
+	}
+	
+	private Boolean passwordCompare(User user, String password) {
+		return user.getPassword().equals(password);
 	}
 }

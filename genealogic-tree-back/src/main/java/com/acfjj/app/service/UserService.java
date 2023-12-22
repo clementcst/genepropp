@@ -2,25 +2,20 @@ package com.acfjj.app.service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import com.acfjj.app.model.PersonInfo;
 import com.acfjj.app.model.User;
-import com.acfjj.app.repository.PersonInfoRepository;
-import com.acfjj.app.repository.UserRepository;
 import com.acfjj.app.utils.Constants;
 
 @Service
 @Scope("singleton")
 public class UserService extends AbstractService {
-	
+
 	public List<User> getAllUsers() {
 		List<User> users = new ArrayList<>();
 		userRepository.findAll().forEach(user -> {
@@ -36,10 +31,12 @@ public class UserService extends AbstractService {
 	public User getUserByNameAndBirthInfo(String lastName, String firstName, LocalDate dateOfBirth,
 			String countryOfBirth, String cityofBirth) {
 		User userFound = null;
-		PersonInfo personInfoFound = personInfoRepository
+		List<PersonInfo> personInfoFounds = personInfoRepository
 				.findByLastNameAndFirstNameAndDateOfBirthAndCountryOfBirthAndCityOfBirth(lastName, firstName,
 						dateOfBirth, countryOfBirth, cityofBirth);
-		if (!Objects.isNull(personInfoFound)) {
+		System.out.println(personInfoFounds);
+		if (!personInfoFounds.isEmpty()) {
+			PersonInfo personInfoFound = personInfoFounds.get(0);
 			userFound = userRepository.findByPersonInfo(personInfoFound);
 		}
 		return userFound;
@@ -81,19 +78,19 @@ public class UserService extends AbstractService {
 			personInfoRepository.save(user.getPersonInfo());
 		}
 	}
-	
+
 	public Boolean existSystemAdminUser() {
 		return !Objects.isNull(getSystemAdminUser());
 	}
-	
+
 	public User getSystemAdminUser() {
 		return userRepository.findByEmail(Constants.SYSTEM_ADMIN_EMAIL);
 	}
-	
-	public List<User> getAdminUsers(){
+
+	public List<User> getAdminUsers() {
 		return userRepository.findByIsAdmin(true);
 	}
-	
+
 	public List<User> getValidatedNonAdminUsers() {
 		return userRepository.findByIsAdminAndValidated(false, true);
 	}

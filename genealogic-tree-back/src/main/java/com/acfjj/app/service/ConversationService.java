@@ -4,12 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
-import com.acfjj.app.repository.ConversationRepository;
-import com.acfjj.app.repository.MessageRepository;
-import com.acfjj.app.repository.UserRepository;
 import com.acfjj.app.utils.ValidationType;
 import com.acfjj.app.model.Conversation;
 import com.acfjj.app.model.Message;
@@ -46,7 +42,7 @@ public class ConversationService extends AbstractService {
 		userRepository.save(user1);
 		user2.addConversation2(conversation);
 		userRepository.save(user2);
-		return "Success";
+		return "Conversation created successfully";
     }
     
     public void updateConversation(long id, Conversation conversation) {
