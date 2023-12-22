@@ -7,12 +7,22 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 })
 export class ContactsComponent {
 
-
-  @Input() contacts: any; // Données de contact
+  @Input() contacts: any;
   @Output() contactClick = new EventEmitter<any>();
+  @Output() createConversationClick = new EventEmitter<void>();
+  showUsersNotInConv: boolean = false;
+  usersNotInConv: any[] = [];
 
   constructor() { }
 
-  ngOnInit() : void{ }
+  ngOnInit(): void { }
 
+  createConversationListener() {
+    this.createConversationClick.emit();
+  }
+
+  showUsersNotInConversation(usersNotInConv: any[]) {
+    this.usersNotInConv = usersNotInConv;
+    this.showUsersNotInConv = true;
+  }
 }
