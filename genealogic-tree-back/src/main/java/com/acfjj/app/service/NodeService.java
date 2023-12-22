@@ -1,16 +1,11 @@
 package com.acfjj.app.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import com.acfjj.app.model.Node;
 import com.acfjj.app.model.PersonInfo;
 import com.acfjj.app.model.Tree;
 import com.acfjj.app.model.TreeNodes;
-import com.acfjj.app.repository.PersonInfoRepository;
-import com.acfjj.app.repository.TreeNodesRepository;
-import com.acfjj.app.repository.TreeRepository;
-import com.acfjj.app.repository.UserRepository;
-import com.acfjj.app.repository.NodeRepository;
 import com.acfjj.app.utils.Misc;
 
 import java.time.LocalDate;
@@ -20,20 +15,10 @@ import java.util.Objects;
 import java.util.Set;
 
 @Service
-public class NodeService {
+@Scope("singleton")
+public class NodeService extends AbstractService {
 
-    @Autowired
-    NodeRepository nodeRepository;
-    @Autowired
-    PersonInfoRepository personInfoRepository;
-    @Autowired
-    TreeRepository treeRepository;
-    @Autowired
-    TreeNodesRepository treeNodesRepository;
-    @Autowired
-    UserRepository userRepository;
-
-    public List<Node> getAllNodes() {
+	public List<Node> getAllNodes() {
         List<Node> nodes = new ArrayList<>();
         nodeRepository.findAll().forEach(nodes::add);
         return nodes;
@@ -176,16 +161,17 @@ public class NodeService {
     	}
     	Integer diff = Misc.findMaxFrequency(diffList);
 
-    	//tous tree avec 2 nodes
+    	//tous tree avec les 2 nodes
     	//différence prof des 2 
-    	//celle qui apparait plus souvent comme prof
+    	//prendre la difference qui apparait le plus en tant que gap 
     	return null;
     }
     
     public Node getNodeByNameAndBirthInfo(String lastName, String firstName, LocalDate dateOfBirth, String countryOfBirth, String cityofBirth) {
 		Node nodeFound = null;
-		PersonInfo personInfoFound = personInfoRepository.findByLastNameAndFirstNameAndDateOfBirthAndCountryOfBirthAndCityOfBirth(lastName, firstName, dateOfBirth, countryOfBirth, cityofBirth); 
-		if(!Objects.isNull(personInfoFound)) {
+		List<PersonInfo> personInfoFounds = personInfoRepository.findByLastNameAndFirstNameAndDateOfBirthAndCountryOfBirthAndCityOfBirth(lastName, firstName, dateOfBirth, countryOfBirth, cityofBirth); 
+		if(!personInfoFounds.isEmpty()) {
+			PersonInfo personInfoFound = personInfoFounds.get(0);
 			nodeFound = nodeRepository.findByPersonInfo(personInfoFound);
 		}
 		return nodeFound;

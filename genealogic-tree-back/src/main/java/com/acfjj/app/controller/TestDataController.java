@@ -4,67 +4,76 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.acfjj.app.model.Node;
 import com.acfjj.app.model.PersonInfo;
 import com.acfjj.app.model.Tree;
 import com.acfjj.app.model.User;
-import com.acfjj.app.repository.TreeRepository;
-import com.acfjj.app.repository.PersonInfoRepository;
-import com.acfjj.app.service.*;
 import com.acfjj.app.utils.Response;
 
 @RestController
-public class TestDataCreationController {
+@Scope("singleton")
+@RequestMapping("/test")
+public class TestDataController extends AbstractController {
 	@Autowired
-	UserController userController;
-	@Autowired
-	UserService userService;
-	@Autowired
-	TreeService treeService;
-	@Autowired
-	NodeService nodeService;
-	@Autowired
-	ConversationService conversationService;
+	AccountController accountController;
 	@Autowired
 	TreeController treeController;
-	@Autowired
-	PersonInfoRepository personInfoRepository;
+	
+	@PostMapping
+	public Response allTest() {
+		List<Response> responses = new ArrayList<>();
+		responses.add(addTestUsers(true));
+		responses.add(addTestTree());
+		responses.add(addTestTree2());
+		addTestNodes();
+		for (Response response : responses) {
+			if (!response.getSuccess()) {
+				return new Response(responses, "One or more failure occured", false);
+			}
+		}
+		return new Response("All Test Data successfully created in DB", true);
+	}
 
-	@PostMapping("/test/users")
-	public Response addTestUsers() {
+	@PostMapping("/users")
+	public Response addTestUsers(@RequestParam(required = false, defaultValue = "1") Boolean validated) {
 		List<User> users = new ArrayList<User>(Arrays.asList(new User[] {
 				new User("Bourhara", "Adam", 1, LocalDate.of(2002, 04, 2), "France", "Cergy", "adam@mail", "password1",
-						"Sécurité socisse", "Telephone ui", "nationality", "adress", 1234, "profilPictureData64"),
+						"Sécurité socisse", "Telephone ui", "nationality", "adress", 1234, "profilPictureUrl"),
 				new User("Cassiet", "Clement", 1, LocalDate.of(1899, 07, 9), "Péîs", "Tournant-En-Brie", "clement@mail",
 						"password2", "Sécurité socisse", "Telephone ui", "nationality", "adress", 1234,
-						"profilPictureData64"),
+						"profilPictureUrl"),
 				new User("Gautier", "Jordan", 1, LocalDate.of(2002, 11, 21), "Nouvelle-Zélande", "Paris Hilton",
 						"jordan@mail", "password3", "Sécurité socisse", "Telephone ui", "nationality", "adress", 1234,
-						"profilPictureData64"),
+						"profilPictureUrl"),
 				new User("Cerf", "Fabien", 1, LocalDate.of(2002, 03, 9), "France", "Paris", "fabien@mail", "password4",
-						"Sécurité socisse", "Telephone ui", "nationality", "adress", 1234, "profilPictureData64"),
+						"Sécurité socisse", "Telephone ui", "nationality", "adress", 1234, "profilPictureUrl"),
 				new User("Legrand", "Joan", 1, LocalDate.of(2002, 10, 26), "France", "Paris", "joan@mail", "password5",
-						"Sécurité socisse", "Telephone ui", "nationality", "adress", 1234, "profilPictureData64") }));
+						"Sécurité socisse", "Telephone ui", "nationality", "adress", 1234, "profilPictureUrl") }));
 		List<Response> responses = new ArrayList<>();
 		for (User user : users) {
-			responses.add(userController.addUser(user, null));
+			responses.add(accountController.registerUser(user, null));
+			user = userService.getUserByEmail(user.getEmail());
+			user.setValidated(validated);
+			userService.updateUser(user.getId(), user);
 		}
 		for (Response response : responses) {
 			if (!response.getSuccess()) {
 				return new Response(responses, "One or more failure occured", false);
 			}
 		}
-		return new Response(responses);
+		return new Response("All test users have successfully been created", true);
 	}
 
-	@PostMapping("/test/trees")
-	public Response addTree() {
+	@PostMapping("/tree")
+	public Response addTestTree() {
 		Tree tree = treeService.getTree(1);
 		Node node = nodeService.getNode((long) 1);
 		Node parent1 = nodeService.getNode((long) 2);
@@ -100,17 +109,18 @@ public class TestDataCreationController {
 				return new Response(responses, "One or more failure occured", false);
 			}
 		}
-		return new Response(responses);
+		return new Response("Test tree 1 have successfully been created", true);
 	}
-
-	@PostMapping("/test/treeTest2")
-	public Response addTreeTest2() {
+	
+	@PostMapping("/tree2")
+	public Response addTestTree2() {
 		List<Response> responses = new ArrayList<>();
 
 		User userTest = new User("Martin", "Y", 1, LocalDate.of(2002, 04, 2), "France", "Cergy", "test@mail",
 				"password1", "Sécurité socisse", "Telephone ui", "nationality", "adress", 1234,
 				"https://99designs-blog.imgix.net/blog/wp-content/uploads/2016/03/web-images.jpg?auto=format&q=60&w=1600&h=824&fit=crop&crop=faces");
-		responses.add(userController.addUser(userTest, null));
+		userTest.setValidated(true);
+		responses.add(accountController.registerUser(userTest, null));
 
 		Tree tree = userTest.getMyTree();
 		Long nodeId = userTest.getRelatedNodeId();
@@ -131,8 +141,8 @@ public class TestDataCreationController {
 		responses.add(treeController.addLinkedNode(tree.getId(), newNode1.getId(), newNode3, 1, "Parent", false));
 		responses.add(treeController.addLinkedNode(tree.getId(), newNode3.getId(), newNode2, 1, "exPartner", true));
 
-		Node newNode4 = new Node("Rossi", "A", 1, LocalDate.of(1988, 9, 10), "Italie", "Rome", userTest, 1,
-				"Italien", "Via del Corso", 75001,
+		Node newNode4 = new Node("Rossi", "A", 1, LocalDate.of(1988, 9, 10), "Italie", "Rome", userTest, 1, "Italien",
+				"Via del Corso", 75001,
 				"https://img.freepik.com/premium-photo/3d-cartoon-fish-shark-portrait-wearing-clothes-glasses-hat-jacket-standing-front_741910-1595.jpg");
 		responses.add(treeController.addLinkedNode(tree.getId(), newNode3.getId(), newNode4, 1, "Partner", false));
 
@@ -149,8 +159,8 @@ public class TestDataCreationController {
 		responses.add(treeController.addLinkedNode(tree.getId(), newNode3.getId(), newNode6, 1, "Child", true));
 		responses.add(treeController.addLinkedNode(tree.getId(), newNode6.getId(), newNode5, 1, "siblings", true));
 
-		Node newNode7 = new Node("Fernandez", "G", 2, LocalDate.of(1982, 6, 14), "Argentine", "Buenos Aires",
-				userTest, 1, "Argentine", "456 Avenida 9 de Julio", 75001,
+		Node newNode7 = new Node("Fernandez", "G", 2, LocalDate.of(1982, 6, 14), "Argentine", "Buenos Aires", userTest,
+				1, "Argentine", "456 Avenida 9 de Julio", 75001,
 				"https://img.freepik.com/photos-premium/licorne-bande-dessinee-corne-criniere_81048-17810.jpg");
 		responses.add(treeController.addLinkedNode(tree.getId(), newNode4.getId(), newNode7, 1, "siblings", false));
 
@@ -172,11 +182,11 @@ public class TestDataCreationController {
 				return new Response(responses, "One or more failure occured", false);
 			}
 		}
-		return new Response(responses);
+		return new Response("Test tree 2 have successfully been created", true);
 	}
 
-	@PostMapping("/test/nodes")
-	public void addNodes() {
+	@PostMapping("/nodes")
+	public void addTestNodes() {
 		List<Node> nodes = new ArrayList<Node>(Arrays.asList(new Node[] {
 				new Node("Bourhara", "Adam", 1, LocalDate.of(2002, 04, 2), "France", "Cergy", userService.getUser(1), 1,
 						"French", "Some Address", 12345, "Base64Image"),
@@ -192,5 +202,4 @@ public class TestDataCreationController {
 			nodeService.addNode(node);
 		}
 	}
-
 }

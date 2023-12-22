@@ -28,11 +28,11 @@ public class UserTest {
 
     static public List<Object> testData() {
         return new ArrayList<Object>(Arrays.asList(new Object[][] {
-            {"Bourhara", "Adam", 1, LocalDate.of(2002, 04, 2), "France", "Cergy", "adam@mail", "password1","Sécurité socisse", "Telephone ui", "nationality", "adress", 1234, "profilPictureData64"},
-            {"Cassiet", "Clement", 1, LocalDate.of(1899, 07, 9), "Péîs", "Tournant-En-Brie", "clement@mail", "password2", "Sécurité socisse", "Telephone ui", "nationality", "adress", 1234, "profilPictureData64"},
-            {"Gautier", "Jordan", 1, LocalDate.of(2002, 11, 21), "Nouvelle-Zélande", "Paris Hilton", "jordan@mail", "password3", "Sécurité socisse", "Telephone ui", "nationality", "adress", 1234, "profilPictureData64"},
-            {"Cerf", "Fabien", 1, LocalDate.of(2002, 03, 9), "France", "Paris", "fabien@mail", "password4", "Sécurité socisse", "Telephone ui", "nationality", "adress", 1234, "profilPictureData64"},
-            {"Legrand", "Joan", 1, LocalDate.of(2002, 10, 26), "France", "Paris", "joan@mail", "password5", "Sécurité socisse", "Telephone ui", "nationality", "adress", 1234, "profilPictureData64"}
+            {"Bourhara", "Adam", 1, LocalDate.of(2002, 04, 2), "France", "Cergy", "adam@mail", "password1","Sécurité socisse", "Telephone ui", "nationality", "adress", 1234, "profilPictureUrl"},
+            {"Cassiet", "Clement", 1, LocalDate.of(1899, 07, 9), "Péîs", "Tournant-En-Brie", "clement@mail", "password2", "Sécurité socisse", "Telephone ui", "nationality", "adress", 1234, "profilPictureUrl"},
+            {"Gautier", "Jordan", 1, LocalDate.of(2002, 11, 21), "Nouvelle-Zélande", "Paris Hilton", "jordan@mail", "password3", "Sécurité socisse", "Telephone ui", "nationality", "adress", 1234, "profilPictureUrl"},
+            {"Cerf", "Fabien", 1, LocalDate.of(2002, 03, 9), "France", "Paris", "fabien@mail", "password4", "Sécurité socisse", "Telephone ui", "nationality", "adress", 1234, "profilPictureUrl"},
+            {"Legrand", "Joan", 1, LocalDate.of(2002, 10, 26), "France", "Paris", "joan@mail", "password5", "Sécurité socisse", "Telephone ui", "nationality", "adress", 1234, "profilPictureUrl"}
         }));
     }
 
@@ -41,9 +41,9 @@ public class UserTest {
     void testUserConstructor(
         String lastName, String firstName, int gender, LocalDate dateOfBirth, String countryOfBirth, String cityOfBirth,
         String email, String password, String noSecu, String noPhone,
-        String nationality, String adress, int postalCode, String profilPictureData64
+        String nationality, String adress, int postalCode, String profilPictureUrl
     ) {
-        User user = new User(lastName, firstName, gender, dateOfBirth, countryOfBirth, cityOfBirth, email, password, noSecu, noPhone, nationality, adress, postalCode, profilPictureData64);
+        User user = new User(lastName, firstName, gender, dateOfBirth, countryOfBirth, cityOfBirth, email, password, noSecu, noPhone, nationality, adress, postalCode, profilPictureUrl);
         assertNotNull(user.getPersonInfo());
         assertAll(() -> {
             assertFalse(user.isAdmin());
@@ -59,7 +59,7 @@ public class UserTest {
             assertEquals(nationality, user.getNationality());
             assertEquals(adress, user.getAdress());
             assertEquals(postalCode, user.getPostalCode());
-            assertEquals(profilPictureData64, user.getProfilPictureData64());
+            assertEquals(profilPictureUrl, user.getProfilPictureUrl());
         });
     }
 
@@ -68,7 +68,7 @@ public class UserTest {
     void testUserSetters(
         String lastName, String firstName, int gender, LocalDate dateOfBirth, String countryOfBirth, String cityOfBirth,
         String email, String password, String noSecu, String noPhone,
-        String nationality, String adress, int postalCode, String profilPictureData64
+        String nationality, String adress, int postalCode, String profilPictureUrl
     ) {
         String lastNameTest = "lastNameTest";
         String firstNameTest = "firstNameTest";
@@ -82,11 +82,11 @@ public class UserTest {
         String nationalityTest = "nationalityTest";
         String adressTest = "adressTest";
         int postalCodeTest = 5678;
-        String profilPictureData64Test = "profilPictureData64Test";
+        String profilPictureUrlTest = "profilPictureUrlTest";
 
         User user = new User(
             lastName, firstName, gender, dateOfBirth, countryOfBirth, cityOfBirth,
-            email, password, noSecu, noPhone, nationality, adress, postalCode, profilPictureData64
+            email, password, noSecu, noPhone, nationality, adress, postalCode, profilPictureUrl
         );
 
         user.setLastName(lastNameTest);
@@ -122,7 +122,7 @@ public class UserTest {
         user.setPostalCode(postalCodeTest);
         assertEquals(postalCodeTest, user.getPostalCode());
 
-        user.setProfilPictureData64(profilPictureData64Test);
-        assertEquals(profilPictureData64Test, user.getProfilPictureData64());
+        user.setProfilPictureUrl(profilPictureUrlTest);
+        assertEquals(profilPictureUrlTest, user.getProfilPictureUrl());
     }
 }

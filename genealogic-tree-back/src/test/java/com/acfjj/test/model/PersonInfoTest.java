@@ -2,8 +2,6 @@ package com.acfjj.test.model;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
@@ -51,9 +49,9 @@ public class PersonInfoTest {
         String nationality,
         String address,
         int postalCode,
-        String profilPictureData64
+        String profilPictureUrl
     ) {
-        PersonInfo personInfo = new PersonInfo(lastName, firstName, gender, dateOfBirth, countryOfBirth, cityOfBirth, isDead, nationality, address, postalCode, profilPictureData64);
+        PersonInfo personInfo = new PersonInfo(lastName, firstName, gender, dateOfBirth, countryOfBirth, cityOfBirth, isDead, nationality, address, postalCode, profilPictureUrl);
         assertAll(() -> {
             assertEquals(lastName, personInfo.getLastName());
             assertEquals(firstName, personInfo.getFirstName());
@@ -65,7 +63,7 @@ public class PersonInfoTest {
             assertEquals(nationality, personInfo.getNationality());
             assertEquals(address, personInfo.getAdress());
             assertEquals(postalCode, personInfo.getPostalCode());
-            assertEquals(profilPictureData64, personInfo.getProfilPictureData64());
+            assertEquals(profilPictureUrl, personInfo.getProfilPictureUrl());
             assertTrue(personInfo.isOrphan());
         });
     }
@@ -83,7 +81,7 @@ public class PersonInfoTest {
         String nationality,
         String address,
         int postalCode,
-        String profilPictureData64
+        String profilPictureUrl
     ) {
         String lastNameTest = "lastNameTest";
         String firstNameTest = "firstNameTest";
@@ -95,9 +93,9 @@ public class PersonInfoTest {
         String nationalityTest = "nationalityTest";
         String addressTest = "addressTest";
         int postalCodeTest = 54321;
-        String profilPictureData64Test = "newBase64Image";
+        String profilPictureUrlTest = "newBase64Image";
 
-        PersonInfo personInfo = new PersonInfo(lastName, firstName, gender, dateOfBirth, countryOfBirth, cityOfBirth, isDead, nationality, address, postalCode, profilPictureData64);
+        PersonInfo personInfo = new PersonInfo(lastName, firstName, gender, dateOfBirth, countryOfBirth, cityOfBirth, isDead, nationality, address, postalCode, profilPictureUrl);
 
         personInfo.setLastName(lastNameTest);
         assertEquals(lastNameTest, personInfo.getLastName());
@@ -129,7 +127,7 @@ public class PersonInfoTest {
         personInfo.setPostalCode(postalCodeTest);
         assertEquals(postalCodeTest, personInfo.getPostalCode());
 
-        personInfo.setProfilPictureData64(profilPictureData64Test);
-        assertEquals(profilPictureData64Test, personInfo.getProfilPictureData64());
+        personInfo.setProfilPictureUrl(profilPictureUrlTest);
+        assertEquals(profilPictureUrlTest, personInfo.getProfilPictureUrl());
     }
 }

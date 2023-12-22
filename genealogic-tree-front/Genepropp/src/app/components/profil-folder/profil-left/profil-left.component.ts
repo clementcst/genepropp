@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { TreeService } from '../../../services/tree/tree.service';
+import { UserService } from '../../../services/user/user.service';
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
@@ -10,10 +11,12 @@ import { CookieService } from 'ngx-cookie-service';
 export class ProfilLeftComponent implements OnInit {
   tree: any = {};
   boxs: any[] = [];
+  user: any = {};
 
-  constructor(private treeService : TreeService, private cookieService: CookieService) { 
+  constructor(private treeService : TreeService, private userService : UserService, private cookieService: CookieService) { 
     this.treeService = treeService;
     this.cookieService = cookieService;
+    this.userService = userService;
   }
 
   ngOnInit(): void {
@@ -33,6 +36,10 @@ export class ProfilLeftComponent implements OnInit {
         const visibilityRadio = document.getElementById('inline-radio-private') as HTMLInputElement;
         visibilityRadio.checked = true;
       }
+    });
+
+    this.userService.getUser(this.cookieService.get('userId')).subscribe((data) => {
+      this.user = data.value;
     });
   }
 }

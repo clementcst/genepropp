@@ -13,6 +13,7 @@ import { ShowPrivateCodeComponent } from '../../PopUps/show-private-code-popup/s
 })
 export class RegistrationComponent {
   authenticationError: boolean = false;
+  authenticationErrorMsg: string = "An error occurred, please contact support";
   step = 1;
   userResponse = 0;
   // Déclarer des variables pour stocker les valeurs des champs
@@ -85,6 +86,15 @@ export class RegistrationComponent {
         }
         else {
           this.authenticationError = true;
+          if(response.value != null) {
+            this.authenticationErrorMsg = response.message;
+            if(response.value.hasOwnProperty('frontMessage')) {
+              this.authenticationErrorMsg = response.value.frontMessage;
+            }
+          }
+          else {
+            this.authenticationErrorMsg = "An error occurred, please contact support";
+          }
           return;
         }
       });

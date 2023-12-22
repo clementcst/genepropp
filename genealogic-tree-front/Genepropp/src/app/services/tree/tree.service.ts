@@ -16,6 +16,6 @@ export class TreeService {
   constructor(private http: HttpClient) { }
 
   getTree(id: string):Observable<TreeResponce> {
-    return this.http.get<TreeResponce>(`http://localhost:8080/tree/${id}`,{responseType: 'json'});
+    return this.http.get<TreeResponce>(`http://localhost:8080/tree?treeId=${id}`,{responseType: 'json'});
   }
 }
