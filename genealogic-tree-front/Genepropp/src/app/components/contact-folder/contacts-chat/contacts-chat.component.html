@@ -1,33 +1,47 @@
 <div class="w-full md:w-[67vw] h-auto md:h-[85vh] bg-green-900 flex flex-col p-4">
-    <div class="h-full bg-gray-300 p-8 flex flex-col rounded-lg">
-      <!-- En-tête de la conversation -->
-      <div class="flex items-center mb-4">
-        <img
-          [src]="contact.profilPictureUrl"
-          alt="Photo de {{ contact.firstName }} {{ contact.lastName }}"
-          class="w-12 h-12 rounded-full"
-        />
-        <div class="ml-4">
-          <h2 class="text-xl font-semibold">{{ contact.firstName }} {{ contact.lastName }}</h2>
-        </div>
-      </div>
-    
-      <!-- Zone de conversation -->
-      <div class="flex-1 bg-white p-4 overflow-y-auto rounded-lg">
-        <!-- Message à afficher (à ajouter) -->
-      </div>
-    
-      <!-- Barre pour le message -->
-      <div class="flex items-center border-t mt-4 pt-2 rounded-lg">
-        <input
-          #messageInput
-          type="text"
-          class="flex-1 p-2 rounded-l border"
-          placeholder="Tapez votre message..."
-          (keydown.enter)="sendMessage()"
-        />
-        <button (click)="sendMessage()" class="px-4 py-2 bg-green-900 text-white rounded-r">Envoyer</button>
+  <div *ngIf="contact" class="h-full bg-gray-300 p-8 flex flex-col rounded-lg">
+    <!-- En-tête de la conversation -->
+    <div class="flex items-center mb-4">
+      <img [src]="contact.senderInfo.profilPictureUrl"
+        alt="Photo de {{ contact.senderInfo.firstName }} {{ contact.senderInfo.lastName }}"
+        class="w-12 h-12 rounded-full" />
+      <div class="ml-4">
+        <h2 class="text-xl font-semibold">{{ contact.senderInfo.firstName }} {{ contact.senderInfo.lastName }}</h2>
       </div>
     </div>
+
+    <!-- Zone de conversation -->
+    <div #chatContainer class="flex-1 bg-white p-4 overflow-y-auto rounded-lg">
+      <div *ngFor="let message of messagetab.messages" class="message-box">
+        <div class="message-header">
+          <img [src]="(message.senderId === contact.id) ? contact.senderInfo.profilPictureUrl : myInfo.profilPictureUrl"
+            alt="Photo de {{ (message.senderId === contact.id) ? contact.senderInfo.firstName : myInfo.firstName }} {{ (message.senderId === contact.id) ? contact.senderInfo.lastName : myInfo.lastName }}"
+            class="w-8 h-8 rounded-full" />
+          <div class="ml-2">
+            <div class="font-semibold">{{ (message.senderId === contact.id) ? contact.senderInfo.firstName :
+              myInfo.firstName }} {{ (message.senderId === contact.id) ? contact.senderInfo.lastName : myInfo.lastName
+              }}</div>
+            <div class="message-time">{{ message.messageDateTime | date: 'mediumTime' }}</div>
+          </div>
+        </div>
+        <div class="message-content">{{ message.content }}</div>
+
+        <div class="mt-2" *ngIf="message.isValidation">
+          <button class="bg-green-500 text-white px-4 py-2 rounded mr-2"
+            (click)="validationUser(message.requests.Yes)">Validate</button>
+          <button class="bg-red-500 text-white px-4 py-2 rounded"
+            (click)="validationUser(message.requests.No)">Deny</button>
+        </div>
+      </div>
+    </div>
+
+
+
+    <!-- Barre pour le message -->
+    <div class="flex items-center border-t mt-4 pt-2 rounded-lg">
+      <input #messageInput type="text" class="flex-1 p-2 rounded-l border" placeholder="Tapez votre message..."
+        (keydown.enter)="sendMessage()" />
+      <button (click)="sendMessage()" class="px-4 py-2 bg-green-900 text-white rounded-r">Envoyer</button>
+    </div>
   </div>
-  
+</div>
