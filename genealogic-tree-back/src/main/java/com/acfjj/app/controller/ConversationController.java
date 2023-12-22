@@ -41,7 +41,12 @@ public class ConversationController extends AbstractController {
 		if (Objects.isNull(user1) || Objects.isNull(user2)) {
 			return new Response("User not found", false);
 		}
-		return new Response(conversationService.addConversation(user1, user2));
+		String successMsg = conversationService.addConversation(user1, user2);
+		Conversation newConv = user1.getConversationWith(user2);
+		if(!Objects.isNull(newConv)) {
+			return new Response(newConv.getId(), successMsg, true);
+		} 
+		return new Response("A failure occured during creation of the conversation.", false);
 	}
 
 	@PostMapping("/message/new")
