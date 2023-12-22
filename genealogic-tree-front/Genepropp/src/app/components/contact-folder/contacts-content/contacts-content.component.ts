@@ -83,10 +83,8 @@ export class ContactsContentComponent implements OnInit {
   handleSelectUser(user: any) {
     this.conversationService.newConversation(this.infoMe.id, user.id)
       .subscribe((response) => {
-        console.log(response)
         this.newConversationId = response.value;
-        console.log(this.newConversationId)
-        const newContact = { senderInfo: user, convId: this.newConversationId.value};
+        let newContact = { senderInfo: user, convId: this.newConversationId};
         this.contactsForFront.push(newContact);
         this.openChat(newContact);
       });
