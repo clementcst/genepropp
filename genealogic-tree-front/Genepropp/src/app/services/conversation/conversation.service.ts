@@ -22,7 +22,6 @@ export class ConversationService {
   }
 
   validateUser(endpoints: string):Observable<any> {
-    console.log(endpoints)
     return this.http.post<any[]>("http://localhost:8080" + endpoints, {responseType: 'json'});
   }
 
@@ -30,7 +29,7 @@ export class ConversationService {
     let params = new HttpParams()
       .set('userId1', userId1)
       .set('userId2', userId2);
-    return this.http.post<any[]>("http://localhost:8080/conversation/new", {params, responseType: 'json'});
+    return this.http.post<any[]>("http://localhost:8080/conversation/new", null, {params, responseType: 'json'});
   }
 
   newMessage(senderId: number, receiverId: number, content: string):Observable<any> {

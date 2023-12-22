@@ -22,6 +22,7 @@ export class ContactsContentComponent implements OnInit {
   idAlreadyInConv: string[] = [];
   users: any[] = [];
   @ViewChild('contactsComponent') contactsComponent: ContactsComponent | undefined;
+  newConversationId: any;
 
   constructor(private userService: UserService, private conversationService: ConversationService, private cookieService: CookieService) {
     this.cookieService = cookieService;
@@ -77,5 +78,17 @@ export class ContactsContentComponent implements OnInit {
 
   openChat(contact: any) {
     this.currentContact = contact;
+  }
+
+  handleSelectUser(user: any) {
+    this.conversationService.newConversation(this.infoMe.id, user.id)
+      .subscribe((response) => {
+        console.log(response)
+        this.newConversationId = response.value;
+        console.log(this.newConversationId)
+        const newContact = { senderInfo: user, convId: this.newConversationId.value};
+        this.contactsForFront.push(newContact);
+        this.openChat(newContact);
+      });
   }
 }

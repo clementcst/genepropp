@@ -10,6 +10,7 @@ export class ContactsComponent {
   @Input() contacts: any;
   @Output() contactClick = new EventEmitter<any>();
   @Output() createConversationClick = new EventEmitter<void>();
+  @Output() selectUserClick = new EventEmitter<any>();
   showUsersNotInConv: boolean = false;
   usersNotInConv: any[] = [];
 
@@ -24,5 +25,9 @@ export class ContactsComponent {
   showUsersNotInConversation(usersNotInConv: any[]) {
     this.usersNotInConv = usersNotInConv;
     this.showUsersNotInConv = true;
+  }
+
+  selectUser(user: any) {
+    this.selectUserClick.emit(user);
   }
 }
