@@ -42,7 +42,7 @@ public class ConversationService extends AbstractService {
 		userRepository.save(user1);
 		user2.addConversation2(conversation);
 		userRepository.save(user2);
-		return "Success";
+		return "Conversation created successfully";
     }
     
     public void updateConversation(long id, Conversation conversation) {
