@@ -7,7 +7,8 @@ interface Contact {
   senderInfo: {
     firstName: string;
     lastName: string;
-    profilPictureUrl: string
+    profilPictureUrl: string;
+    id: string;
   };
   convId: string;
   id: string;

@@ -14,12 +14,12 @@
     <div #chatContainer class="flex-1 bg-white p-4 overflow-y-auto rounded-lg">
       <div *ngFor="let message of messagetab.messages" class="message-box bg-gray-100">
         <div class="message-header">
-          <img [src]="(message.senderId === contact.id) ? contact.senderInfo.profilPictureUrl : myInfo.profilPictureUrl"
-            alt="Photo de {{ (message.senderId === contact.id) ? contact.senderInfo.firstName : myInfo.firstName }} {{ (message.senderId === contact.id) ? contact.senderInfo.lastName : myInfo.lastName }}"
+          <img [src]="(message.senderId === contact.senderInfo.id) ? contact.senderInfo.profilPictureUrl : myInfo.profilPictureUrl"
+            alt="Photo de {{ (message.senderId === contact.senderInfo.id) ? contact.senderInfo.firstName : myInfo.firstName }} {{ (message.senderId === contact.senderInfo.id) ? contact.senderInfo.lastName : myInfo.lastName }}"
             class="w-8 h-8 rounded-full" />
           <div class="ml-2">
-            <div class="font-semibold">{{ (message.senderId === contact.id) ? contact.senderInfo.firstName :
-              myInfo.firstName }} {{ (message.senderId === contact.id) ? contact.senderInfo.lastName : myInfo.lastName
+            <div class="font-semibold">{{ (message.senderId === contact.senderInfo.id) ? contact.senderInfo.firstName :
+              myInfo.firstName }} {{ (message.senderId === contact.senderInfo.id) ? contact.senderInfo.lastName : myInfo.lastName
               }}</div>
             <div class="message-time">{{ message.messageDateTime | date: 'mediumTime' }}</div>
           </div>
