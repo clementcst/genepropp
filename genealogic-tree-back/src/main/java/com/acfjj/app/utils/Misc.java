@@ -137,7 +137,7 @@ public class Misc {
 				break;
 			case "noSecu":
 				responseStr += isSocialSecurityNumberAcceptable(value) ? ""
-						: "Invalid Sécurité Social number format. It must be " + endWasStr;
+						: "Invalid Sécurité Social number format. It must be 13 digits length " + endWasStr;
 				break;
 			case "postalCode":
 				try {
