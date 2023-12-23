@@ -38,14 +38,15 @@ export class ProfilLeftComponent implements OnInit {
   private showUserProfil() {
     this.treeService.getTree(this.cookieService.get('userId')).subscribe((data) => {
       this.tree = data.value;
-      console.log(this.tree)
       this.boxs = [
         { title: "Month views", value: this.tree.viewOfMonth },
         { title: "Annual views", value: this.tree.viewOfYear },
         { title: "Tree length", value: this.tree.id }
       ];
-
-      if (this.tree.treePublic) {
+    });
+    this.userService.getUser(this.cookieService.get('userId')).subscribe((data) => {
+      this.user = data.value;
+      if (this.user.isMyTreePublic) {
         const visibilityRadio = document.getElementById('inline-radio-public') as HTMLInputElement;
         visibilityRadio.checked = true;
       } 
@@ -53,9 +54,6 @@ export class ProfilLeftComponent implements OnInit {
         const visibilityRadio = document.getElementById('inline-radio-private') as HTMLInputElement;
         visibilityRadio.checked = true;
       }
-    });
-    this.userService.getUser(this.cookieService.get('userId')).subscribe((data) => {
-      this.user = data.value;
     });
   }
 
@@ -70,6 +68,7 @@ export class ProfilLeftComponent implements OnInit {
       if(response.success) {
         this.successMessage = response.message || 'Modification successful.';
         this.showSuccessMessage = true;
+        this.newPictureUrl = '';
         setTimeout(() => {
           this.showSuccessMessage = false;
         }, 3000);
@@ -98,7 +97,6 @@ export class ProfilLeftComponent implements OnInit {
   logTreeVisibility() {
     const inputsData: any = {};
     inputsData.treePrivacy = this.treeVisibilityControl.value;
-    console.log('Tree Visibility:', inputsData);
     this.userService.updateUser(this.user.id, inputsData).subscribe(response => {
       if(response.success) {
         this.successMessageTree = response.message || 'Modification successful.';
