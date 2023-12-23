@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { FormControl } from '@angular/forms';
 import { TreeService } from '../../../services/tree/tree.service';
 import { UserService } from '../../../services/user/user.service';
 import { CookieService } from 'ngx-cookie-service';
@@ -18,6 +19,11 @@ export class ProfilLeftComponent implements OnInit {
   successMessage: string = '';
   showFailedMessage: boolean = false;
   failedMessage: string = '';
+  treeVisibilityControl = new FormControl();
+  showSuccessMessageTree: boolean = false;
+  successMessageTree: string = '';
+  showFailedMessageTree: boolean = false;
+  failedMessageTree: string = '';
 
   constructor(private treeService : TreeService, private userService : UserService, private cookieService: CookieService) { 
     this.treeService = treeService;
@@ -32,6 +38,7 @@ export class ProfilLeftComponent implements OnInit {
   private showUserProfil() {
     this.treeService.getTree(this.cookieService.get('userId')).subscribe((data) => {
       this.tree = data.value;
+      console.log(this.tree)
       this.boxs = [
         { title: "Month views", value: this.tree.viewOfMonth },
         { title: "Annual views", value: this.tree.viewOfYear },
@@ -47,7 +54,6 @@ export class ProfilLeftComponent implements OnInit {
         visibilityRadio.checked = true;
       }
     });
-
     this.userService.getUser(this.cookieService.get('userId')).subscribe((data) => {
       this.user = data.value;
     });
@@ -83,5 +89,32 @@ export class ProfilLeftComponent implements OnInit {
   cancelChangePicture() {
     this.changePictureFormVisible = false;
     this.newPictureUrl = '';
+  }
+
+  updateTreeVisibility(value: number) {
+    this.treeVisibilityControl.setValue(value);
+  }
+
+  logTreeVisibility() {
+    const inputsData: any = {};
+    inputsData.treePrivacy = this.treeVisibilityControl.value;
+    console.log('Tree Visibility:', inputsData);
+    this.userService.updateUser(this.user.id, inputsData).subscribe(response => {
+      if(response.success) {
+        this.successMessageTree = response.message || 'Modification successful.';
+        this.showSuccessMessageTree = true;
+        setTimeout(() => {
+          this.showSuccessMessageTree = false;
+        }, 3000);
+        this.showUserProfil()
+      }
+      else {
+        this.failedMessageTree = response.message || 'Modification failed.';
+        this.showFailedMessageTree = true;
+        setTimeout(() => {
+          this.showFailedMessageTree = false;
+        }, 3000);
+      }
+    });
   }
 }
