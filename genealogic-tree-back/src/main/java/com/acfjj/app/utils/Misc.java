@@ -90,7 +90,17 @@ public class Misc {
 		String passwordRegex = "^(?=.*[a-z])(?=.*[A-Z]).{6,}$";
 		return password.matches(passwordRegex);
 	}
-
+	
+	public static boolean isEmailAcceptable(String email) {
+		if (Objects.isNull(email)) {
+			return false;
+		}
+        String emailPattern = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
+        Pattern pattern = Pattern.compile(emailPattern);
+        Matcher matcher = pattern.matcher(email);
+        return matcher.matches();
+    }
+	
 	public static boolean isStringSafe(String input) {
 		if (input == null) {
 			return true;
@@ -112,7 +122,7 @@ public class Misc {
 			}
 			prevResponseStr = String.copyValueOf(responseStr.toCharArray());
 			String value = LHM.get(key);
-			responseStr += isStringSafe(value) ? "" : "XSS tentative on field" + key + ", user reported.\n";
+			responseStr += isStringSafe(value) ? "" : "XSS tentative on field" + key + ", your ip has been reported to admins.\n";
 			String endWasStr =  "\n" + key + " was " + value + "\n||\n";
 			switch (key) {
 			case "password":
@@ -122,9 +132,12 @@ public class Misc {
 			case "noPhone":
 				responseStr += isPhoneNumberAcceptable(value) ? "" : "Invalid phone Number format." + endWasStr;
 				break;
+			case "email":
+				responseStr += isEmailAcceptable(value) ? "" : "Invalid email format." + endWasStr;
+				break;
 			case "noSecu":
 				responseStr += isSocialSecurityNumberAcceptable(value) ? ""
-						: "Invalid Sécurité Social number format." + endWasStr;
+						: "Invalid Sécurité Social number format. It must be 13 digits length " + endWasStr;
 				break;
 			case "postalCode":
 				try {

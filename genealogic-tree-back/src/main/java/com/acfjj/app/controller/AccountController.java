@@ -38,6 +38,9 @@ public class AccountController extends AbstractController {
 
 	@GetMapping("/login")
 	public Response login(@RequestParam String privateCode, @RequestParam String password) {
+		if(!Misc.isStringSafe(password) || !Misc.isStringSafe(privateCode)) {
+			return new Response("XSS tentative, your ip has been reported to admins.", false);
+		}
 		User user = userService.getUserByPrivateCode(privateCode);
 		if (Objects.isNull(user)) {
 			return new Response("Incorrect private code", false);
