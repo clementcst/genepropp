@@ -27,7 +27,6 @@ export class UserService {
 
   updateUser(id: string, inputs: any):Observable<UserResponse> {
     const params = { userId: id.toString() };
-    //console.log(inputs)
     return this.http.post<UserResponse>(`http://localhost:8080/user/profil/update`, inputs, {params, responseType: 'json'});
   }
 }
