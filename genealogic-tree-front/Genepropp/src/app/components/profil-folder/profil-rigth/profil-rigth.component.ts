@@ -99,8 +99,6 @@ export class ProfilRigthComponent implements OnInit {
         setTimeout(() => {
           this.showFailedMessage = false;
         }, 3000);
-
-        this.showUserProfil();
       }
     });
   }
