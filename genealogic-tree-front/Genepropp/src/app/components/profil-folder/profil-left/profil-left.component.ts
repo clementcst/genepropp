@@ -12,6 +12,12 @@ export class ProfilLeftComponent implements OnInit {
   tree: any = {};
   boxs: any[] = [];
   user: any = {};
+  changePictureFormVisible: boolean = false;
+  newPictureUrl: string = '';
+  showSuccessMessage: boolean = false;
+  successMessage: string = '';
+  showFailedMessage: boolean = false;
+  failedMessage: string = '';
 
   constructor(private treeService : TreeService, private userService : UserService, private cookieService: CookieService) { 
     this.treeService = treeService;
@@ -20,6 +26,10 @@ export class ProfilLeftComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.showUserProfil()
+  }
+
+  private showUserProfil() {
     this.treeService.getTree(this.cookieService.get('userId')).subscribe((data) => {
       this.tree = data.value;
       this.boxs = [
@@ -41,5 +51,37 @@ export class ProfilLeftComponent implements OnInit {
     this.userService.getUser(this.cookieService.get('userId')).subscribe((data) => {
       this.user = data.value;
     });
+  }
+
+  showChangePictureForm() {
+    this.changePictureFormVisible = true;
+  }
+
+  submitPicture() {
+    const inputsData: any = {};
+    inputsData.profilPictureUrl = this.newPictureUrl;
+    this.userService.updateUser(this.user.id, inputsData).subscribe(response => {
+      if(response.success) {
+        this.successMessage = response.message || 'Modification successful.';
+        this.showSuccessMessage = true;
+        setTimeout(() => {
+          this.showSuccessMessage = false;
+        }, 3000);
+        this.showUserProfil()
+      }
+      else {
+        this.failedMessage = response.message || 'Modification failed.';
+        this.showFailedMessage = true;
+        setTimeout(() => {
+          this.showFailedMessage = false;
+        }, 3000);
+      }
+    });
+    this.changePictureFormVisible = false;
+  }
+
+  cancelChangePicture() {
+    this.changePictureFormVisible = false;
+    this.newPictureUrl = '';
   }
 }

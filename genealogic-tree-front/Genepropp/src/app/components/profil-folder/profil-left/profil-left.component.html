@@ -6,24 +6,37 @@
             <span class="text-xl font-semibold block mb-6">Profil : </span>
             <div class="flex items-center">
                 <div class="w-40 h-40 rounded mr-12">
-                    <img
-                        [src]="user.profilPictureUrl"
-                        alt="Default avatar"
-                        class="object-none object-scale-down">
+                    <img [src]="user.profilPictureUrl" alt="Default avatar" class="object-none object-scale-down">
                 </div>
-                <app-profil-statbox
-                    *ngFor="let box of boxs"
-                    [box]="box">
+                <app-profil-statbox *ngFor="let box of boxs" [box]="box">
                 </app-profil-statbox>
             </div>
         </div>
 
-        <div>
-            <label for="inputFile"
-                class="ml-10 text-sm font-bold text-white bg-green-800 hover:bg-green-300 focus:ring-2 focus:outline-none focus:ring-green-300 rounded-lg px-5 py-2">
-                Changer ma photo
-            </label>
-            <input type="file" id="inputFile" class="hidden">
+        <div class="ml-10 mt-2 flex">
+            <div *ngIf="changePictureFormVisible" class="flex items-center">
+                <input type="text" placeholder="Enter image URL" [(ngModel)]="newPictureUrl" name="newPictureUrl"
+                    class="rounded p-2 border" />
+                <button type="button" class="ml-2 px-4 py-2 bg-green-800 text-white rounded" (click)="submitPicture()">
+                    Save
+                </button>
+                <button type="button" class="ml-2 px-4 py-2 bg-red-500 text-white rounded"
+                    (click)="cancelChangePicture()">
+                    Cancel
+                </button>
+            </div>
+
+            <button type="button" *ngIf="!changePictureFormVisible"
+                class="text-white bg-green-800 hover:bg-green-300 focus:ring-2 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm sm:w-auto px-5 py-2.5"
+                (click)="showChangePictureForm()">
+                Change Profile Picture
+            </button>
+            <div *ngIf="showSuccessMessage" class="ml-2 relative message success-message">
+                {{ successMessage }}
+            </div>
+            <div *ngIf="showFailedMessage" class="ml-2 relative message failed-message">
+                {{ failedMessage }}
+            </div>
         </div>
 
         <div class="w-full pb-8 px-8 mx-2 flex mt-14">
@@ -48,9 +61,17 @@
                 class="font-medium text-xl font-semibold block text-green-800 dark:text-green-800 hover:underline">Go to
                 the Tree</a>
         </div>
-        <button type="submit"
-            class="ml-10 text-white bg-green-800 hover:bg-green-300 focus:ring-2 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm sm:w-auto px-5 py-2.5">Submit
-            modification</button>
+        <div class="flex">
+            <button type="submit"
+                class="ml-10 text-white bg-green-800 hover:bg-green-300 focus:ring-2 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm sm:w-auto px-5 py-2.5">Submit
+                modification</button>
+            <div *ngIf="showSuccessMessage" class="ml-2 relative message success-message">
+                {{ successMessage }}
+            </div>
+            <div *ngIf="showFailedMessage" class="ml-2 relative message failed-message">
+                {{ failedMessage }}
+            </div>
+        </div>
     </form>
 
 

@@ -57,7 +57,6 @@ export class ProfilRigthComponent implements OnInit {
   }
 
   onSubmitModification() {
-    console.log(this.userOnInit)
     const birthday = (document.getElementById('birthdayInput') as HTMLInputElement)?.value;
     const sexe = (document.querySelector('input[name="sexeInput"]:checked') as HTMLInputElement)?.value;
     const inputsData: any = {};
@@ -82,7 +81,6 @@ export class ProfilRigthComponent implements OnInit {
     if (this.inputs2.find(input => input.label === 'address')?.value != this.userOnInit.adress) {
       inputsData.adress = this.inputs2.find(input => input.label === 'address')?.value;
     }
-    console.log(inputsData)
     this.userService.updateUser(this.user.id, inputsData).subscribe(response => {
       if (response.success) {
         this.successMessage = response.message || 'Modification successful.';
