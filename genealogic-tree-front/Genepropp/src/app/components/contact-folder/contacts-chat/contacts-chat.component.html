@@ -14,12 +14,14 @@
     <div #chatContainer class="flex-1 bg-white p-4 overflow-y-auto rounded-lg">
       <div *ngFor="let message of messagetab.messages" class="message-box bg-gray-100">
         <div class="message-header">
-          <img [src]="(message.senderId === contact.senderInfo.id) ? contact.senderInfo.profilPictureUrl : myInfo.profilPictureUrl"
+          <img
+            [src]="(message.senderId === contact.senderInfo.id) ? contact.senderInfo.profilPictureUrl : myInfo.profilPictureUrl"
             alt="Photo de {{ (message.senderId === contact.senderInfo.id) ? contact.senderInfo.firstName : myInfo.firstName }} {{ (message.senderId === contact.senderInfo.id) ? contact.senderInfo.lastName : myInfo.lastName }}"
             class="w-8 h-8 rounded-full" />
           <div class="ml-2">
             <div class="font-semibold">{{ (message.senderId === contact.senderInfo.id) ? contact.senderInfo.firstName :
-              myInfo.firstName }} {{ (message.senderId === contact.senderInfo.id) ? contact.senderInfo.lastName : myInfo.lastName
+              myInfo.firstName }} {{ (message.senderId === contact.senderInfo.id) ? contact.senderInfo.lastName :
+              myInfo.lastName
               }}</div>
             <div class="message-time">{{ message.messageDateTime | date: 'mediumTime' }}</div>
           </div>
@@ -39,8 +41,9 @@
 
     <!-- Barre pour le message -->
     <div class="flex items-center border-t mt-4 pt-2 rounded-lg">
-      <input #messageInput type="text" class="flex-1 p-2 rounded-l border" placeholder="Tapez votre message..."
-        (keydown.enter)="sendMessage()" />
+      <textarea #messageInput
+        class="flex-1 mr-2 p-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-green-900"
+        placeholder="Tapez votre message..." (keydown.enter)="sendMessage()" style="height: 2.5rem;"></textarea>
       <button (click)="sendMessage()" class="px-4 py-2 bg-green-900 text-white rounded-r">Envoyer</button>
     </div>
   </div>
