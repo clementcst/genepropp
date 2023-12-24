@@ -12,7 +12,7 @@ import com.acfjj.app.repository.TreeRepository;
 import com.acfjj.app.repository.UserRepository;
 
 @Service
-@Scope("singleton")
+@Scope("session")
 public abstract class AbstractService {
     @Autowired
     ConversationRepository conversationRepository;

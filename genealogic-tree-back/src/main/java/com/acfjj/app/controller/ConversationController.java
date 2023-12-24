@@ -108,8 +108,32 @@ public class ConversationController extends AbstractController {
 			userService.updateUser(concernedUser.getId(), concernedUser);
 		}
 		for (Message validation : similarValidations) {
-			conversationService.disableValidation(validation);
+			conversationService.disableValidation(validation, userResponse, validator);
 		}
+		return new Response(successMsg, true);
+	}
+	
+	@PostMapping("/validation/treeMergeValidation")
+	public Response treeMergeValidation(@RequestParam long msgId, @RequestParam long requesterId,
+			@RequestParam long validatorId, @RequestParam Boolean userResponse) {
+		Message validationMsg = conversationService.getMessage(msgId);
+		if (Objects.isNull(validationMsg) || !validationMsg.getIsValidation()) {
+			return new Response("Validation message not found or has already been validated", false);
+		}
+		User requester = userService.getUser(requesterId);
+		if (Objects.isNull(requester) || requesterId != validationMsg.getConcernedUserId()) {
+			return new Response("Requester user not found or mismatch", false);
+		}
+		User validator = userService.getUser(validatorId);
+		if (Objects.isNull(validator) || validatorId != validationMsg.getReceiverId()) {
+			return new Response("Validator user not found or mismatch", false);
+		}
+		String successMsg = validationMsg.getValidationType().name() + " successfully "
+				+ (userResponse ? "validated and disable" : "disabled");
+		if (userResponse) {
+			//merge des tree ici
+		}
+		conversationService.disableValidation(validationMsg, userResponse, validator);
 		return new Response(successMsg, true);
 	}
 }

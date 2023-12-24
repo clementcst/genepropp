@@ -143,8 +143,8 @@ public class Message {
 			this.concernedUserId = concernedUserId;
 		}
 
-		public void disableValidation() {
-			this.getValidationType().setDisableValidationMsg(this);
+		public void disableValidation(boolean response, User validator) {
+			this.getValidationType().setDisableValidationMsg(this, response, validator);
 			this.setValidationType(null);
 			this.setConcernedUserId(null);
 		}
