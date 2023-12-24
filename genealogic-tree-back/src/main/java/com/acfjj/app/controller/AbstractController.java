@@ -11,7 +11,7 @@ import com.acfjj.app.service.UserService;
 
 @RestController
 @CrossOrigin(origins = "${angular.app.url}")
-@Scope("singleton")
+@Scope("session")
 public abstract class AbstractController {
 	@Autowired
 	protected TreeService treeService;

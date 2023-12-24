@@ -14,30 +14,68 @@ public enum ValidationType {
 			validationMsg += concernedUser.toString();
 			return validationMsg;
 		}
+
 		@Override
 		public LinkedHashMap<String, String> getValidationRequests(Message msg) {
-			LinkedHashMap<String,String> requests = new LinkedHashMap<String, String>();
-			String requestsStart = "/conversation/validation/userValidation?msgId="+ msg.getId() +
-								   "&concernedUserId=" + msg.getConcernedUserId() + 
-								   "&validatorId=" + msg.getReceiverId() +
-								   "&userResponse=";
+			LinkedHashMap<String, String> requests = new LinkedHashMap<String, String>();
+			String requestsStart = "/conversation/validation/userValidation?msgId=" + msg.getId() + "&concernedUserId="
+					+ msg.getConcernedUserId() + "&validatorId=" + msg.getReceiverId() + "&userResponse=";
 			requests.put("Yes", requestsStart + "1");
 			requests.put("No", requestsStart + "0");
 			return requests;
 		}
+
 		@Override
-		public void setDisableValidationMsg(Message msg) {
-			msg.setContent(msg.getContent() + "\nUser has been validated by the admin: " + msg.getSender().getFullName() + " on " + Misc.getLocalDateTime());
+		public void setDisableValidationMsg(Message msg, boolean userResponse, User validator) {
+			String disabledMsg = msg.getContent() + "\nUser has been ";
+			disabledMsg += userResponse ? "validated " : "refused ";
+			disabledMsg += "by the admin: " + validator.getFullName() + " on " + Misc.getLocalDateTime();
+			msg.setContent(disabledMsg);
+		}
+	},
+	TREE_MERGE_VALIDATION("Hello, I want to merge my tree with you. ") {
+		@Override
+		public String getValidationMsg(User concernedUser) {
+			String validationMsg = this.validationMsg;
+			validationMsg += "\n Here is my tree";
+			validationMsg += "\n link to my tree : " + concernedUser.getMyTreeId();
+			return validationMsg;
+		}
+
+		@Override
+		public LinkedHashMap<String, String> getValidationRequests(Message msg) {
+			LinkedHashMap<String, String> requests = new LinkedHashMap<String, String>();
+			String requestsStart = "/conversation/validation/treeMergeValidation?msgId=" + msg.getId()
+					+ "&requesterId=" + msg.getSenderId() + "&validatorId=" + msg.getReceiverId()
+					+ "&userResponse=";
+			requests.put("Yes", requestsStart + "1");
+			requests.put("No", requestsStart + "0");
+			return requests;
+		}
+
+		@Override
+		public void setDisableValidationMsg(Message msg, boolean userResponse, User validator) {
+			String disabledMsg = msg.getContent() + "\nTree merge proposal has been ";
+			disabledMsg += userResponse ? "accepted " : "refused ";
+			disabledMsg += "by : " + validator.getFullName() + " on " + Misc.getLocalDateTime();
+			disabledMsg += userResponse
+					? "\nTree " + msg.getReceiver().getMyTreeId() + "of " + msg.getReceiver().getFullName()
+							+ " has been merge with the tree " + msg.getSender().getMyTreeId() + "of "
+							+ msg.getSender().getFullName() +"."
+					: "";
+			msg.setContent(disabledMsg);
 		}
 	};
+
 	protected final String validationMsg;
-	
+
 	private ValidationType(String validationMsg) {
 		this.validationMsg = validationMsg;
 	}
+
 	public abstract String getValidationMsg(User concernedUser);
-	
-	public abstract void setDisableValidationMsg(Message msg);
-	
-	public abstract LinkedHashMap<String,String> getValidationRequests(Message msg);
+
+	public abstract void setDisableValidationMsg(Message msg, boolean userResponse, User validator);
+
+	public abstract LinkedHashMap<String, String> getValidationRequests(Message msg);
 }

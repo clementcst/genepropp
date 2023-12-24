@@ -72,8 +72,8 @@ public class ConversationService extends AbstractService {
     	return messageRepository.findById(msgId).orElse(null);
     }
     
-    public void disableValidation(Message msg) {
-    	msg.disableValidation();
+    public void disableValidation(Message msg, boolean userResponse, User validator) {
+    	msg.disableValidation(userResponse, validator);
     	updateMessage(msg.getId(), msg);
     }
  
