@@ -40,10 +40,10 @@
 
 
     <!-- Barre pour le message -->
-    <div class="flex items-center border-t mt-4 pt-2 rounded-lg">
+    <div class="flex items-center mt-4 pt-2">
       <textarea #messageInput
-        class="flex-1 mr-2 p-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-green-900"
-        placeholder="Tapez votre message..." (keydown.enter)="sendMessage()" style="height: 2.5rem;"></textarea>
+        class="flex-1 mr-2 p-2 border border-gray-300 rounded focus:outline-none focus:border-green-900"
+        placeholder="Tapez votre message..." (keydown.enter)="sendMessage()" style="height: 2.5rem; resize: none;"></textarea>
       <button (click)="sendMessage()" class="px-4 py-2 bg-green-900 text-white rounded-r">Envoyer</button>
     </div>
   </div>
