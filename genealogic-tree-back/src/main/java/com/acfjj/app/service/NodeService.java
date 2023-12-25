@@ -180,12 +180,12 @@ public class NodeService extends AbstractService {
     }
     
     public Node getNodeByNameAndBirthInfo(String lastName, String firstName, LocalDate dateOfBirth, String countryOfBirth, String cityofBirth) {
-		Node nodeFound = null;
-		PersonInfo personInfoFound = personInfoRepository.findByLastNameAndFirstNameAndDateOfBirthAndCountryOfBirthAndCityOfBirth(lastName, firstName, dateOfBirth, countryOfBirth, cityofBirth); 
-		if(!Objects.isNull(personInfoFound)) {
-			nodeFound = nodeRepository.findByPersonInfo(personInfoFound);
-		}
-		return nodeFound;
+		for(PersonInfo person : personInfoRepository.findByLastNameAndFirstNameAndDateOfBirthAndCountryOfBirthAndCityOfBirth(lastName, firstName, dateOfBirth, countryOfBirth, cityofBirth)) {
+			if(!Objects.isNull(person)) {
+				return nodeRepository.findByPersonInfo(person);
+			}
+		}		
+		return null;
 	}
 
     public Node getPublicNodeByNameAndBirthInfo(String lastName, String firstName, LocalDate dateOfBirth, String countryOfBirth, String cityofBirth) {

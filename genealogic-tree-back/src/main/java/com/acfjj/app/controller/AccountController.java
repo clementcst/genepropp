@@ -120,7 +120,7 @@ public class AccountController extends AbstractController {
 		if (!Objects.isNull(existingNode)) {
 			nodeService.updateNode(existingNode.getId(), existingNode);
 		} else {
-			nodeService.addNode(new Node(user.getPersonInfo(), user, 2));
+			nodeService.addNode(new Node(null, user.getPersonInfo(), user, 2));
 		}
 		Node node = nodeService.getPublicNodeByNameAndBirthInfo(lastName, firstName, user.getDateOfBirth(),
 				user.getCountryOfBirth(), user.getCityOfBirth());
