@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
 </head>
-<body>
+<body *ngIf="isUserIdValid">
     <app-nav></app-nav>
     <app-home-content></app-home-content>
     <app-footer></app-footer>

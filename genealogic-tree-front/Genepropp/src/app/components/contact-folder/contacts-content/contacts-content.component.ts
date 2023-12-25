@@ -61,7 +61,6 @@ export class ContactsContentComponent implements OnInit {
 
   createConversation() {
     let usersNotInConv: any[] = [];
-    console.log(this.idAlreadyInConv);
     this.userService.getUsers().subscribe((data) => {
       this.users = data.value;
       this.users.forEach((user) => {
