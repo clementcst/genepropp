@@ -25,9 +25,7 @@ public class Node {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
-    //AJOUTER UN HASCHILD
-    
+
     @JsonIgnore
     @OneToOne
     @JoinColumn(name = "person_info_id")
