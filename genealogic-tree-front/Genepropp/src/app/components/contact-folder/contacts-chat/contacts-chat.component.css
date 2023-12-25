@@ -21,6 +21,7 @@
   
   .message-content {
     font-weight: bold;
+    white-space: pre-line;
   }
   
   .message-time {

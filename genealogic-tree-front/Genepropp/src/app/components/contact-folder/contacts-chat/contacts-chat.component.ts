@@ -1,4 +1,4 @@
-import { Component, Input, ViewChild, ElementRef, OnInit, AfterViewChecked, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, ViewChild, ElementRef, OnInit, AfterViewChecked, OnChanges, SimpleChanges, HostListener } from '@angular/core';
 import { ConversationService } from '../../../services/conversation/conversation.service';
 import { UserService } from '../../../services/user/user.service';
 import { CookieService } from 'ngx-cookie-service';
@@ -7,7 +7,8 @@ interface Contact {
   senderInfo: {
     firstName: string;
     lastName: string;
-    profilPictureUrl: string
+    profilPictureUrl: string;
+    id: string;
   };
   convId: string;
   id: string;
@@ -69,6 +70,15 @@ export class ContactsChatComponent implements OnInit, AfterViewChecked, OnChange
         this.receiveMessage();
       }
     });
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent) {
+    if (event.key === 'Enter' && event.target instanceof HTMLTextAreaElement) {
+      if (!event.shiftKey) {
+        event.preventDefault();
+      }
+    }
   }
 
   sendMessage() {
