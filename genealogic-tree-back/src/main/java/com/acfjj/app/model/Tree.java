@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.acfjj.app.utils.Constants;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
@@ -74,7 +73,7 @@ public class Tree {
 	}
 
 	public void setPrivacy(int privacy) {
-		this.privacy = Constants.TREE_PRIVACY_LIST.contains(privacy) ? privacy : 1;
+		this.privacy = privacy;
 	}
 
 	public Set<TreeNodes> getTreeNodes() {
