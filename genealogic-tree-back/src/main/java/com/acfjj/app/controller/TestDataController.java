@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +18,6 @@ import com.acfjj.app.model.PersonInfo;
 import com.acfjj.app.model.Tree;
 import com.acfjj.app.model.User;
 import com.acfjj.app.utils.Response;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
 @Scope("singleton")
@@ -29,6 +27,21 @@ public class TestDataController extends AbstractController {
 	AccountController accountController;
 	@Autowired
 	TreeController treeController;
+	
+	@PostMapping
+	public Response allTest() {
+		List<Response> responses = new ArrayList<>();
+		responses.add(addTestUsers(true));
+		responses.add(addTestTree());
+		responses.add(addTestTree2());
+		addTestNodes();
+		for (Response response : responses) {
+			if (!response.getSuccess()) {
+				return new Response(responses, "One or more failure occured", false);
+			}
+		}
+		return new Response("All Test Data successfully created in DB", true);
+	}
 
 	@PostMapping("/users")
 	public Response addTestUsers(@RequestParam(required = false, defaultValue = "1") Boolean validated) {
