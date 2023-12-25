@@ -11,6 +11,7 @@ import java.util.Set;
 import com.acfjj.app.utils.Misc;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import com.acfjj.app.utils.Constants;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -365,7 +366,7 @@ public class Node {
 		String adress = keys.contains("adress") ? data.get("adress") : null;
 		int postalCode = keys.contains("postalCode") && !Objects.isNull(data.get("postalCode")) ? (int) Misc.convertObjectToLong(data.get("postalCode")) : null;
 		if(postalCode<=0 ) {
-			postalCode= -1;
+			postalCode= Constants.DEFAULT_POSTAL_CODE;
 		}
 		String ppUrl = keys.contains("profilPictureUrl") ? data.get("profilPictureUrl") : null;
 //				: Constants.DEFAULT_PP_URL;
