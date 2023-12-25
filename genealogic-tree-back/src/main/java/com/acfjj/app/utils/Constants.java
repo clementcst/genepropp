@@ -53,6 +53,4 @@ public class Constants {
 	    put("postalCode", "12000");
 	    put("profilPictureUrl", "https://media.licdn.com/dms/image/C4E03AQEVvI1smo3OVA/profile-displayphoto-shrink_400_400/0/1653388794981?e=1707350400&v=beta&t=IBYKa81wTiNOuRJAjtI47GNLFFujzw4Sh37WFBBjKOc"); 
 	}};
-	
-	public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withLocale(Locale.FRENCH);
 }
