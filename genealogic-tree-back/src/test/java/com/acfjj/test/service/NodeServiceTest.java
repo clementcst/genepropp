@@ -63,7 +63,7 @@ public class NodeServiceTest {
     	User user3 = new User("User3", "FirstName3", 0, LocalDate.of(2003, 1, 1), "Country3", "City3", "email3", "password3", "Security3", "Phone3", "Nationality3", "Address3", 12345, "Base64Image3");
     	userService.addUser(user3);
         user3 = userService.getUserByNameAndBirthInfo("User3","FirstName3", LocalDate.of(2003, 1, 1), "Country3", "City3");
-    	Node parent1 = new Node(user3.getPersonInfo(), user1, null, null, 1);  
+    	Node parent1 = new Node(null,user3.getPersonInfo(), user1, null, null, 1);  
     	
     	Node childNode = nodeService.getNode((long) 1);
         nodeService.addNode(parent1);
@@ -100,7 +100,7 @@ public class NodeServiceTest {
     public void testDeleteNode() {
     	PersonInfo person = new PersonInfo("person4", "FirstName4", 1, LocalDate.of(2004, 1, 1), "Country4", "City4", false, "Nationality1", "Address1", 12345, "Base64Image1");
         User user3 = userService.getUserByNameAndBirthInfo("User3","FirstName3", LocalDate.of(2003, 1, 1), "Country3", "City3");
-        Node nodeToDel = new Node(person, user3, null, null, 0);
+        Node nodeToDel = new Node(null,person, user3, null, null, 0);
         nodeService.addNode(nodeToDel);
         nodeToDel = nodeService.getNodeByNameAndBirthInfo("person4", "FirstName4", LocalDate.of(2004, 1, 1), "Country4", "City4");
 
@@ -137,7 +137,7 @@ public class NodeServiceTest {
     public void testGetParentsOfNode() {
         User user2 = userService.getUser(2);
         User user1 = userService.getUser(1);
-        Node parent2 = new Node(user2.getPersonInfo(), user1, null, null, 0);
+        Node parent2 = new Node(null,user2.getPersonInfo(), user1, null, null, 0);
         Node childNode = nodeService.getNode((long) 1);
         
         nodeService.addNode(parent2);
@@ -195,7 +195,7 @@ public class NodeServiceTest {
         userService.addUser(user2);
         user2 = userService.getUserByNameAndBirthInfo("User2","FirstName2", LocalDate.of(2001, 2, 2), "Country2", "City2");
 
-        return new Node(user1.getPersonInfo(), user1, null, null, 0);
+        return new Node(null,user1.getPersonInfo(), user1, null, null, 0);
     }
 
     private Tree createTestTree() {

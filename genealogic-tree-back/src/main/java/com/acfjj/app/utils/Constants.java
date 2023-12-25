@@ -25,7 +25,7 @@ public class Constants {
 	public static final int MAX_POSTAL_CODE = 99999;
 	public static final String DEFAULT_NO_PHONE = "+0000000000";
 	public static final String DEFAULT_NO_SECU = "1234567890123";
-	
+
 	public static final List<String> POSSIBLE_LHM_KEYS = Arrays.asList("lastName", "firstName", "gender", "dateOfBirth", "countryOfBirth",
 			"cityOfBirth", "email", "password", "noSecu", "noPhone", "nationality", "adress", "postalCode",
 			"profilPictureUrl", "dateOfDeath", "privacy", "treePrivacy");
@@ -33,7 +33,7 @@ public class Constants {
 			"cityOfBirth", "email", "password");
 	public static final List<String> PROFIL_UPDATE_FORBIDDEN_KEYS = Arrays.asList("lastName", "firstName", "password");
 
-			
+
 	public static final String SYSTEM_ADMIN_PRIVATE_CODE = "TheSystemAdmin";
 	public static final String SYSTEM_ADMIN_EMAIL = "system.admin.account@gmail.com";
 	@SuppressWarnings("serial")
@@ -52,5 +52,5 @@ public class Constants {
 	    put("adress", "1 Avenue du Bourg Palette");
 	    put("postalCode", "12000");
 	    put("profilPictureUrl", "https://media.licdn.com/dms/image/C4E03AQEVvI1smo3OVA/profile-displayphoto-shrink_400_400/0/1653388794981?e=1707350400&v=beta&t=IBYKa81wTiNOuRJAjtI47GNLFFujzw4Sh37WFBBjKOc"); 
-	}};	
+	}};
 }

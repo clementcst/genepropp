@@ -3,12 +3,15 @@ package com.acfjj.test.model;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -33,8 +36,8 @@ public class NodeTest {
         User user1 = new User("User1", "FirstName1", 1, LocalDate.of(2000, 1, 1), "Country1", "City1", "email1", "password1", "Security1", "Phone1", "Nationality1", "Address1", 12345, "Base64Image1");
         User user2 = new User("User2", "FirstName2", 1, LocalDate.of(2001, 2, 2), "Country2", "City2", "email2", "password2", "Security2", "Phone2", "Nationality2", "Address2", 54321, "Base64Image2");
 
-        Node parent1 = new Node("Parent1", "ParentFirstName1", 1, LocalDate.of(1990, 3, 3), "Country3", "City3", user1, 1, "Nationality3", "Address3", 67890, "Base64Image3");
-        Node parent2 = new Node("Parent2", "ParentFirstName2", 1, LocalDate.of(1991, 4, 4), "Country4", "City4", user2, 0, "Nationality4", "Address4", 98765, "Base64Image4");
+        Node parent1 = new Node(null,"Parent1", "ParentFirstName1", 1, LocalDate.of(1990, 3, 3), "Country3", "City3", user1, 1, "Nationality3", "Address3", 67890, "Base64Image3");
+        Node parent2 = new Node(null,"Parent2", "ParentFirstName2", 1, LocalDate.of(1991, 4, 4), "Country4", "City4", user2, 0, "Nationality4", "Address4", 98765, "Base64Image4");
 
         TreeNodes treeNodes1 = new TreeNodes(null, parent1, 1, 0);
         TreeNodes treeNodes2 = new TreeNodes(null, parent2, 0, 0);
@@ -53,7 +56,7 @@ public class NodeTest {
         PersonInfo personInfo, User createdBy, Node parent1, Node parent2,
         int privacy, String nationality, String address, int postalCode, String profilPictureUrl, TreeNodes treeNodes
     ) {
-        Node node = new Node(personInfo, createdBy, parent1, parent2, privacy);
+        Node node = new Node(null,personInfo, createdBy, parent1, parent2, privacy);
         assertAll(() -> {
             assertEquals(personInfo, node.getPersonInfo());
             assertEquals(createdBy, node.getCreatedBy());
@@ -74,13 +77,13 @@ public class NodeTest {
         PersonInfo personInfo, User createdBy, Node parent1, Node parent2,
         int privacy, String nationality, String address, int postalCode, String profilPictureUrl, TreeNodes treeNodes
     ) {
-        Node node = new Node(personInfo, createdBy, parent1, parent2, privacy);
+        Node node = new Node(null,personInfo, createdBy, parent1, parent2, privacy);
         PersonInfo newPersonInfo = new PersonInfo("NewLastName", "NewFirstName", 1, LocalDate.of(2000, 1, 1), "NewCountry", "NewCity", false, "NewNationality", "NewAddress", 99999, "NewBase64Image");
         User newCreatedBy = new User("NewUser", "NewFirstName", 1, LocalDate.of(2000, 1, 1), "NewCountry", "NewCity", "NewEmail", "NewPassword", "NewSecurity", "NewPhone", "NewNationality", "NewAddress", 99999, "NewBase64Image");
-        Node newParent1 = new Node("NewParent", "NewParentFirstName", 1, LocalDate.of(1990, 3, 3), "NewCountry", "NewCity", newCreatedBy, 1, "NewNationality", "NewAddress", 99999, "NewBase64Image");
-        Node Partner = new Node("Partner", "Partner", 1, LocalDate.of(1990, 3, 3), "NewCountry", "NewCity", newCreatedBy, 1, "NewNationality", "NewAddress", 99999, "NewBase64Image");
-        Node exPartners = new Node("exPartners", "exPartners", 1, LocalDate.of(1990, 3, 3), "NewCountry", "NewCity", newCreatedBy, 1, "NewNationality", "NewAddress", 99999, "NewBase64Image");
-        Node siblings = new Node("siblings", "siblings", 1, LocalDate.of(1990, 3, 3), "NewCountry", "NewCity", newCreatedBy, 1, "NewNationality", "NewAddress", 99999, "NewBase64Image");
+        Node newParent1 = new Node(null,"NewParent", "NewParentFirstName", 1, LocalDate.of(1990, 3, 3), "NewCountry", "NewCity", newCreatedBy, 1, "NewNationality", "NewAddress", 99999, "NewBase64Image");
+        Node Partner = new Node(null,"Partner", "Partner", 1, LocalDate.of(1990, 3, 3), "NewCountry", "NewCity", newCreatedBy, 1, "NewNationality", "NewAddress", 99999, "NewBase64Image");
+        Node exPartners = new Node(null,"exPartners", "exPartners", 1, LocalDate.of(1990, 3, 3), "NewCountry", "NewCity", newCreatedBy, 1, "NewNationality", "NewAddress", 99999, "NewBase64Image");
+        Node siblings = new Node(null,"siblings", "siblings", 1, LocalDate.of(1990, 3, 3), "NewCountry", "NewCity", newCreatedBy, 1, "NewNationality", "NewAddress", 99999, "NewBase64Image");
         
         node.setPersonInfo(newPersonInfo);
         node.setCreatedBy(newCreatedBy);
@@ -120,18 +123,18 @@ public class NodeTest {
         PersonInfo personInfo, User createdBy, Node parent1, Node parent2,
         int privacy, String nationality, String address, int postalCode, String profilPictureUrl, TreeNodes treeNodes
     ) {
-        Node nodeWithParents = new Node(personInfo, createdBy, parent1, parent2, privacy);
-        Node nodeWithoutParents = new Node(personInfo, createdBy, null, null, privacy);
+        Node nodeWithParents = new Node(null,personInfo, createdBy, parent1, parent2, privacy);
+        Node nodeWithoutParents = new Node(null,personInfo, createdBy, null, null, privacy);
         User newCreatedBy = new User("NewUser", "NewFirstName", 1, LocalDate.of(2000, 1, 1), "NewCountry", "NewCity", "NewEmail", "NewPassword", "NewSecurity", "NewPhone", "NewNationality", "NewAddress", 99999, "NewBase64Image");
-        Node Partner = new Node("Partner", "Partner", 1, LocalDate.of(1990, 3, 3), "NewCountry", "NewCity", newCreatedBy, 1, "NewNationality", "NewAddress", 99999, "NewBase64Image");
-        Node exPartners = new Node("exPartners", "exPartners", 1, LocalDate.of(1990, 3, 3), "NewCountry", "NewCity", newCreatedBy, 1, "NewNationality", "NewAddress", 99999, "NewBase64Image");
-        Node siblings = new Node("siblings", "siblings", 1, LocalDate.of(1990, 3, 3), "NewCountry", "NewCity", newCreatedBy, 1, "NewNationality", "NewAddress", 99999, "NewBase64Image");
-        Node nodeWithParent1 = new Node(personInfo, createdBy, parent1, null, privacy);
-        Node nodeWithParent2 = new Node(personInfo, createdBy, null, parent2, privacy);
-        Node nodeWithPartner = new Node(personInfo, createdBy, null, null, privacy);
+        Node Partner = new Node(null,"Partner", "Partner", 1, LocalDate.of(1990, 3, 3), "NewCountry", "NewCity", newCreatedBy, 1, "NewNationality", "NewAddress", 99999, "NewBase64Image");
+        Node exPartners = new Node(null,"exPartners", "exPartners", 1, LocalDate.of(1990, 3, 3), "NewCountry", "NewCity", newCreatedBy, 1, "NewNationality", "NewAddress", 99999, "NewBase64Image");
+        Node siblings = new Node(null,"siblings", "siblings", 1, LocalDate.of(1990, 3, 3), "NewCountry", "NewCity", newCreatedBy, 1, "NewNationality", "NewAddress", 99999, "NewBase64Image");
+        Node nodeWithParent1 = new Node(null,personInfo, createdBy, parent1, null, privacy);
+        Node nodeWithParent2 = new Node(null,personInfo, createdBy, null, parent2, privacy);
+        Node nodeWithPartner = new Node(null,personInfo, createdBy, null, null, privacy);
         nodeWithPartner.setPartner(Partner);
-        Node nodeWithExPartners = new Node(personInfo, createdBy, null, null, privacy);
-        Node nodeWithSiblings = new Node(personInfo, createdBy, null, null, privacy);
+        Node nodeWithExPartners = new Node(null,personInfo, createdBy, null, null, privacy);
+        Node nodeWithSiblings = new Node(null,personInfo, createdBy, null, null, privacy);
 
         nodeWithExPartners.addExPartners(exPartners);
         nodeWithSiblings.addSiblings(siblings);
