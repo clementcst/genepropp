@@ -6,6 +6,10 @@ import org.springframework.stereotype.Service;
 import com.acfjj.app.model.Node;
 import com.acfjj.app.model.Tree;
 import com.acfjj.app.model.TreeNodes;
+import com.acfjj.app.repository.NodeRepository;
+import com.acfjj.app.repository.PersonInfoRepository;
+import com.acfjj.app.repository.TreeNodesRepository;
+import com.acfjj.app.repository.TreeRepository;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -131,7 +135,6 @@ public class TreeService extends AbstractService {
 			if (treeNode.getTree().getId() == treeId)
 				depth = treeNode.getDepth();
 		}
-		System.out.println();
 		addNodeToTree(tree, parent, privacy, depth + 1);
 		if (node.getParent1() == null || node.getParent1Id().equals(parent.getId())) {
 			node.setParent1(parent);
@@ -140,6 +143,8 @@ public class TreeService extends AbstractService {
 		} else {
 			return;
 		}
+		parent.setHasChild(true);
+		nodeRepository.save(parent);
 		nodeRepository.save(node);
 	}
 	
@@ -158,6 +163,8 @@ public class TreeService extends AbstractService {
 		} else {
 			return;
 		}
+		parent.setHasChild(true);
+		nodeRepository.save(parent);
 		nodeRepository.save(child);
 	}
 

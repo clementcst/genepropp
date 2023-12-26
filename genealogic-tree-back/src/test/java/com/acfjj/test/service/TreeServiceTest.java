@@ -102,7 +102,7 @@ public class TreeServiceTest {
         Tree retrievedTree = treeService.getTree(tree.getId());
         assertNotNull(retrievedTree);
         
-        Node node2 = new Node(userService.getUser(2).getPersonInfo(), userService.getUser(1), null, null, 0);
+        Node node2 = new Node(null,userService.getUser(2).getPersonInfo(), userService.getUser(1), null, null, 0);
         nodeService.addNode(node2);
         node2 = nodeService.getNodeByNameAndBirthInfo("User2","FirstName2", LocalDate.of(2001, 2, 2), "Country2", "City2");
         
@@ -197,6 +197,6 @@ public void testUpdateTree() {
         userService.addUser(user2);
         user2 = userService.getUserByNameAndBirthInfo("User2","FirstName2", LocalDate.of(2001, 2, 2), "Country2", "City2");
 
-        return new Node(user1.getPersonInfo(), user2, null, null, 0);
+        return new Node(null,user1.getPersonInfo(), user2, null, null, 0);
     }
 }

@@ -8,7 +8,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -29,8 +31,8 @@ public class TreeTest {
     static CustomTestWatcher testWatcher = new CustomTestWatcher();
 
     static public List<Object> testData() {
-        Node node1 = new Node("Bourhara", "Adam", 1, LocalDate.of(2002, 04, 2), "France", "Cergy", null, 1, "French", "Some Address", 12345, "Base64Image");
-        Node node2 = new Node("Cassiet", "Clement", 1, LocalDate.of(1899, 07, 9), "Péîs", "Tournant-En-Brie", null, 1, "NewNationality", "NewAddress", 99999, "NewBase64Image");
+        Node node1 = new Node(null,"Bourhara", "Adam", 1, LocalDate.of(2002, 04, 2), "France", "Cergy", null, 1, "French", "Some Address", 12345, "Base64Image");
+        Node node2 = new Node(null,"Cassiet", "Clement", 1, LocalDate.of(1899, 07, 9), "Péîs", "Tournant-En-Brie", null, 1, "NewNationality", "NewAddress", 99999, "NewBase64Image");
 //        Node node3 = new Node("Gautier", "Jordan", 1, LocalDate.of(2002, 11, 21), "Nouvel-Zélande", "Paris Hilton", null, 1, "Kiwi", "Yet Another Address", 67890, "Base64Image3");
 
         TreeNodes nodes1 = new TreeNodes(null, node1, 1, 0);
