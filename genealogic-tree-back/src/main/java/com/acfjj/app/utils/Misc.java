@@ -123,7 +123,7 @@ public class Misc {
 		Set<String> keys = LHM.keySet();
 		for (String key : keys) {
 			if (!Constants.POSSIBLE_LHM_KEYS.contains(key)) {
-				return new Response("Error key : " + key + " cannot be checked by LHMcheck: key not registered.",
+				return new Response(key,"Error key : " + key + " cannot be checked by LHMcheck: key not registered.",
 						false);
 			}
 			prevResponseStr = String.copyValueOf(responseStr.toCharArray());
@@ -291,7 +291,7 @@ public class Misc {
             try {
                 return Integer.parseInt(input.toString());
             } catch (NumberFormatException e2) {
-                return -10L;
+                return -9L;
             }
         }
     }

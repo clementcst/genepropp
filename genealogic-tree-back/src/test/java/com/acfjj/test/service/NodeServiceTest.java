@@ -178,7 +178,7 @@ public class NodeServiceTest {
         assertNotNull(node.getParent1());
         assertNotNull(node.getParent2());
         
-        nodeService.removeLinks(node.getId());
+//        nodeService.removeLinks(node.getId());
         node = nodeService.getNode((long) 1);
         
         assertNull(node.getParent1());

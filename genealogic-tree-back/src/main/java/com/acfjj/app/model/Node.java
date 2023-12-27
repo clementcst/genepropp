@@ -252,7 +252,7 @@ public class Node {
 	
 	@JsonIgnore
 	public boolean isPublic() {
-		return this.getPrivacy() == 1;		
+		return this.getPrivacy() == 2;		
 	}
 	public String getLastName() {
 	    return personInfo.getLastName();
