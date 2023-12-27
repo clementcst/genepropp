@@ -127,7 +127,7 @@ public class Misc {
 						false);
 			}
 			prevResponseStr = String.copyValueOf(responseStr.toCharArray());
-			String value = LHM.get(key).toString();
+			String value = LHM.get(key);
 			responseStr += isStringSafe(value) ? "" : "XSS tentative on field" + key + ", your ip has been reported to admins.\n";
 			String endWasStr =  "\n" + key + " was " + value + "\n||\n";
 			switch (key) {
@@ -291,7 +291,7 @@ public class Misc {
             try {
                 return Integer.parseInt(input.toString());
             } catch (NumberFormatException e2) {
-                return -9;
+                return -9L;
             }
         }
     }
