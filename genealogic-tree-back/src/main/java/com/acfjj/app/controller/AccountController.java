@@ -124,6 +124,7 @@ public class AccountController extends AbstractController {
 		}
 		Node node = nodeService.getPublicNodeByNameAndBirthInfo(lastName, firstName, user.getDateOfBirth(),
 				user.getCountryOfBirth(), user.getCityOfBirth());
+		System.out.println(node);
 		if (Objects.isNull(node)) {
 			return new Response("Fail to create user's Node in DB", false);
 		}

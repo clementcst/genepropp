@@ -123,11 +123,11 @@ public class Misc {
 		Set<String> keys = LHM.keySet();
 		for (String key : keys) {
 			if (!Constants.POSSIBLE_LHM_KEYS.contains(key)) {
-				return new Response("Error key : " + key + " cannot be checked by LHMcheck: key not registered.",
+				return new Response(key,"Error key : " + key + " cannot be checked by LHMcheck: key not registered.",
 						false);
 			}
 			prevResponseStr = String.copyValueOf(responseStr.toCharArray());
-			String value = LHM.get(key);
+			String value = LHM.get(key).toString();
 			responseStr += isStringSafe(value) ? "" : "XSS tentative on field" + key + ", your ip has been reported to admins.\n";
 			String endWasStr =  "\n" + key + " was " + value + "\n||\n";
 			switch (key) {
@@ -291,7 +291,7 @@ public class Misc {
             try {
                 return Integer.parseInt(input.toString());
             } catch (NumberFormatException e2) {
-                return -10L;
+                return -9;
             }
         }
     }

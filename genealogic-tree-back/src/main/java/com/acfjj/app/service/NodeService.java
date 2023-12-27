@@ -82,8 +82,8 @@ public class NodeService extends AbstractService {
         return;
     }
    
-   public void removeLinks(Long id) {
-       Node node = getNode(id);
+   public void removeLinks(Long nodeId, Long treeId) {
+       Node node = getNode(nodeId);
        if (node != null) {        	
            if (node.getParent1() != null) {
         	   node.setParent1(null);
@@ -117,7 +117,23 @@ public class NodeService extends AbstractService {
         	   updateNode(node.getId(),node);  
            }
        }
-       //has child des parents
+       if(node.getHasChild()) {
+    	   Set<TreeNodes> treeNodes = treeNodesRepository.findAll();
+           for(TreeNodes treeNode : treeNodes) {
+        	   if(treeNode.getTree().getId() == treeId) {
+        		   if(treeNode.getNode().getParent1Id() == node.getId()) {
+        			   treeNode.getNode().setParent1(null);
+        			   updateNode(treeNode.getNode().getId(), treeNode.getNode());
+        		   }
+        		   if(treeNode.getNode().getParent2Id() == node.getId()) {
+        			   treeNode.getNode().setParent2(null);
+        			   updateNode(treeNode.getNode().getId(), treeNode.getNode());
+        		   }
+        	   }
+           }
+       }  
+       node.setHasChild(false);
+       updateNode(node.getId(),node);  
        //si est parent, delete lien parent enfant
 
    }
@@ -171,12 +187,7 @@ public class NodeService extends AbstractService {
     	for(Tree tree : trees1) {
     		diffList.add(tree.getTreeNodesByNode(node1).getDepth() - tree.getTreeNodesByNode(node2).getDepth());
     	}
-    	Integer diff = Misc.findMaxFrequency(diffList);
-
-    	//tous tree avec 2 nodes
-    	//différence prof des 2 
-    	//celle qui apparait plus souvent comme prof
-    	return null;
+    	return Misc.findMaxFrequency(diffList);
     }
     
     public Node getNodeByNameAndBirthInfo(String lastName, String firstName, LocalDate dateOfBirth, String countryOfBirth, String cityofBirth) {

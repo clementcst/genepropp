@@ -117,12 +117,17 @@ public class TestDataController extends AbstractController {
 	public Response addTestTree2() {
 		List<Response> responses = new ArrayList<>();
 
-		User userTest = new User("Martin", "Y", 1, LocalDate.of(1990, 04, 2), "France", "Cergy", "test@mail",
+		User userTest = new User("Martin034", "Y", 1, LocalDate.of(1990, 04, 2), "France", "Cergy", "test2356kjalevzl65@mail",
 				"password1", "Sécurité socisse", "Telephone ui", "nationality", "adress", 1234,
 				"https://99designs-blog.imgix.net/blog/wp-content/uploads/2016/03/web-images.jpg?auto=format&q=60&w=1600&h=824&fit=crop&crop=faces");
 		userTest.setValidated(true);
 		responses.add(accountController.registerUser(userTest, null));
-
+		for (Response response : responses) {
+			if (!response.getSuccess()) {
+				return new Response(responses, "Oafaioklgjpd", false);
+			}
+		}
+		userTest = userService.getUserByNameAndBirthInfo("Martin034", "Y", LocalDate.of(1990, 04, 2), "France", "Cergy");
 		Tree tree = userTest.getMyTree();
 		Long nodeId = userTest.getRelatedNodeId();
 
