@@ -186,6 +186,10 @@ export class TreeContentComponent {
     return true;
   }
 
+  convertToString(array: number[]): string {
+    return array.join(',');
+}
+
   updateDatabaseData(treeFromDB: any[], treeTab: any[]): any[] {
     const idMap = new Map(treeFromDB.map((item) => [item.id, item]));
 
@@ -202,10 +206,14 @@ export class TreeContentComponent {
             if(!this.isEqual(existingItem[key],createdItem[key])){
               KeyHaveChanged = true
               if(key == 'parent1Id' || key == 'parent2Id') { ParentsKeyHaveChanged = true; } 
-              if(key == 'partnerId' ){ 
+              if(key == 'partnerId' || "exPartnerIds" ){ 
                 KeyNotDisplayChanges = true }
               console.log("le param "+key+" de "+existingItem.id+" a changé !"+existingItem[key]+"-->"+createdItem[key])
-              existingItem[key] = createdItem[key]
+              if( key == "exPartnersId" || key == "treesId") {
+                existingItem[key] = this.convertToString(createdItem[key] )
+              }else{
+                existingItem[key] = createdItem[key]
+              }
             } 
         });
         if(KeyHaveChanged  && ParentsKeyHaveChanged) this.linkedHashMap.putOrAdd(existingItem.id, "PARENT");
@@ -550,6 +558,25 @@ export class TreeContentComponent {
       return true;
     }
 
+     convertToStrings(data: any[]): any[] {
+      return data.map(obj => {
+          const newObj = {};
+          for (const key in obj) {
+              if (obj.hasOwnProperty(key)) {
+                if(obj[key] != null){
+                  //@ts-ignore
+                  newObj[key] = String(obj[key]);
+                }else{
+                  //@ts-ignore
+                  newObj[key] = null;
+                }
+                  
+              }
+          }
+          return newObj;
+      });
+  }
+
       saveTree(): boolean {
 
         console.log("on lance le save")
@@ -585,6 +612,8 @@ export class TreeContentComponent {
 
           //change les tableau par leur premier élément dans les champs des nodes du tableau
           this.GetFirst(this.treeMergeForDB);
+
+          this.treeMergeForDB = this.convertToStrings(this.treeMergeForDB);
 
           console.log("Voici le tableau envoyé à la db");
           console.log(this.treeMergeForDB);
