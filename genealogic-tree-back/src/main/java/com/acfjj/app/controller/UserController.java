@@ -39,7 +39,7 @@ public class UserController extends AbstractController {
 		if(!User.isUpdatableUsing(dataLHM)) {
 			return new Response("Request Body format is invalid.", false);
 		}
-		Response LHMCheckResponse = Misc.LHMCheck(dataLHM);
+		Response LHMCheckResponse = Misc.LHMCheck(dataLHM, "USER");
 		if(!LHMCheckResponse.getSuccess()) {
 			return LHMCheckResponse;
 		}

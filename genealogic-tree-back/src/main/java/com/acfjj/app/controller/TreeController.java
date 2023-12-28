@@ -1,5 +1,6 @@
 package com.acfjj.app.controller;
 
+import org.apache.tomcat.util.bcel.classfile.Constant;
 import org.springframework.context.annotation.Scope;
 import org.springframework.web.bind.annotation.*;
 
@@ -8,6 +9,7 @@ import com.acfjj.app.model.PersonInfo;
 import com.acfjj.app.model.Tree;
 import com.acfjj.app.model.TreeNodes;
 import com.acfjj.app.model.User;
+import com.acfjj.app.utils.Constants;
 import com.acfjj.app.utils.Misc;
 import com.acfjj.app.utils.Response;
 
@@ -62,7 +64,7 @@ public class TreeController extends AbstractController {
 	}
 
 	@DeleteMapping("/deletNode")
-	public Response deleteNode(@RequestParam Node node) {		
+	public Response deleteNode(@RequestParam Node node) {
 		Set<TreeNodes> treeNodes = node.getTreeNodes();
 		for (TreeNodes treeNode : treeNodes) {
 			nodeService.removeLinks(node.getId(), treeNode.getTree().getId());
@@ -71,9 +73,9 @@ public class TreeController extends AbstractController {
 				if (nodes.isOrphan()) {
 					nodeService.deleteNode(nodes.getId());
 				}
-			}			
+			}
 		}
-		if(!Objects.isNull(nodeService.getNode(node.getId()))) {
+		if (!Objects.isNull(nodeService.getNode(node.getId()))) {
 			return new Response("The node has not been deleted, there is a problem", false);
 		}
 		return new Response("The node has been deleted", true);
@@ -120,36 +122,51 @@ public class TreeController extends AbstractController {
 	@PostMapping("/updateTree")
 	public Response updateTree(@RequestBody Map<String, Object> requestData, @RequestParam int userId,
 			@RequestParam int treeId) {
+		//Init
 		Long UserId = (long) userId;
 		Long TreeId = (long) treeId;
 
 		List<LinkedHashMap<String, String>> tree;
 		LinkedHashMap<Long, String> updates;
 		try {
-			tree = (List<LinkedHashMap<String, String>>) requestData.get("data1"); 
+			tree = (List<LinkedHashMap<String, String>>) requestData.get("data1");
 			updates = (LinkedHashMap<Long, String>) requestData.get("data2");
-		}catch(Exception e) {
+		} catch (Exception e) {
 			return new Response("Invalid format", false);
 		}
-		
+
 		if (updates.size() <= 0) {
 			return new Response("No change detected", false);
-		}
-		Response response = firstVerifications(tree, UserId);
-		if (!response.getSuccess()) {
-			return response;
 		}
 		LinkedHashMap<Long, Node> existingNodes = new LinkedHashMap<Long, Node>();
 		LinkedHashMap<Long, Node> nodeToAdd = new LinkedHashMap<Long, Node>();
 		LinkedHashMap<Long, String> unknownRelation = new LinkedHashMap<Long, String>();
 
+		//LHM Check
+		String responseStr = "";
+		boolean responseSuccess = true;
 		for (LinkedHashMap<String, String> node : tree) {
-//			Response raiponce = Misc.LHMCheck(node);
-//			if(!raiponce.getSuccess()) {
-//				return raiponce;
-//			}
+			Response LHMres = Misc.LHMCheck(node, "NODE");
+			if (!LHMres.getSuccess()) {
+				responseStr += node.containsKey("lastName") && node.containsKey("firstName")
+						? "\n\nFormat problem found in node " + node.get("lastName") + " " + node.get("firstName")
+								+ LHMres.getMessage()  + "\n"
+						: "\n\nFormat problem found in node " + node.get("id") + LHMres.getMessage() + "\n";
+				responseSuccess = false;
+			}
+		}
+		
+		// First Verifications
+		String firstVerifStr = firstVerifications(tree, UserId);
+		responseStr += firstVerifStr != "OK" ? firstVerifStr : "";
+		responseSuccess = firstVerifStr != "OK" ? false : responseSuccess;
+
+		//Ici jsp ce que ça fait, j'ai pas touché
+		for (LinkedHashMap<String, String> node : tree) {
 			Long id = Misc.convertObjectToLong(node.get("id"));
+			// Init node check & process
 			User creator = userService.getUser(id >= 0 ? Misc.convertObjectToLong(node.get("createdById")) : UserId);
+			//securité creator not found
 
 			Node parent1 = getNodeIfNonNegative(Misc.convertObjectToLong(node.get("parent1Id")));
 			Node parent2 = getNodeIfNonNegative(Misc.convertObjectToLong(node.get("parent2Id")));
@@ -172,25 +189,50 @@ public class TreeController extends AbstractController {
 			}
 		}
 
-		// test si droit d'update les nodes
+		// Verify Permissions
 		for (Map.Entry<Long, String> nodeUpdate : updates.entrySet()) {
 			Long id = Misc.convertObjectToLong(nodeUpdate.getKey());
-			if ("UPDATE".equals(nodeUpdate.getValue().toUpperCase())
-					&& nodeService.getNode(id).getCreatedById() != UserId) {
-				return new Response("the node of " + nodeService.getNode(id).getFirstName()+" "+ nodeService.getNode(id).getLastName()
-						+ " does not belong to you, you cannot update it", false);
+			Node node = nodeService.getNode(id);
+			if (!Objects.isNull(node)) {
+				if ("UPDATE".equals(nodeUpdate.getValue().toUpperCase())
+						&& nodeService.getNode(id).getCreatedById() != UserId) {
+					responseStr += "the node of " + nodeService.getNode(id).getFullName()
+							+ " does not belong to you, you cannot update it\n";
+					responseSuccess = false;
+				}
+				if ("DELETE".equals(nodeUpdate.getValue().toUpperCase())
+						&& nodeService.getNode(id).getCreatedById() != UserId) {
+					responseStr += "the node of " + nodeService.getNode(id).getFullName()
+							+ " does not belong to you, you cannot delete it\n";
+					responseSuccess = false;
+				}
+				if ("DELETE".equals(nodeUpdate.getValue().toUpperCase()) && nodeService.getNode(id).getPersonInfo()
+						.getId() == userService.getUser(userId).getPersonInfo().getId()) {
+					responseStr += "This is your node, you cannot delete the main node. You cannot delete your tree either if that's your goal.\n";
+					responseSuccess = false;
+				}
+			} else {
+				if(nodeUpdate.getValue().equals("UPDATE") || nodeUpdate.getValue().equals("DELETE")) {
+					responseStr += "Cannot update or delete node with id " + id + " because it has not been found in databased\n";
+					responseSuccess = false;
+				}
 			}
-			if ("DELETE".equals(nodeUpdate.getValue().toUpperCase())
-					&& nodeService.getNode(id).getCreatedById() != UserId) {
-				return new Response("the node of " + nodeService.getNode(id).getFirstName()+" "+ nodeService.getNode(id).getLastName()
-						+ " does not belong to you, you cannot delete it", false);
-			}
-			if("DELETE".equals(nodeUpdate.getValue().toUpperCase())
-					&& nodeService.getNode(id).getPersonInfo().getId() == userService.getUser(userId).getPersonInfo().getId()) {
-				return new Response("This tree belongs to you, you cannot delete the main node. Do you want to delete your tree ?", false);
+		}
+		//Post Check return if problem
+		if(!responseSuccess) {
+			return new Response(responseStr, responseSuccess);
+		}
+		
+		// Check all Actions Type are allowed
+		for (Map.Entry<Long, String> newOrUpdatedNode : updates.entrySet()) {
+			String key = newOrUpdatedNode.getValue();
+			if (!Constants.POSSIBLE_NODE_ACTIONS.contains(key)) {
+				return new Response("No Problem was found in the tree, but an action type has an incorrect value : "
+						+ key + " for entry " + newOrUpdatedNode.getKey() + " \nThat is not a normal error, pls contact support.", false);
 			}
 		}
 
+		// True Process
 		for (Map.Entry<Long, String> newOrUpdatedNode : updates.entrySet()) {
 			Long id = Misc.convertObjectToLong(newOrUpdatedNode.getKey());
 			String key = newOrUpdatedNode.getValue();
@@ -208,7 +250,7 @@ public class TreeController extends AbstractController {
 				addPartnerRelations(id, TreeId, child, nodeToAdd, existingNodes, unknownRelation, updates);
 				break;
 			case "SIBLINGS":
-				// Pas fait pour l'instant
+				// Useless ATM, so not implemented
 				break;
 //					case "EXPARTNER":
 //						if(!existingNodes.get(id).getExPartnersId().isEmpty() && existingNodes.get(id).getPartnerId() < 0) {
@@ -225,9 +267,9 @@ public class TreeController extends AbstractController {
 				break;
 			case "DELETE":
 				deleteNodeFromTree(nodeService.getNode(id), TreeId);
-			break;
+				break;
 			default:
-				return new Response("Update not founded, try again", false);
+				return new Response("Incorrect Parameter update " + key, false);
 			}
 		}
 
@@ -235,7 +277,7 @@ public class TreeController extends AbstractController {
 			return new Response("Something went wrong", false);
 		}
 
-		return new Response("Success", true);
+		return new Response("Tree Updated successfully", true);
 	}
 
 	@PutMapping("/node/addNodeWithLink")
@@ -388,10 +430,13 @@ public class TreeController extends AbstractController {
 		return true;
 	}
 
-	private Response firstVerifications(List<LinkedHashMap<String, String>> tree, Long userConnectedId) {
+	private String firstVerifications(List<LinkedHashMap<String, String>> tree, Long userConnectedId) {
+		String returnStr = "One or more logical problem has been found in your tree, so it has not been saved :\n";
+		Boolean thereIsAProb = false;
 		for (LinkedHashMap<String, String> node : tree) {
 //			if(!Misc.birthIsPossible((String) node.get("dateOfBirth"), (String) node.get("dateOfDeath"))) {
-//				return new Response(node.get("fisrtName") + "died before he lived", false);
+//				returnStr += "\t- The node of " + node.get("fisrtName") + " " + node.get("fisrtName") + "'s date of death is before his/her date of birth.\n";
+//				thereIsAProb = true;
 //			}			
 			if (node != null) {
 				LinkedHashMap<String, String> parent1;
@@ -401,13 +446,16 @@ public class TreeController extends AbstractController {
 					Long parent1Id = Misc.convertObjectToLong(node.get("parent1Id"));
 					parent1 = findNodeWithId(tree, parent1Id);
 					if (!Misc.parentIsOlder((String) parent1.get("dateOfBirth"), (String) node.get("dateOfBirth"))) {
-						return new Response(parent1.get("firstName")+" "+parent1.get("lastName") + " is too young to be " + node.get("firstName") + " " + node.get("lastName") + "'s father",
-								false);
+						returnStr += "\t- The node " + parent1.get("firstName") + " " + parent1.get("lastName")
+								+ " is too young to be " + node.get("firstName") + " " + node.get("lastName")
+								+ "'s parent.\n";
+						thereIsAProb = true;
 					}
 					if (!Misc.parentWasAlive((String) parent1.get("dateOfDeath"), (String) node.get("dateOfBirth"))) {
-						return new Response(
-								parent1.get("fisrtName") + " " + parent1.get("lastName") + " was dead for the birth of " 
-								+ node.get("firstName") + " " + node.get("lastName"), false);
+						returnStr += "\t- The node " + parent1.get("fisrtName") + " " + parent1.get("lastName")
+								+ " was dead at the date of the birth indicated in the node of " + node.get("firstName")
+								+ " " + node.get("lastName") + "\n";
+						thereIsAProb = true;
 					}
 
 				}
@@ -417,18 +465,21 @@ public class TreeController extends AbstractController {
 					parent2 = findNodeWithId(tree, parent2Id);
 
 					if (!Misc.parentIsOlder((String) parent2.get("dateOfBirth"), (String) node.get("dateOfBirth"))) {
-						return new Response(parent2.get("firstName")+" "+parent2.get("lastName") + " is too young to be " + node.get("firstName") + " " + node.get("lastName") + "'s father",
-								false);
+						returnStr += "\t- The node " + parent2.get("firstName") + " " + parent2.get("lastName")
+								+ " is too young to be " + node.get("firstName") + " " + node.get("lastName")
+								+ "'s parent.\n";
+						thereIsAProb = true;
 					}
 					if (!Misc.parentWasAlive((String) parent2.get("dateOfDeath"), (String) node.get("dateOfBirth"))) {
-						return new Response(
-								parent2.get("fisrtName") + " " + parent2.get("lastName") + " was dead for the birth of " 
-										+ node.get("firstName") + " " + node.get("lastName"), false);					}
+						returnStr += "\t- The node " + parent2.get("fisrtName") + " " + parent2.get("lastName")
+								+ " was dead at the date of the birth indicated in the node of " + node.get("firstName")
+								+ " " + node.get("lastName") + "\n";
+						thereIsAProb = true;
+					}
 				}
 			}
-
 		}
-		return new Response("Success", true);
+		return !thereIsAProb ? "OK" : returnStr;
 	}
 
 	private static LinkedHashMap<String, String> findNodeWithId(List<LinkedHashMap<String, String>> tree, Long id) {
