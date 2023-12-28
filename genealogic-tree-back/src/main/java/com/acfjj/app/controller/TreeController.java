@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.*;
 import com.acfjj.app.model.Node;
 import com.acfjj.app.model.PersonInfo;
 import com.acfjj.app.model.Tree;
-import com.acfjj.app.model.TreeNodes;
 import com.acfjj.app.model.User;
 import com.acfjj.app.utils.Misc;
 import com.acfjj.app.utils.Response;
@@ -18,7 +17,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 @RestController
 @CrossOrigin(origins = "${angular.app.url}")
@@ -62,30 +60,33 @@ public class TreeController extends AbstractController {
 	}
 
 	@DeleteMapping("/deletNode")
-	public Response deleteNode(@RequestParam Node node) {		
-		Set<TreeNodes> treeNodes = node.getTreeNodes();
-		for (TreeNodes treeNode : treeNodes) {
-			nodeService.removeLinks(node.getId(), treeNode.getTree().getId());
-			nodeService.deleteNode(node.getId());
-			for (Node nodes : nodeService.getAllNodes()) {
-				if (nodes.isOrphan()) {
-					nodeService.deleteNode(nodes.getId());
+	public Response deleteNode(@RequestParam Node node) {
+//		Tree tree = treeService.getTree(treeId);
+//		if (nodeService.doesNodeBelongToTree(node.getId(), treeId) == true) {
+		List<User> users = userService.getAllUsers();
+		for (User user : users) {
+			if (node.getCreatedBy() == user) {
+				nodeService.removeLinks(node.getId());
+				nodeService.deleteNode(node.getId());
+				for (Node nodes : nodeService.getAllNodes()) {
+					if (nodes.isOrphan()) {
+						nodeService.deleteNode(nodes.getId());
+					}
 				}
-			}			
+			}
+
+//			}
+			return new Response("You cannot delete this node", false);
 		}
-		if(!Objects.isNull(nodeService.getNode(node.getId()))) {
-			return new Response("The node has not been deleted, there is a problem", false);
-		}
-		return new Response("The node has been deleted", true);
+		return new Response("This node is not in your tree", false);
 	}
 
 	@DeleteMapping("/deleteNode")
 	public Response deleteNodeFromTree(@RequestParam Node node, @RequestParam long treeId) {
-		Long nodeId = node.getId();
 		Tree tree = treeService.getTree(treeId);
 		treeService.removeNodeFromTree(tree, node);
-		node = nodeService.getNode(nodeId);
-		if (!Objects.isNull(node) && node.isOrphan()) {
+		node = nodeService.getNode(node.getId());
+		if (node.isOrphan()) {
 			return deleteNode(node);
 		}
 		return new Response("The node has been removed", true);
@@ -116,24 +117,21 @@ public class TreeController extends AbstractController {
 		return new Response("Success", true);
 	}
 
-	@SuppressWarnings("unchecked")
 	@PostMapping("/updateTree")
 	public Response updateTree(@RequestBody Map<String, Object> requestData, @RequestParam int userId,
 			@RequestParam int treeId) {
 		Long UserId = (long) userId;
 		Long TreeId = (long) treeId;
 
-		List<LinkedHashMap<String, String>> tree;
-		LinkedHashMap<Long, String> updates;
-		try {
-			tree = (List<LinkedHashMap<String, String>>) requestData.get("data1"); 
-			updates = (LinkedHashMap<Long, String>) requestData.get("data2");
-		}catch(Exception e) {
-			return new Response("Invalid format", false);
-		}
-		
+		@SuppressWarnings("unchecked")
+		List<LinkedHashMap<String, String>> tree = (List<LinkedHashMap<String, String>>) requestData.get("data1"); // Object
+																													// data2
+																													// =
+																													// requestData.get("data2");
+		@SuppressWarnings("unchecked")
+		LinkedHashMap<Long, String> updates = (LinkedHashMap<Long, String>) requestData.get("data2");
 		if (updates.size() <= 0) {
-			return new Response("No change detected", false);
+			return new Response("no change detected", false);
 		}
 		Response response = firstVerifications(tree, UserId);
 		if (!response.getSuccess()) {
@@ -144,10 +142,7 @@ public class TreeController extends AbstractController {
 		LinkedHashMap<Long, String> unknownRelation = new LinkedHashMap<Long, String>();
 
 		for (LinkedHashMap<String, String> node : tree) {
-//			Response raiponce = Misc.LHMCheck(node);
-//			if(!raiponce.getSuccess()) {
-//				return raiponce;
-//			}
+			// ajout vérif de Joan
 			Long id = Misc.convertObjectToLong(node.get("id"));
 			User creator = userService.getUser(id >= 0 ? Misc.convertObjectToLong(node.get("createdById")) : UserId);
 
@@ -177,17 +172,8 @@ public class TreeController extends AbstractController {
 			Long id = Misc.convertObjectToLong(nodeUpdate.getKey());
 			if ("UPDATE".equals(nodeUpdate.getValue().toUpperCase())
 					&& nodeService.getNode(id).getCreatedById() != UserId) {
-				return new Response("the node of " + nodeService.getNode(id).getFirstName()+" "+ nodeService.getNode(id).getLastName()
+				return new Response("the node of " + nodeService.getNode(id).getFirstName()
 						+ " does not belong to you, you cannot update it", false);
-			}
-			if ("DELETE".equals(nodeUpdate.getValue().toUpperCase())
-					&& nodeService.getNode(id).getCreatedById() != UserId) {
-				return new Response("the node of " + nodeService.getNode(id).getFirstName()+" "+ nodeService.getNode(id).getLastName()
-						+ " does not belong to you, you cannot delete it", false);
-			}
-			if("DELETE".equals(nodeUpdate.getValue().toUpperCase())
-					&& nodeService.getNode(id).getPersonInfo().getId() == userService.getUser(userId).getPersonInfo().getId()) {
-				return new Response("This tree belongs to you, you cannot delete the main node. Do you want to delete your tree ?", false);
 			}
 		}
 
@@ -223,11 +209,8 @@ public class TreeController extends AbstractController {
 			case "UPDATE":
 				nodeService.updateWithoutRelation(id, existingNodes.get(id));
 				break;
-			case "DELETE":
-				deleteNodeFromTree(nodeService.getNode(id), TreeId);
-			break;
 			default:
-				return new Response("Update not founded, try again", false);
+				return new Response("there is a problem with " + nodeToAdd.get(id).getFirstName(), false);
 			}
 		}
 
@@ -388,7 +371,7 @@ public class TreeController extends AbstractController {
 		return true;
 	}
 
-	private Response firstVerifications(List<LinkedHashMap<String, String>> tree, Long userConnectedId) {
+	public Response firstVerifications(List<LinkedHashMap<String, String>> tree, Long userConnectedId) {
 		for (LinkedHashMap<String, String> node : tree) {
 //			if(!Misc.birthIsPossible((String) node.get("dateOfBirth"), (String) node.get("dateOfDeath"))) {
 //				return new Response(node.get("fisrtName") + "died before he lived", false);
@@ -401,13 +384,12 @@ public class TreeController extends AbstractController {
 					Long parent1Id = Misc.convertObjectToLong(node.get("parent1Id"));
 					parent1 = findNodeWithId(tree, parent1Id);
 					if (!Misc.parentIsOlder((String) parent1.get("dateOfBirth"), (String) node.get("dateOfBirth"))) {
-						return new Response(parent1.get("firstName")+" "+parent1.get("lastName") + " is too young to be " + node.get("firstName") + " " + node.get("lastName") + "'s father",
+						return new Response(parent1.get("firstName") + "is younger than " + node.get("firstName"),
 								false);
 					}
 					if (!Misc.parentWasAlive((String) parent1.get("dateOfDeath"), (String) node.get("dateOfBirth"))) {
 						return new Response(
-								parent1.get("fisrtName") + " " + parent1.get("lastName") + " was dead for the birth of " 
-								+ node.get("firstName") + " " + node.get("lastName"), false);
+								parent1.get("fisrtName") + "was dead for the birth of " + node.get("firstName"), false);
 					}
 
 				}
@@ -417,13 +399,13 @@ public class TreeController extends AbstractController {
 					parent2 = findNodeWithId(tree, parent2Id);
 
 					if (!Misc.parentIsOlder((String) parent2.get("dateOfBirth"), (String) node.get("dateOfBirth"))) {
-						return new Response(parent2.get("firstName")+" "+parent2.get("lastName") + " is too young to be " + node.get("firstName") + " " + node.get("lastName") + "'s father",
+						return new Response(parent2.get("fisrtName") + "is younger than " + node.get("firstName"),
 								false);
 					}
 					if (!Misc.parentWasAlive((String) parent2.get("dateOfDeath"), (String) node.get("dateOfBirth"))) {
 						return new Response(
-								parent2.get("fisrtName") + " " + parent2.get("lastName") + " was dead for the birth of " 
-										+ node.get("firstName") + " " + node.get("lastName"), false);					}
+								parent2.get("fisrtName") + "was dead for the birth of " + node.get("firstName"), false);
+					}
 				}
 			}
 

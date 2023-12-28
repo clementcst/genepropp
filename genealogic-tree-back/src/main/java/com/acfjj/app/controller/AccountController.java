@@ -70,7 +70,7 @@ public class AccountController extends AbstractController {
 		if(!User.isCastableUsing(dataLHM)) {
 			return new Response("Request Body format is invalid.", false);
 		}
-		Response LHMCheckResponse = Misc.LHMCheck(dataLHM);
+		Response LHMCheckResponse = Misc.LHMCheck(dataLHM, "USER");
 		if(!LHMCheckResponse.getSuccess()) {
 			return LHMCheckResponse;
 		}
