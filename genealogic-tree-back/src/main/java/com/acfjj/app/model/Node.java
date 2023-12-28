@@ -377,6 +377,10 @@ public class Node {
 		return node;
 	}
 	
+	public static Node merge(Node baseNode, Node additionNode) {
+		return null;
+	}
+	
 	
 	@Override
 	public String toString() {
