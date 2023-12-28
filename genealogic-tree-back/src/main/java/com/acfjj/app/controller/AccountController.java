@@ -154,8 +154,6 @@ public class AccountController extends AbstractController {
 		Node nodeFound = nodeService.getPublicNodeByNameAndBirthInfo(userToRegister.getLastName(),
 				userToRegister.getFirstName(), userToRegister.getDateOfBirth(), userToRegister.getCountryOfBirth(),
 				userToRegister.getCityOfBirth());
-		System.out.println(userFound);
-		System.out.println(userFound2);
 		if (!Objects.isNull(userFound) || !Objects.isNull(userFound2)) {
 			userFound = Objects.isNull(userFound) ? userFound2 : userFound;
 			Map<String, Object> responseValue = new LinkedHashMap<String, Object>();

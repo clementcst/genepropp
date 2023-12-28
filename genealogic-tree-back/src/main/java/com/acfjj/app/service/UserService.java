@@ -34,7 +34,6 @@ public class UserService extends AbstractService {
 		List<PersonInfo> personInfoFounds = personInfoRepository
 				.findByLastNameAndFirstNameAndDateOfBirthAndCountryOfBirthAndCityOfBirth(lastName, firstName,
 						dateOfBirth, countryOfBirth, cityofBirth);
-		System.out.println(personInfoFounds);
 		if (!personInfoFounds.isEmpty()) {
 			PersonInfo personInfoFound = personInfoFounds.get(0);
 			userFound = userRepository.findByPersonInfo(personInfoFound);
