@@ -81,7 +81,7 @@ public class TreeService extends AbstractService {
 	}
 
 	public List<Tree> getPublicTrees() {
-		return treeRepository.findByPrivacy(1);
+		return treeRepository.findByPrivacy(0);
 	}
 
 //    public void deleteNodeFromTree(Long nodeId, Long treeId) {
@@ -226,8 +226,6 @@ public class TreeService extends AbstractService {
 		nodeRepository.save(node);
 	}
 
-	// Faire les removes links
-
 	public void removeNodeFromTree(Tree tree, Node node) {
 		Long treeId = tree.getId();
 		if (tree != null && node != null) {
@@ -238,12 +236,12 @@ public class TreeService extends AbstractService {
 
 				if (nodeToRemove != null) {
 					treeNodes.remove(nodeToRemove);
-					node.setTreeNodes(treeNodes);
+					node.removeTreeNodes(nodeToRemove);
 					tree.setTreeNodes(treeNodes);
 
 					nodeRepository.save(node);
-					nodeToRemove.setTree(null);
-					treeNodesRepository.save(nodeToRemove);
+//					nodeToRemove.setTree(null);
+					treeNodesRepository.delete(nodeToRemove);
 					treeRepository.save(tree);
 					tree = getTree(treeId);
 				}

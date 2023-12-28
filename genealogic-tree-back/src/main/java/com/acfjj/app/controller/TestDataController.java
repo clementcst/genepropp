@@ -123,6 +123,7 @@ public class TestDataController extends AbstractController {
 		userTest.setValidated(true);
 		responses.add(accountController.registerUser(userTest, null));
 
+		userTest = userService.getUserByNameAndBirthInfo("Martin", "Y", LocalDate.of(1990, 04, 2), "France", "Cergy");
 		Tree tree = userTest.getMyTree();
 		Long nodeId = userTest.getRelatedNodeId();
 

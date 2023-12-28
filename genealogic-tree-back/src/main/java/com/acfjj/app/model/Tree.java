@@ -104,7 +104,7 @@ public class Tree {
 
 	@JsonIgnore
 	public boolean isPublic() {
-		return this.getPrivacy() == 1;
+		return this.getPrivacy() == 0;
 	}
 
 	public long getViewOfMonth() {
