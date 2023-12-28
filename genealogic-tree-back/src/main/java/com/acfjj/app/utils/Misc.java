@@ -311,7 +311,7 @@ public class Misc {
 			try {
 				return Integer.parseInt(input.toString());
 			} catch (NumberFormatException e2) {
-				return -10L;
+				return -9L;
 			}
 		}
 	}
