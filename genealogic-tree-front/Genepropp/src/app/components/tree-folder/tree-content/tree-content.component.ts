@@ -28,14 +28,17 @@ export class TreeContentComponent {
   tempTreeTab: any[] = [];
   treeMergeForDB: any[] = [];
 
+  isMyTree: boolean = true;
+
   linkedHashMap = new LinkedHashMap<number, string>();
   loading: boolean = false;
   isReadyToDisplay: boolean = false;
 
+  TempUserData: any ={};
   myIDNode: any = {};
   myParam: string = '';
   partnerTab: any[] = [];
-  myID: any = {}; //id de la personne dont l'arbre s'affiche, a changer par la suite
+  myID = this.cookieService.get('userId')
   myTreeId: any = {};
   InfoChangementTab: object[] = [];
   
@@ -350,82 +353,87 @@ export class TreeContentComponent {
 
     {
 
-      this.route.queryParams.subscribe(params => {
-        // Récupérez la valeur du paramètre 'myParam' de l'URL
-        if(params['userIdForTree']){
-          this.myID = params['userIdForTree']
-        }else{
-          this.myID = this.cookieService.get('userId')
-        }
-      });
-
       this.isReadyToDisplay = true;
 
-      //affectation de la relatednode dans l'instance myNodeID
+      //affectation de la relatednode dans l'instance myNodeID + affectation de treeID
       this.userService.getUser(this.myID).subscribe((data) => {
 
-        this.myIDNode = data.value;
-        this.myIDNode = this.myIDNode.relatedNodeId;
-        
-      });
+        this.TempUserData = data.value;
+        this.myIDNode = this.TempUserData.relatedNodeId;
+        this.myTreeId = this.TempUserData.myTreeId
+
+        this.route.queryParams.subscribe(params => {
+          // Récupérez la valeur du paramètre 'myParam' de l'URL
+          if(params['treeId']){
+            this.myTreeId = params['treeId']
+            this.isMyTree = false
+          }else{
+            
+          }
+        });
 
         const tree = document.getElementById('tree');
-        
+        console.log("Voici tis is ..."+this.isMyTree)
         if (tree) {
-            var family = new FamilyTree(tree, {
+          let familyConfig: any = {
 
-                showXScroll: FamilyTree.scroll.visible,
-                showYScroll: FamilyTree.scroll.visible,
-                mouseScrool: FamilyTree.action.zoom,
-                nodeTreeMenu: true,
-                nodeMenu: {
-                    details: { text: "Details" },
-                    edit: { text: "Edit" }
-                },
-                nodeBinding: {
-                field_0: "fullName",
-                img_0: "profilPictureUrl"
-                },
+            showXScroll: FamilyTree.scroll.visible,
+            showYScroll: FamilyTree.scroll.visible,
+            mouseScrool: FamilyTree.action.zoom,
+            nodeTreeMenu: false,
+            nodeMenu: {
+                details: { text: "Details" },
+                edit: { text: "Edit" }
+            },
+            nodeBinding: {
+            field_0: "fullName",
+            img_0: "profilPictureUrl"
+            },
 
-                editForm: {
-                  titleBinding: "fullName",
-                  photoBinding: "profilPictureUrl",
-                  generateElementsFromFields: false,
-                  elements: [     
-                      { type: 'textbox', label: 'FirstName', binding: 'firstName' },
-                      { type: 'textbox', label: 'LastName', binding: 'lastName' },
-                      { type: 'textbox', label: 'gender', binding: 'gender' },
-                      { type: 'textbox', label: 'privacy', binding: 'privacy' },
-                      { type: 'textbox', label: 'Photo Url', binding: 'profilPictureUrl' },
-                      { type: 'date', label: 'Birth Date', binding: 'dateOfBirth' },
-                      { type: 'date', label: 'Death Date', binding: 'dateOfDeath' },
-                      { type: 'textbox', label: 'City of birth', binding: 'cityOfBirth' },
-                      { type: 'textbox', label: 'Country of birth', binding: 'countryOfBirth' },
-                      { type: 'textbox', label: 'adress', binding: 'adress' },
-                      { type: 'textbox', label: 'postalCode', binding: 'postalCode' },
-                      { type: 'textbox', label: 'nationality', binding: 'nationality' },
+            editForm: {
+              titleBinding: "fullName",
+              photoBinding: "profilPictureUrl",
+              generateElementsFromFields: false,
+              elements: [     
+                  { type: 'textbox', label: 'FirstName', binding: 'firstName' },
+                  { type: 'textbox', label: 'LastName', binding: 'lastName' },
+                  { type: 'textbox', label: 'gender', binding: 'gender' },
+                  { type: 'textbox', label: 'privacy', binding: 'privacy' },
+                  { type: 'textbox', label: 'Photo Url', binding: 'profilPictureUrl' },
+                  { type: 'date', label: 'Birth Date', binding: 'dateOfBirth' },
+                  { type: 'date', label: 'Death Date', binding: 'dateOfDeath' },
+                  { type: 'textbox', label: 'City of birth', binding: 'cityOfBirth' },
+                  { type: 'textbox', label: 'Country of birth', binding: 'countryOfBirth' },
+                  { type: 'textbox', label: 'adress', binding: 'adress' },
+                  { type: 'textbox', label: 'postalCode', binding: 'postalCode' },
+                  { type: 'textbox', label: 'nationality', binding: 'nationality' },
 
-                  ],
-                    buttons:  {
-                        edit: {
-                            icon: FamilyTree.icon.edit(24,24,'#fff'),
-                            text: 'Edit',
-                            hideIfEditMode: true,
-                            hideIfDetailsMode: false
-                        },
-                        remove: {
-                        icon: FamilyTree.icon.remove(24,24,'#fff'),
-                        text: 'remove',
+              ],
+                buttons:  {
+                    edit: {
+                        icon: FamilyTree.icon.edit(24,24,'#fff'),
+                        text: 'Edit',
                         hideIfEditMode: true,
                         hideIfDetailsMode: false
+                    },
+                    remove: {
+                    icon: FamilyTree.icon.remove(24,24,'#fff'),
+                    text: 'remove',
+                    hideIfEditMode: true,
+                    hideIfDetailsMode: false
 
-                        },
-                        pdf:null,
-                        share:null
-                    }
-                }  
+                    },
+                    pdf:null,
+                    share:null
+                }
+            }  
 
-            });
+        }
+          if (!this.isMyTree) {
+                  delete familyConfig['nodeTreeMenu'];
+           }
+
+            var family = new FamilyTree(tree,familyConfig);
 
             family.on('render-link', function (sender, args) {
               var cnodeData = family.get(args.cnode.id);
@@ -437,14 +445,14 @@ export class TreeContentComponent {
                   args.html = args.html.replace("path", "path stroke-dasharray='3, 2'");
               }
           });
-          
 
+         
+          
     
             //Chargement du tableau de l'arbre depuis base de donnée
-            this.treeService.getTree(this.myID).subscribe((data) => {
+            this.treeService.getTree(this.myTreeId).subscribe((data) => {
 
               this.TempTreeFromDB = data.value;
-              this.myTreeId = this.TempTreeFromDB.id;
               this.treeFromDB =  this.TempTreeFromDB.nodes;
 
               console.log("FROM DB");
@@ -486,6 +494,7 @@ export class TreeContentComponent {
              this.isReadyToDisplay = false;
            });  
         }// fin if tree
+      });
     }//fin ng oninit
 
 
