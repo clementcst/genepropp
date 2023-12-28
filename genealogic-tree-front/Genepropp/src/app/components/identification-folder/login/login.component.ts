@@ -40,6 +40,7 @@ export class LoginComponent implements OnInit{
       .subscribe((response) => {
         if (response.success) {
           this.cookieService.set('userId', response.value);
+          this.cookieService.set('privateCode', "a faire");
           this.router.navigate(['homePage']);
         }
         else {

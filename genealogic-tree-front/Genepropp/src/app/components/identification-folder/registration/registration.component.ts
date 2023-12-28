@@ -16,7 +16,6 @@ export class RegistrationComponent {
   authenticationErrorMsg: string = "An error occurred, please contact support";
   step = 1;
   userResponse = 0;
-  // Déclarer des variables pour stocker les valeurs des champs
   data: any = {
     firstName: '',
     lastName: '',

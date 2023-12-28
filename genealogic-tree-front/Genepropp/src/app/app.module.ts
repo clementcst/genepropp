@@ -33,13 +33,15 @@ import { ProfilLeftComponent } from './components/profil-folder/profil-left/prof
 import { ProfilRigthComponent } from './components/profil-folder/profil-rigth/profil-rigth.component';
 import { ProfilStatboxComponent } from './components/profil-folder/profil-statbox/profil-statbox.component';
 import { ProfilInputsComponent } from './components/profil-folder/profil-inputs/profil-inputs.component';
-import { TreeContentComponent } from './components/tree-folder/tree-content/tree-content.component';
-import { TreeNodeComponent } from './components/tree-folder/tree-node/tree-node.component';
 
 import { HttpClientModule } from '@angular/common/http';
 import { YourPopupComponentComponent } from './components/PopUps/registration-popup/your-popup-component.component';
 import { ShowPrivateCodeComponent } from './components/PopUps/show-private-code-popup/show-private-code.component';
 
+import { TreeContentComponent } from './components/tree-folder/tree-content/tree-content.component';
+import { LinkedHashMap } from './components/tree-folder/linked-hashmap/linked-hashmap.component';
+import { NodeCreationRulesComponent } from './components/PopUps/node-creation-rules/node-creation-rules.component';
+import { ErrorMergeTreePopupComponent } from './components/PopUps/error-merge-tree-popup/error-merge-tree-popup.component';
 
 
 
@@ -71,10 +73,12 @@ import { ShowPrivateCodeComponent } from './components/PopUps/show-private-code-
     ProfilRigthComponent,
     ProfilStatboxComponent,
     ProfilInputsComponent,
-    TreeContentComponent,
-    TreeNodeComponent,
     YourPopupComponentComponent,
     ShowPrivateCodeComponent,
+    TreeContentComponent,
+    LinkedHashMap,
+    NodeCreationRulesComponent,
+    ErrorMergeTreePopupComponent
   ],
   imports: [
     BrowserModule,

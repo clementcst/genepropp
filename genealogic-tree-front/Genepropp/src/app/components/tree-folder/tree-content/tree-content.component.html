@@ -1,8 +1,39 @@
-<div class="min-h-full w-full border-2 border-black" style="height: 85vh;">
-    <div class="tree m-2 border-2 border-black overflow-x-auto overflow-y-auto " style="height: 81vh; white-space: nowrap;">
+    
+    
+    <script src="https://balkan.app/js/FamilyTree.js"></script>
+    <div class="h-[85vh]">
+      <div id="tree"></div>
+    </div>
 
-        
-        <app-tree-node [node]="node"></app-tree-node>
+
+    <div class="absolute top-10 left-0 m-4 p-2 items-center">
+      <button (click)="openNodeCreationRulesPopup()" class="bg-green-900 text-white rounded py-2 mt-5 px-4 text-lgr">
+        NODE'S CREATION RULES
+      </button>
+
+      <div *ngIf="isReadyToDisplay" class="ml-2 flex flex-raw items-center py-5">
+        <div class="mr-2 text-red-500">Your tree is loading</div>
+        <div class="spinner red-spinner"></div>
+      </div>
+    </div>
+    
+
+    <div class="absolute bottom-10 left-0 m-4 p-2 items-center">
+
+      <div class="flex flex-raw">
+        <button (click)="saveTree()" [disabled]="loading" class="bg-green-900 text-white rounded py-2 px-4 text-lg">
+          SAVE YOUR TREE
+        </button>
+  
+        <div *ngIf="loading" class="ml-2">
+          <!-- Indicateur de chargement, cercle qui tourne -->
+          <div class="spinner red-spinner"></div>
+        </div>
+      </div>
+     
+
+      <div id="errorContainer">
+        <span id="errorMessages" class="text-red-500"></span>
+      </div>
     
     </div>
-</div>
