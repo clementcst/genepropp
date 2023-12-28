@@ -28,12 +28,15 @@
         </div>
         <div class="message-content">{{ message.content }}</div>
 
-        <div class="mt-2" *ngIf="message.isValidation">
+        <div class="mt-2" *ngIf="message.isValidation && myInfo.id == message.senderId">
           <button class="bg-green-500 text-white px-4 py-2 rounded mr-2"
             (click)="validationUser(message.requests.Yes)">Validate</button>
           <button class="bg-red-500 text-white px-4 py-2 rounded"
             (click)="validationUser(message.requests.No)">Deny</button>
         </div>
+      </div>
+      <div *ngIf="loading" class="ml-2">
+        <div class="spinner red-spinner"></div>
       </div>
     </div>
 
@@ -44,7 +47,10 @@
       <textarea #messageInput
         class="flex-1 mr-2 p-2 border border-gray-300 rounded focus:outline-none focus:border-green-900"
         placeholder="Tapez votre message..." (keydown.enter)="sendMessage()" style="height: 2.5rem; resize: none;"></textarea>
-      <button (click)="sendMessage()" class="px-4 py-2 bg-green-900 text-white rounded-r">Envoyer</button>
+      <button *ngIf="!loading" (click)="sendMessage()" class="px-4 py-2 bg-green-900 text-white rounded-r">Envoyer</button>
+      <div *ngIf="loading" class="ml-2">
+        <div class="spinner red-spinner"></div>
+      </div>
     </div>
   </div>
 </div>

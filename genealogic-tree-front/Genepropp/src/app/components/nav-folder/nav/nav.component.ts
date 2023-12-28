@@ -28,7 +28,6 @@ export class NavComponent implements OnInit {
   ngOnInit() : void{ 
     this.userService.getUser(this.cookieService.get('userId')).subscribe((data) => {
       this.user = data.value;
-      console.log(this.user)
     });
   }
 
