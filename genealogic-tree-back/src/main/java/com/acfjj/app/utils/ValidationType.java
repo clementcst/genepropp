@@ -62,7 +62,7 @@ public enum ValidationType {
 					? "\nTree " + msg.getReceiver().getMyTreeId() + "of " + msg.getReceiver().getFullName()
 							+ " has been merge with the tree " + msg.getSender().getMyTreeId() + "of "
 							+ msg.getSender().getFullName() +"."
-					: "";
+					: "\nIf one of you wanted to create a node that was in the tree of the other, or was the other person, create it in private";
 			msg.setContent(disabledMsg);
 		}
 	};

@@ -18,8 +18,10 @@ public class Constants {
 	public static final List<Integer> TREE_PRIVACY_LIST =  new ArrayList<>(Arrays.asList(1, 0));
 	public static final int DEFAULT_GENDER = 2;
 	public static final LocalDate DEFAULT_DATEOFBIRTH = LocalDate.of(1900,1,1);
-	public static final LocalDate MIN_DATEOFBIRTH = Misc.getLocalDateTime().toLocalDate().minusYears(120);
-	public static final LocalDate MAX_DATEOFBIRTH = Misc.getLocalDateTime().toLocalDate().minusYears(18);
+	public static final LocalDate MIN_DATEOFBIRTH_USER = Misc.getLocalDateTime().toLocalDate().minusYears(120);
+	public static final LocalDate MAX_DATEOFBIRTH_USER = Misc.getLocalDateTime().toLocalDate().minusYears(18);
+	public static final LocalDate MIN_DATEOFBIRTH = Misc.getLocalDateTime().toLocalDate().minusYears(2000);
+	public static final LocalDate MAX_DATEOFBIRTH = Misc.getLocalDateTime().toLocalDate();
 	public static final int DEFAULT_POSTAL_CODE = 99999;
 	public static final int MIN_POSTAL_CODE = 00000;
 	public static final int MAX_POSTAL_CODE = 99999;
