@@ -64,7 +64,10 @@ export class RegistrationComponent {
     this.loading = true;
     this.resetErrors();
     this.checkErrors();
-    if (this.errors.isdetected) return;
+    if (this.errors.isdetected) {
+      this.loading = false;
+      return;
+    }
 
     this.identificationService.registerResquest(this.data, this.step, this.userResponse)
       .subscribe((response) => {
