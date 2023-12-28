@@ -136,103 +136,117 @@ public class Misc {
 			}
 			prevResponseStr = String.copyValueOf(responseStr.toCharArray());
 			String value = LHM.get(key);
-			responseStr += isStringSafe(value) ? ""
-					: "XSS tentative on field" + key + ", your ip has been reported to admins.\n";
-			String endWasStr = "\n" + key + " was " + value + "\n||\n";
-			switch (key) {
-			case "password":
-				responseStr += isPasswordAcceptable(value) ? ""
-						: "Invalid password. It must be at least 6 characters long and contain at least 1 lowercase and 1 uppercase letter.";
-				break;
-			case "noPhone":
-				responseStr += isPhoneNumberAcceptable(value) ? "" : "Invalid phone Number format." + endWasStr;
-				break;
-			case "email":
-				responseStr += isEmailAcceptable(value) ? "" : "Invalid email format." + endWasStr;
-				break;
-			case "noSecu":
-				responseStr += isSocialSecurityNumberAcceptable(value) ? ""
-						: "Invalid Sécurité Social number format. It must be 13 digits length " + endWasStr;
-				break;
-			case "postalCode":
-				try {
-					keyErr = "Code Postal must be an integer";
-					int postalcode = Integer.parseInt(value);
-					keyErr = "Invalid code postal format. Must be an integer between 00000 & 99999";
-					responseStr += isPostalCodeAcceptable(postalcode) ? "" : keyErr + endWasStr;
-				} catch (Exception e) {
-					responseStr += keyErr + endWasStr;
+			if(!Objects.isNull(value) && !value.equals("")) {
+				/* System.out.println(key + " : " + value); */
+				responseStr += isStringSafe(value) ? ""
+						: "XSS tentative on field" + key + ", your ip has been reported to admins.\n";
+				String endWasStr = "\n" + key + " was " + value + "\n||\n";
+				switch (key) {
+				case "password":
+					responseStr += isPasswordAcceptable(value) ? ""
+							: "Invalid password. It must be at least 6 characters long and contain at least 1 lowercase and 1 uppercase letter.";
+					break;
+				case "noPhone":
+					responseStr += isPhoneNumberAcceptable(value) ? "" : "Invalid phone Number format." + endWasStr;
+					break;
+				case "email":
+					responseStr += isEmailAcceptable(value) ? "" : "Invalid email format." + endWasStr;
+					break;
+				case "noSecu":
+					responseStr += isSocialSecurityNumberAcceptable(value) ? ""
+							: "Invalid Sécurité Social number format. It must be 13 digits length " + endWasStr;
+					break;
+				case "postalCode":
+					try {
+						keyErr = "Code Postal must be an integer";
+						int postalcode = Integer.parseInt(value);
+						keyErr = "Invalid code postal format. Must be an integer between 00000 & 99999";
+						responseStr += isPostalCodeAcceptable(postalcode) ? "" : keyErr + endWasStr;
+					} catch (Exception e) {
+						responseStr += keyErr + endWasStr;
+					}
+					break;
+				case "hasChild":
+					try {
+						keyErr = "HasChild must be a boolean";
+						@SuppressWarnings("unused")
+						boolean hasChild = Boolean.parseBoolean(value);
+					} catch (Exception e) {
+						responseStr += keyErr + endWasStr;
+					}
+					break;
+				case "orphan":
+					try {
+						keyErr = "orphan must be a boolean";
+						@SuppressWarnings("unused")
+						boolean orphan = Boolean.parseBoolean(value);
+					} catch (Exception e) {
+						responseStr += keyErr + endWasStr;
+					}
+					break;
+				case "gender":
+					try {
+						keyErr = "Gender must be an integer";
+						int gender = Integer.parseInt(value);
+						keyErr = "Invalid gender value. Must be 0, 1 or 2";
+						responseStr += Constants.GENDER_LIST.contains(gender) ? "" : keyErr + endWasStr;
+					} catch (Exception e) {
+						responseStr += keyErr + endWasStr;
+					}
+					break;
+				case "privacy":
+					try {
+						keyErr = "Privacy must be an integer";
+						int privacy = Integer.parseInt(value);
+						keyErr = "Invalid privacy value or format. Must be either " + Constants.NODE_PRIVACY_LIST;
+						responseStr += Constants.NODE_PRIVACY_LIST.contains(privacy) ? "" : keyErr + endWasStr;
+					} catch (Exception e) {
+						responseStr += keyErr + endWasStr;
+					}
+					break;
+				case "treePrivacy":
+					try {
+						keyErr = "Tree Privacy must be an integer";
+						int treePrivacy = Integer.parseInt(value);
+						keyErr = "Invalid treePrivacy value or format. Must be either " + Constants.TREE_PRIVACY_LIST;
+						responseStr += Constants.TREE_PRIVACY_LIST.contains(treePrivacy) ? "" : keyErr + endWasStr;
+					} catch (Exception e) {
+						responseStr += keyErr + endWasStr;
+					}
+					break;
+				case "dateOfBirth":
+					try {
+						keyErr = "Invalid format of " + key;
+						LocalDate dateOfBirth = LocalDate.parse(value);
+						keyErr = key + "Invalid, must be in range : "
+								+ (mode == "USER" ? Constants.MIN_DATEOFBIRTH_USER : Constants.MIN_DATEOFBIRTH) + " -> "
+								+ (mode == "USER" ? Constants.MAX_DATEOFBIRTH_USER : Constants.MAX_DATEOFBIRTH);
+						responseStr += mode == "USER"
+								? (isDateOfBirthAcceptableForUser(dateOfBirth) ? "" : keyErr + endWasStr)
+								: (isDateOfBirthAcceptable(dateOfBirth) ? "" : keyErr + endWasStr);
+					} catch (Exception e) {
+						responseStr += keyErr + endWasStr;
+					}
+					break;
+				case "dateOfDeath":
+					try {
+						keyErr = "Invalid format of " + key + "\n";
+						LocalDate dateOfDeath = LocalDate.parse(value);
+						keyErr = key + "Invalid, must be before today.\n";
+						responseStr += dateOfDeath.isBefore(Misc.getLocalDateTime().toLocalDate()) ? ""
+								: keyErr + endWasStr;
+					} catch (Exception e) {
+						responseStr += keyErr + endWasStr;
+					}
+					break;
+				default:
+					break;
 				}
-				break;
-			case "hasChild":
-				try {
-					keyErr = "Has must must be a boolean";
-					boolean hasChild = Boolean.parseBoolean(value);
-				} catch (Exception e) {
-					responseStr += keyErr + endWasStr;
+				if (!prevResponseStr.equals(responseStr)) {
+					responseValue.add(key);
 				}
-				break;
-			case "gender":
-				try {
-					keyErr = "Gender must be an integer";
-					int gender = Integer.parseInt(value);
-					keyErr = "Invalid gender value. Must be 0, 1 or 2";
-					responseStr += Constants.GENDER_LIST.contains(gender) ? "" : keyErr + endWasStr;
-				} catch (Exception e) {
-					responseStr += keyErr + endWasStr;
-				}
-				break;
-			case "privacy":
-				try {
-					keyErr = "Privacy must be an integer";
-					int privacy = Integer.parseInt(value);
-					keyErr = "Invalid privacy value or format. Must be either " + Constants.NODE_PRIVACY_LIST;
-					responseStr += Constants.NODE_PRIVACY_LIST.contains(privacy) ? "" : keyErr + endWasStr;
-				} catch (Exception e) {
-					responseStr += keyErr + endWasStr;
-				}
-				break;
-			case "treePrivacy":
-				try {
-					keyErr = "Tree Privacy must be an integer";
-					int treePrivacy = Integer.parseInt(value);
-					keyErr = "Invalid treePrivacy value or format. Must be either " + Constants.TREE_PRIVACY_LIST;
-					responseStr += Constants.TREE_PRIVACY_LIST.contains(treePrivacy) ? "" : keyErr + endWasStr;
-				} catch (Exception e) {
-					responseStr += keyErr + endWasStr;
-				}
-				break;
-			case "dateOfBirth":
-				try {
-					keyErr = "Invalid format of " + key;
-					LocalDate dateOfBirth = LocalDate.parse(value);
-					keyErr = key + "Invalid, must be in range : "
-							+ (mode == "USER" ? Constants.MIN_DATEOFBIRTH_USER : Constants.MIN_DATEOFBIRTH) + " -> "
-							+ (mode == "USER" ? Constants.MAX_DATEOFBIRTH_USER : Constants.MAX_DATEOFBIRTH);
-					responseStr += mode == "USER"
-							? (isDateOfBirthAcceptableForUser(dateOfBirth) ? "" : keyErr + endWasStr)
-							: (isDateOfBirthAcceptable(dateOfBirth) ? "" : keyErr + endWasStr);
-				} catch (Exception e) {
-					responseStr += keyErr + endWasStr;
-				}
-				break;
-			case "dateOfDeath":
-				try {
-					keyErr = "Invalid format of " + key + "\n";
-					LocalDate dateOfDeath = LocalDate.parse(value);
-					keyErr = key + "Invalid, must be before today.\n";
-					responseStr += dateOfDeath.isBefore(Misc.getLocalDateTime().toLocalDate()) ? ""
-							: keyErr + endWasStr;
-				} catch (Exception e) {
-					responseStr += keyErr + endWasStr;
-				}
-				break;
-			default:
-				break;
 			}
-			if (!prevResponseStr.equals(responseStr)) {
-				responseValue.add(key);
-			}
+				
 		}
 		return responseStr.equals("") ? new Response(null, true) : new Response(responseValue, responseStr, false);
 	}
