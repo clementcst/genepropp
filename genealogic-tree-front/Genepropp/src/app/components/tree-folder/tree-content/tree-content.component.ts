@@ -21,6 +21,8 @@ import { LinkedHashMap } from '../linked-hashmap/linked-hashmap.component';
 export class TreeContentComponent {
   TempTreeFromDB: any ={};
   treeFromDB: any[] = [];
+
+  tabForSaveUnknowID: any[] = [];
   errorMessages: string[] = [];
 
   treeTab: any[] = [];
@@ -352,7 +354,7 @@ export class TreeContentComponent {
     ngOnInit() 
 
     {
-
+      
       this.isReadyToDisplay = true;
 
       //affectation de la relatednode dans l'instance myNodeID + affectation de treeID
@@ -367,13 +369,12 @@ export class TreeContentComponent {
           if(params['treeId']){
             this.myTreeId = params['treeId']
             this.isMyTree = false
-          }else{
-            
           }
         });
+        console.log("voici le treeid de celui qui va arriver : "+this.myTreeId)
 
         const tree = document.getElementById('tree');
-        console.log("Voici tis is ..."+this.isMyTree)
+        //console.log("Voici tis is ..."+this.isMyTree)
         if (tree) {
           let familyConfig: any = {
 
@@ -458,6 +459,12 @@ export class TreeContentComponent {
               console.log("FROM DB");
               console.log(this.treeFromDB)
 
+              //enleve les id qu'on ne connait pas + créer une liste pour les rajouter apres
+              console.log(this.getAllIds(this.treeFromDB))
+              this.createTabForSaveUnknowID(this.treeFromDB,this.getAllIds(this.treeFromDB))
+
+              console.log(this.tabForSaveUnknowID)
+
               //remplissage depuis la database
               this.treeFromDB.forEach((node: any) => {
                   let tempNode = {
@@ -490,6 +497,7 @@ export class TreeContentComponent {
                   this.treeTab.push(tempNode);   
               });
               //fin
+
               family.load(this.treeTab);
              this.isReadyToDisplay = false;
            });  
@@ -497,6 +505,58 @@ export class TreeContentComponent {
       });
     }//fin ng oninit
 
+
+      createTabForSaveUnknowID(tableauObjets: any[], tableauId: any[]) {
+    
+        tableauObjets.forEach(objet => {
+          // Vérifiez le champ parent1Id
+          objet.parent1Id = this.verifierRelation(objet.parent1Id, "parent1Id", objet.id,tableauId);
+          // Vérifiez le champ parent2Id
+          objet.parent2Id = this.verifierRelation(objet.parent2Id, "parent2Id", objet.id,tableauId );
+          // Vérifiez le champ partnerId
+          objet.partnerId =  this.verifierRelation(objet.partnerId, "partnerId",objet.id,tableauId );
+    
+          // Vérifiez le tableau exPartnersId[]
+          if (Array.isArray(objet.exPartnersId)) {
+            // @ts-ignore
+            objet.exPartnersId.forEach((exPartnerId, index) => {
+              objet.exPartnersId[index] = this.verifierRelation(exPartnerId, "exPartnersId", objet.id, tableauId);
+            });
+          }
+        });
+      }
+
+      AddUnknowIdIfNoChanges(tableauObjets: any[]) {
+        this.tabForSaveUnknowID.forEach(obj => {
+          //console.log("obj id : "+obj.id+" obj relation : "+obj.relation+" obj valeur :"+obj.valeur)
+          const objetTrouve = tableauObjets.find(temp => temp.id === obj.id.toString());
+          //console.log(objetTrouve)
+
+          if (objetTrouve[obj.relation]) {
+            // Mettre à jour la propriété dans le premier tableau avec la valeur du deuxième tableau
+            console.log("on met la jour la node "+obj.id+" la valeur de "+obj.relation+" a  "+obj.valeur)
+            objetTrouve[obj.relation] = obj.valeur.toString();
+         }
+        });
+      }
+      
+
+      getAllIds(tableauObjets: { id: number }[]): number[] {
+        return tableauObjets.map(objet => objet.id);
+      }
+    
+      verifierRelation(champ: number | null, nomRelation: string, idNode: number, tableauId: any[]): number | null {
+    
+        if (champ !== null && !tableauId.includes(champ)) {
+          this.tabForSaveUnknowID.push({ id: idNode, relation: nomRelation, valeur: champ });
+          //console.log("on push "+idNode+" relation "+nomRelation+" valeur"+champ);
+          return null;
+        }  
+        return champ;
+      }
+
+    
+    
 
     //fonction qui test les nodes pour Jordan + set les par défault, et remet en forme les champs pour le back
     validateNode(node: any): boolean {
@@ -623,6 +683,9 @@ export class TreeContentComponent {
           this.GetFirst(this.treeMergeForDB);
 
           this.treeMergeForDB = this.convertToStrings(this.treeMergeForDB);
+
+          console.log("Remet les valeur qui on été retiré car proviennet d'un autre arbe de cette node");
+          this.AddUnknowIdIfNoChanges(this.treeMergeForDB);
 
           console.log("Voici le tableau envoyé à la db");
           console.log(this.treeMergeForDB);
