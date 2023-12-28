@@ -21,9 +21,10 @@
     <div class="absolute bottom-10 left-0 m-4 p-2 items-center">
 
       <div class="flex flex-raw">
-        <button (click)="saveTree()" [disabled]="loading" class="bg-green-900 text-white rounded py-2 px-4 text-lg">
+        <button *ngIf="isMyTree" (click)="saveTree()" [disabled]="loading" class="bg-green-900 text-white rounded py-2 px-4 text-lg">
           SAVE YOUR TREE
         </button>
+        
   
         <div *ngIf="loading" class="ml-2">
           <!-- Indicateur de chargement, cercle qui tourne -->
