@@ -44,32 +44,7 @@ public class TreeController extends AbstractController {
 		tree.addAView();
 		treeService.updateTree(tree.getId(), tree);
 		return new Response("Success",true);
-	}
-	
-	@PutMapping("/updateNode")
-	public void updateNode(@RequestParam Long nodeId, @RequestParam Node node) {
-		nodeService.updateNode(nodeId, node);
-	}
-
-	@PutMapping("/addNode")
-	public Response addNode(@RequestParam Node node) {
-		nodeService.addNode(node);
-		node = nodeService.getNode(node.getId());
-		if (Objects.isNull(node)) {
-			return new Response("Fail to create node", false);
-		}
-		return new Response("Success", true);
-	}
-
-	@PutMapping("/addTree")
-	public Response addTree(@RequestParam Tree tree) {
-		treeService.addTree(tree);
-		tree = treeService.getTreeByName(tree.getName());
-		if (Objects.isNull(tree)) {
-			return new Response("Fail to create user's Tree: step 2 failed", false);
-		}
-		return new Response("Success", true);
-	}
+	}	
 
 	@SuppressWarnings("unchecked")
 	@PostMapping("/updateTree")
