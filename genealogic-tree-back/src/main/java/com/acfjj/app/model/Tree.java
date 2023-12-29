@@ -112,7 +112,7 @@ public class Tree {
 	public boolean isPublic() {
 		return this.getPrivacy() == Constants.TREE_PRIVACY_PUBLIC;
 	}
-	
+
 	public void setIsPublic(Boolean isPublic) {
 		if(isPublic) {
 			this.setPrivacy(Constants.TREE_PRIVACY_PUBLIC);
@@ -142,7 +142,7 @@ public class Tree {
 		setViewOfMonth(getViewOfMonth()+1);
 		setViewOfYear(getViewOfYear()+1);
 	}
-	
+
 	public void resetViewIfNec() {
 		LocalDate today = Misc.getLocalDateTime().toLocalDate();
 		if(today.getMonthValue() != this.getVOMresetDate().getMonthValue()) {

@@ -1,9 +1,11 @@
 package com.acfjj.app.controller;
 
+import org.apache.tomcat.util.bcel.classfile.Constant;
 import org.springframework.context.annotation.Scope;
 import org.springframework.web.bind.annotation.*;
 
 import com.acfjj.app.model.Node;
+import com.acfjj.app.model.PersonInfo;
 import com.acfjj.app.model.Tree;
 import com.acfjj.app.model.TreeNodes;
 import com.acfjj.app.model.User;
@@ -11,6 +13,9 @@ import com.acfjj.app.utils.Constants;
 import com.acfjj.app.utils.Misc;
 import com.acfjj.app.utils.Response;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,8 +44,8 @@ public class TreeController extends AbstractController {
 		tree.addAView();
 		treeService.updateTree(tree.getId(), tree);
 		return new Response("Success",true);
-	}
-	
+	}	
+
 	@SuppressWarnings("unchecked")
 	@PostMapping("/updateTree")
 	public Response updateTree(@RequestBody Map<String, Object> requestData, @RequestParam int userId,
@@ -83,17 +88,19 @@ public class TreeController extends AbstractController {
 				responseSuccess = false;
 			}
 		}
-
+		
 		// First Verifications
 		String firstVerifStr = firstVerifications(tree, UserId);
 		responseStr += firstVerifStr != "OK" ? firstVerifStr : "";
 		responseSuccess = firstVerifStr != "OK" ? false : responseSuccess;
 
-		// Init nodes relations (jcrois que c'est ça ?)
+		// Separation beteen existing nodes and node to add
+		// Init  unknownRelation => all links that will be used to add nodes
 		for (LinkedHashMap<String, String> node : tree) {
 			Long id = Misc.convertObjectToLong(node.get("id"));
 			User creator = userService.getUser(id >= 0 ? Misc.convertObjectToLong(node.get("createdById")) : UserId);
 			// securité creator not found
+
 			Node parent1 = getNodeIfNonNegative(Misc.convertObjectToLong(node.get("parent1Id")));
 			Node parent2 = getNodeIfNonNegative(Misc.convertObjectToLong(node.get("parent2Id")));
 			Node partner = getNodeIfNonNegative(Misc.convertObjectToLong(node.get("partnerId")));
@@ -114,7 +121,7 @@ public class TreeController extends AbstractController {
 				unknownRelation.put(id, allRelations);
 			}
 		}
-		
+
 		// Verify Permissions (Case DELETE and UPDATE)
 		for (Map.Entry<Long, String> nodeUpdate : updates.entrySet()) {
 			Long id = Misc.convertObjectToLong(nodeUpdate.getKey());
@@ -145,7 +152,7 @@ public class TreeController extends AbstractController {
 				}
 			}
 		}
-		// Post Check return if problem
+		//Post Check return if problem
 		if (!responseSuccess) {
 			return new Response(responseStr, responseSuccess);
 		}
@@ -192,7 +199,7 @@ public class TreeController extends AbstractController {
 			}
 		}
 
-		// True Process (me semble ?)
+		// True Process
 		for (Map.Entry<Long, String> newOrUpdatedNode : updates.entrySet()) {
 			Long id = Misc.convertObjectToLong(newOrUpdatedNode.getKey());
 			String key = newOrUpdatedNode.getValue();
@@ -210,7 +217,7 @@ public class TreeController extends AbstractController {
 				break;
 //					case "EXPARTNER":
 //						if(!existingNodes.get(id).getExPartnersId().isEmpty() && existingNodes.get(id).getPartnerId() < 0) {
-//							addLinkedNode(treeId, id, nodesToAdd.get(existingNodes.get(id).getPartnerId()), nodeToAdd.get(existingNodes.get(id).getPartnerId()).getPrivacy() ,"Partner",false);
+//							addLinkedNode(treeId, id, nodesToAdd.get(existingNodes.get(id).getPartnerId()), nodesToAdd.get(existingNodes.get(id).getPartnerId()).getPrivacy() ,"Partner",false);
 //							nodesToAdd.remove(nodeService.getNode(id).getPartnerId());
 //							existingNodes.put(nodeService.getNode(id).getPartnerId(), nodeService.getNode(id).getPartner());	
 //						}
@@ -235,7 +242,7 @@ public class TreeController extends AbstractController {
 
 		return new Response("Tree Updated successfully", true);
 	}
-
+	
 	public Response deleteTree(@RequestParam Long treeId) {
 		Tree tree = treeService.getTree(treeId);
 		for (Node node : tree.getNodes()) {
@@ -387,7 +394,6 @@ public class TreeController extends AbstractController {
 			// check if the node is already in the tree
 			if (nodeService.doesNodeBelongToTree(node.getId(), treeId)) {
 				return new Response("Cannot add a node in your tree that is already in your tree", false);
-			}
 			// If you have not created this node (always at this point, could be an else)
 			else if (!existingNode.getCreatedById().equals(userWhoWantsToCreate.getId())) {
 				User creator = existingNode.getCreatedBy();
@@ -413,7 +419,7 @@ public class TreeController extends AbstractController {
 						+ node.getFullNameAndBirthInfo()
 						+ ") as been found in the tree of another user. \nHere is the node. Is that the node you wanna create ?\n If so, click yes and a request to merge the other user tree will be sent. \nOtherwise click no, and change data in the Node or create it in private.",
 						true);
-			}
+				}
 		}
 		return new Response(null, true);
 	}
@@ -449,6 +455,7 @@ public class TreeController extends AbstractController {
 		return true;
 	}
 
+	@SuppressWarnings("null")
 	private String firstVerifications(List<LinkedHashMap<String, String>> tree, Long userConnectedId) {
 		String returnStr = "One or more logical problem has been found in your tree, so it has not been saved :\n";
 		Boolean thereIsAProb = false;
@@ -461,9 +468,13 @@ public class TreeController extends AbstractController {
 				LinkedHashMap<String, String> parent1;
 				LinkedHashMap<String, String> parent2;
 				if (node.containsKey("parent1Id") && !Objects.isNull(node.get("parent1Id"))) {
-//					Object parent = (Object) ;
+//					Object parent = (Object);
 					Long parent1Id = Misc.convertObjectToLong(node.get("parent1Id"));
 					parent1 = findNodeWithId(tree, parent1Id);
+					if(Objects.isNull(parent1)) {
+						parent1.put("dateOfBirth", nodeService.getNode(parent1Id).getDateOfBirth().toString());
+						parent1.put("dateOfDeath", null);
+					}
 					if (!Misc.parentIsOlder((String) parent1.get("dateOfBirth"), (String) node.get("dateOfBirth"))) {
 						returnStr += "\t- The node " + parent1.get("firstName") + " " + parent1.get("lastName")
 								+ " is too young to be " + node.get("firstName") + " " + node.get("lastName")
@@ -482,7 +493,10 @@ public class TreeController extends AbstractController {
 				if (node.containsKey("parent2Id") && !Objects.isNull(node.get("parent2Id"))) {
 					Long parent2Id = Misc.convertObjectToLong(node.get("parent2Id"));
 					parent2 = findNodeWithId(tree, parent2Id);
-
+					if(Objects.isNull(parent2)) {
+						parent2.put("dateOfBirth", nodeService.getNode(parent2Id).getDateOfBirth().toString());
+						parent2.put("dateOfDeath", null);
+					}
 					if (!Misc.parentIsOlder((String) parent2.get("dateOfBirth"), (String) node.get("dateOfBirth"))) {
 						returnStr += "\t- The node " + parent2.get("firstName") + " " + parent2.get("lastName")
 								+ " is too young to be " + node.get("firstName") + " " + node.get("lastName")

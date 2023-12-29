@@ -48,7 +48,7 @@ public class TestDataController extends AbstractController {
 		List<User> users = new ArrayList<User>(Arrays.asList(new User[] {
 				new User("Bourhara", "Adam", 1, LocalDate.of(2002, 04, 2), "France", "Cergy", "adam@mail", "password1",
 						"Sécurité socisse", "Telephone ui", "nationality", "adress", 1234, "profilPictureUrl"),
-				new User("Cassiet", "Clement", 1, LocalDate.of(1899, 07, 9), "Péîs", "Tournant-En-Brie", "clement@mail",
+				new User("Cassiet", "Clement", 1, LocalDate.of(2002, 07, 9), "Péîs", "Tournant-En-Brie", "clement@mail",
 						"password2", "Sécurité socisse", "Telephone ui", "nationality", "adress", 1234,
 						"profilPictureUrl"),
 				new User("Gautier", "Jordan", 1, LocalDate.of(2002, 11, 21), "Nouvelle-Zélande", "Paris Hilton",
@@ -89,18 +89,18 @@ public class TestDataController extends AbstractController {
 		responses.add(treeController.addLinkedNode(tree.getId(), siblings.getId(), parent1, 1, "Parent", false));
 		responses.add(treeController.addLinkedNode(tree.getId(), node.getId(), exPartner, 0, "ExPartner", false));
 
-		PersonInfo personInfo1 = new PersonInfo("Dupont", "Camille", 0, LocalDate.of(2002, 04, 2), "Pays", "Ville",
+		PersonInfo personInfo1 = new PersonInfo("Dupont", "Camille", 0, LocalDate.of(1950, 04, 2), "Pays", "Ville",
 				true, "Nationalité", "Adresse", 12345, "Base64Image");
 		Node newNode1 = new Node(null,personInfo1, userService.getUser(1), 1);
 		responses.add(treeController.addLinkedNode(tree.getId(), node.getId(), newNode1, 1, "Parent", false));
 		responses.add(treeController.addLinkedNode(tree.getId(), newNode1.getId(), parent1, 1, "Partner", true));
 		responses.add(treeController.addLinkedNode(tree.getId(), siblings.getId(), newNode1, 1, "Parent", true));
 
-		Node newNode2 = new Node(null,"Silva", "Rafael", 1, LocalDate.of(2002, 04, 2), "Pays", "Ville",
+		Node newNode2 = new Node(null,"Silva", "Rafael", 1, LocalDate.of(1900, 04, 2), "Pays", "Ville",
 				userService.getUser(1), 1, "Nationalité", "Adresse", 12345, "Base64Image");
 		responses.add(treeController.addLinkedNode(tree.getId(), newNode1.getId(), newNode2, 1, "Parent", false));
 
-		Node newNode3 = new Node(null,"Petrov", "Yuri", 1, LocalDate.of(2002, 04, 2), "Pays", "Ville",
+		Node newNode3 = new Node(null,"Petrov", "Yuri", 1, LocalDate.of(1950, 04, 2), "Pays", "Ville",
 				userService.getUser(1), 1, "Nationalité", "Adresse", 12345, "Base64Image");
 		responses.add(treeController.addLinkedNode(tree.getId(), newNode1.getId(), newNode3, 1, "Siblings", false));
 		responses.add(treeController.addLinkedNode(tree.getId(), newNode3.getId(), newNode2, 0, "Parent", true));

@@ -47,8 +47,9 @@ public class Constants {
 			"UPDATE", "DELETE", "EXPARTNER");
 	public static final List<String> POSSIBLE_NODE_ACTIONS_CREATION = Arrays.asList("PARENT", "PARTNER", "SIBLINGS",
 			"CHILD", "EXPARTNER");
-	
-	
+
+
+
 	public static final String SYSTEM_ADMIN_PRIVATE_CODE = "TheSystemAdmin";
 	public static final String SYSTEM_ADMIN_EMAIL = "system.admin.account@gmail.com";
 	@SuppressWarnings("serial")
@@ -57,7 +58,7 @@ public class Constants {
 			put("lastName", "System");
 			put("firstName", "Admin");
 			put("gender", "2");
-			put("dateOfBirth", "1905-01-01");
+			put("dateOfBirth", "1930-01-01");
 			put("countryOfBirth", "Wakanda");
 			put("cityOfBirth", "Bourg Palette");
 			put("email", SYSTEM_ADMIN_EMAIL);
