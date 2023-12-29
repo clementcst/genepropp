@@ -316,7 +316,21 @@ public class User {
 	public Long getRelatedNodeId() {
 		return Objects.isNull(getPersonInfo().getRelatedNode()) ? null : getPersonInfo().getRelatedNode().getId();
 	}
+	
+	public long getTreeSize() {
+		if(Objects.isNull(getMyTree())) {
+			return -1;
+		}
+		return getMyTree().getNodes().size();
+	}
 
+	public String getTreeName() {
+		if(Objects.isNull(getMyTree())) {
+			return null;
+		}
+		return getMyTree().getName();
+	}
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
