@@ -6,7 +6,10 @@
             <span class="text-xl font-semibold block mb-6">Profil : </span>
             <div class="flex items-center">
                 <div class="w-40 h-40 rounded mr-12">
-                    <img [src]="user.profilPictureUrl" alt="Default avatar" class="object-none object-scale-down">
+                    <img *ngIf="!loadingPicture" [src]="user.profilPictureUrl" alt="Default avatar" class="object-none object-scale-down w-full h-full">
+                    <div *ngIf="loadingPicture" class="ml-2">
+                        <div class="spinner red-spinner"></div>
+                    </div>
                 </div>
                 <app-profil-statbox *ngFor="let box of boxs" [box]="box">
                 </app-profil-statbox>
@@ -26,7 +29,7 @@
                 </button>
             </div>
 
-            <button type="button" *ngIf="!changePictureFormVisible"
+            <button type="button" *ngIf="!changePictureFormVisible" [disabled]="loadingPicture"
                 class="text-white bg-green-800 hover:bg-green-300 focus:ring-2 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm sm:w-auto px-5 py-2.5"
                 (click)="showChangePictureForm()">
                 Change Profile Picture
@@ -44,14 +47,14 @@
             <div class="flex">
                 <div class="flex items-center mr-4">
                     <input id="inline-radio-public" type="radio" name="node_visibility"
-                        class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300" [checked]="treeVisibilityControl.value === 1"
-                        (change)="updateTreeVisibility(1)">
+                        class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300"
+                        [checked]="treeVisibilityControl.value === 1" (change)="updateTreeVisibility(1)">
                     <label for="inline-radio-public" class="ml-2 text-sm font-medium">Public</label>
                 </div>
                 <div class="flex items-center mr-4">
                     <input id="inline-radio-private" type="radio" name="node_visibility"
-                        class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300" [checked]="treeVisibilityControl.value === 0"
-                        (change)="updateTreeVisibility(0)">
+                        class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300"
+                        [checked]="treeVisibilityControl.value === 0" (change)="updateTreeVisibility(0)">
                     <label for="inline-radio-private" class="ml-2 text-sm font-medium">Private</label>
                 </div>
             </div>
@@ -62,10 +65,13 @@
                 the Tree</a>
         </div>
         <div class="flex">
-            <button type="submit" (click)="logTreeVisibility()"
+            <button type="submit" (click)="logTreeVisibility()" [disabled]="loadingTree"
                 class="ml-10 text-white bg-green-800 hover:bg-green-300 focus:ring-2 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm sm:w-auto px-5 py-2.5">
                 Submit modifications
             </button>
+            <div *ngIf="loadingTree" class="ml-2">
+                <div class="spinner red-spinner"></div>
+            </div>
             <div *ngIf="showSuccessMessageTree" class="ml-2 relative message success-message">
                 {{ successMessageTree }}
             </div>

@@ -16,6 +16,7 @@ export class ProfilRigthComponent implements OnInit {
   successMessage: string = '';
   showFailedMessage: boolean = false;
   failedMessage: string = '';
+  loadingUser: boolean = false;
 
   constructor(private userService : UserService, private cookieService: CookieService) { 
     this.userService = userService;
@@ -57,6 +58,7 @@ export class ProfilRigthComponent implements OnInit {
   }
 
   onSubmitModification() {
+    this.loadingUser = true;
     const birthday = (document.getElementById('birthdayInput') as HTMLInputElement)?.value;
     const sexe = (document.querySelector('input[name="sexeInput"]:checked') as HTMLInputElement)?.value;
     const inputsData: any = {};
@@ -83,6 +85,7 @@ export class ProfilRigthComponent implements OnInit {
     }
     this.userService.updateUser(this.user.id, inputsData).subscribe(response => {
       if (response.success) {
+        this.loadingUser = false;
         this.successMessage = response.message || 'Modification successful.';
         this.showSuccessMessage = true;
         setTimeout(() => {
@@ -92,6 +95,7 @@ export class ProfilRigthComponent implements OnInit {
         this.showUserProfil();
       }
       else {
+        this.loadingUser = false;
         this.failedMessage = response.message || 'Modification failed.';
         this.showFailedMessage = true;
         setTimeout(() => {

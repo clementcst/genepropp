@@ -24,6 +24,8 @@ export class ProfilLeftComponent implements OnInit {
   successMessageTree: string = '';
   showFailedMessageTree: boolean = false;
   failedMessageTree: string = '';
+  loadingPicture: boolean = false;
+  loadingTree: boolean = false;
 
   constructor(private treeService : TreeService, private userService : UserService, private cookieService: CookieService) { 
     this.treeService = treeService;
@@ -62,10 +64,12 @@ export class ProfilLeftComponent implements OnInit {
   }
 
   submitPicture() {
+    this.loadingPicture = true;
     const inputsData: any = {};
     inputsData.profilPictureUrl = this.newPictureUrl;
     this.userService.updateUser(this.user.id, inputsData).subscribe(response => {
       if(response.success) {
+        this.loadingPicture = false;
         this.successMessage = response.message || 'Modification successful.';
         this.showSuccessMessage = true;
         this.newPictureUrl = '';
@@ -75,6 +79,7 @@ export class ProfilLeftComponent implements OnInit {
         this.showUserProfil()
       }
       else {
+        this.loadingPicture = false;
         this.failedMessage = response.message || 'Modification failed.';
         this.showFailedMessage = true;
         setTimeout(() => {
@@ -95,10 +100,12 @@ export class ProfilLeftComponent implements OnInit {
   }
 
   logTreeVisibility() {
+    this.loadingTree = true;
     const inputsData: any = {};
     inputsData.treePrivacy = this.treeVisibilityControl.value;
     this.userService.updateUser(this.user.id, inputsData).subscribe(response => {
       if(response.success) {
+        this.loadingTree = false;
         this.successMessageTree = response.message || 'Modification successful.';
         this.showSuccessMessageTree = true;
         setTimeout(() => {
@@ -107,6 +114,7 @@ export class ProfilLeftComponent implements OnInit {
         this.showUserProfil()
       }
       else {
+        this.loadingTree = false;
         this.failedMessageTree = response.message || 'Modification failed.';
         this.showFailedMessageTree = true;
         setTimeout(() => {
