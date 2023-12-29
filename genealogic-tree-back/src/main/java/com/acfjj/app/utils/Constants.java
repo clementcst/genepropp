@@ -28,17 +28,22 @@ public class Constants {
 	public static final int MAX_POSTAL_CODE = 99999;
 	public static final String DEFAULT_NO_PHONE = "+0000000000";
 	public static final String DEFAULT_NO_SECU = "1234567890123";
+	public static final String TEMPORARY_STR_MAKER = "BlorkBlorkTemporary3000&é&é&é&é&++}}";
 
 	public static final List<String> POSSIBLE_LHM_KEYS = Arrays.asList("lastName", "firstName", "gender", "dateOfBirth",
 			"countryOfBirth", "cityOfBirth", "email", "password", "noSecu", "noPhone", "nationality", "adress",
 			"postalCode", "profilPictureUrl", "dateOfDeath", "privacy", "treePrivacy", "id", "hasChild", "dead",
-			"parent1Id", "parent2Id", "partnerId", "exPartnersId", "createdById", "treesId", "treeId", "siblingsId", "orphan");
+			"parent1Id", "parent2Id", "partnerId", "exPartnersId", "createdById", "treesId", "treeId", "siblingsId",
+			"orphan");
 	public static final List<String> USER_LHM_REQUIRED_KEYS = Arrays.asList("lastName", "firstName", "gender",
 			"dateOfBirth", "countryOfBirth", "cityOfBirth", "email", "password");
 	public static final List<String> PROFIL_UPDATE_FORBIDDEN_KEYS = Arrays.asList("lastName", "firstName", "password");
 	public static final List<String> POSSIBLE_NODE_ACTIONS = Arrays.asList("PARENT", "PARTNER", "SIBLINGS", "CHILD",
 			"UPDATE", "DELETE", "EXPARTNER");
-
+	public static final List<String> POSSIBLE_NODE_ACTIONS_CREATION = Arrays.asList("PARENT", "PARTNER", "SIBLINGS",
+			"CHILD", "EXPARTNER");
+	
+	
 	public static final String SYSTEM_ADMIN_PRIVATE_CODE = "TheSystemAdmin";
 	public static final String SYSTEM_ADMIN_EMAIL = "system.admin.account@gmail.com";
 	@SuppressWarnings("serial")

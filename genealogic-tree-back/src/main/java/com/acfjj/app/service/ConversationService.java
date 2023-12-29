@@ -1,6 +1,7 @@
 package com.acfjj.app.service;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -65,7 +66,9 @@ public class ConversationService extends AbstractService {
     }
     
     public List<Message> getUserValidationsOfConcernedUser(User concernedUser, ValidationType validationType) {
-    	return messageRepository.findByConcernedUserIdAndValidationType(concernedUser.getId(), validationType);
+    	LinkedHashMap<String,Object> validationInfos = new LinkedHashMap<String, Object>();
+    	validationInfos.put("concernedUserId", concernedUser.getId());
+    	return messageRepository.findByValidationInfosAndValidationType(validationInfos, validationType);
     }
     
     public Message getMessage(Long msgId) {
