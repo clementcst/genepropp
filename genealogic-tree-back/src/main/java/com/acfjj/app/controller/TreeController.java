@@ -23,9 +23,24 @@ import java.util.Set;
 public class TreeController extends AbstractController {
 	@GetMapping("/tree")
 	public Response getTree(@RequestParam Long treeId) {
-		return new Response(treeService.getTree(treeId));
+		Tree tree = treeService.getTree(treeId);
+		if (Objects.isNull(tree)) {
+			return new Response("Tree not found", false);
+		}
+		return new Response(tree);
 	}
-
+	
+	@PostMapping("/tree/addView")
+	public Response addView(@RequestParam Long treeId) {
+		Tree tree = treeService.getTree(treeId);
+		if (Objects.isNull(tree)) {
+			return new Response("Tree not found", false);
+		}
+		tree.addAView();
+		treeService.updateTree(tree.getId(), tree);
+		return new Response("Success",true);
+	}
+	
 	@SuppressWarnings("unchecked")
 	@PostMapping("/updateTree")
 	public Response updateTree(@RequestBody Map<String, Object> requestData, @RequestParam int userId,
