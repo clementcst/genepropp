@@ -63,7 +63,7 @@ public class UserController extends AbstractController {
 			userService.updateUser(userId, user);
 			if(dataLHM.containsKey("treePrivacy")) {
 				Tree tree = user.getMyTree();
-				tree.setPrivacy(Integer.parseInt(dataLHM.get("treePrivacy")));
+				tree.setIsPublic(Boolean.parseBoolean(dataLHM.get("treePrivacy")));
 				treeService.updateTree(tree.getId(), tree);
 			}
 			return new Response("User profil updated successfully", true);

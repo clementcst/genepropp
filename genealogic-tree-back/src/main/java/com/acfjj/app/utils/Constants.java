@@ -15,8 +15,13 @@ public class Constants {
 	public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 			.withLocale(Locale.FRENCH);
 	public static final List<Integer> GENDER_LIST = new ArrayList<>(Arrays.asList(1, 2, 0));
-	public static final List<Integer> NODE_PRIVACY_LIST = new ArrayList<>(Arrays.asList(1, 2, 0));
-	public static final List<Integer> TREE_PRIVACY_LIST = new ArrayList<>(Arrays.asList(1, 0));
+	public static final int TREE_PRIVACY_PUBLIC = 0;
+	public static final int TREE_PRIVACY_PRIVATE = 1;
+	public static final int NODE_PRIVACY_PUBLIC = 2;
+	public static final int NODE_PRIVACY_RESTRICTED = 1;
+	public static final int NODE_PRIVACY_PRIVATE = 0;
+	public static final List<Integer> NODE_PRIVACY_LIST = new ArrayList<>(Arrays.asList(NODE_PRIVACY_PRIVATE, NODE_PRIVACY_PUBLIC, NODE_PRIVACY_RESTRICTED));
+	public static final List<Integer> TREE_PRIVACY_LIST = new ArrayList<>(Arrays.asList(TREE_PRIVACY_PUBLIC, TREE_PRIVACY_PRIVATE));
 	public static final int DEFAULT_GENDER = 2;
 	public static final LocalDate DEFAULT_DATEOFBIRTH = LocalDate.of(1900, 1, 1);
 	public static final LocalDate MIN_DATEOFBIRTH_USER = Misc.getLocalDateTime().toLocalDate().minusYears(120);
