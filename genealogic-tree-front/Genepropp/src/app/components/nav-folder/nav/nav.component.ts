@@ -1,11 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { UserService } from '../../../services/user/user.service';
+import { CookieService } from 'ngx-cookie-service';
 
 @Component({
   selector: 'app-nav',
   templateUrl: './nav.component.html',
   styleUrls: ['./nav.component.css']
 })
-export class NavComponent {
+export class NavComponent implements OnInit {
 
 
   pages=[
@@ -16,9 +18,17 @@ export class NavComponent {
     {link:"/profilPage", displayName:"Profil"},
     { link: "/", displayName: "Log out"}
   ]
+  user: any = {};
 
-  constructor() { }
+  constructor(private userService : UserService, private cookieService: CookieService) { 
+    this.userService = userService;
+    this.cookieService = cookieService;
+  }
 
-  ngOnInit() : void{ }
+  ngOnInit() : void{ 
+    this.userService.getUser(this.cookieService.get('userId')).subscribe((data) => {
+      this.user = data.value;
+    });
+  }
 
 }

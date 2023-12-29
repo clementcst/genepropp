@@ -20,6 +20,7 @@ export class LoginComponent implements OnInit{
   }
   authenticationError: boolean = false;
   errorMessage: string = '';
+  loading: boolean = false;
 
   constructor(
     private identificationService: IdentificationService,
@@ -32,17 +33,24 @@ export class LoginComponent implements OnInit{
   }
 
   onSubmit() {
+    this.loading = true;
     this.resetErrors();
     this.checkErrors();
-    if(this.errors.isdetected) return;
+    if(this.errors.isdetected) {
+      this.loading = false;
+      return;
+    }
 
     this.identificationService.loginattempt(this.data)
       .subscribe((response) => {
         if (response.success) {
+          this.loading = false;
           this.cookieService.set('userId', response.value);
+          this.cookieService.set('privateCode', "a faire");
           this.router.navigate(['homePage']);
         }
         else {
+          this.loading = false;
           this.authenticationError = true;
           this.errorMessage = response.message;
         }

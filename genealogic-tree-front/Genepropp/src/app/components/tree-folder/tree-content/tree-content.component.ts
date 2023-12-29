@@ -21,7 +21,6 @@ import { LinkedHashMap } from '../linked-hashmap/linked-hashmap.component';
 export class TreeContentComponent {
   TempTreeFromDB: any ={};
   treeFromDB: any[] = [];
-
   tabForSaveUnknowID: any[] = [];
   errorMessages: string[] = [];
 
@@ -31,7 +30,6 @@ export class TreeContentComponent {
   treeMergeForDB: any[] = [];
 
   isMyTree: boolean = true;
-
   linkedHashMap = new LinkedHashMap<number, string>();
   loading: boolean = false;
   isReadyToDisplay: boolean = false;
@@ -149,6 +147,75 @@ export class TreeContentComponent {
       node.parent1Id = node.mid;
       node.parent2Id = node.fid;
 
+    // Trouver les IDs qui sont dans le tableau1 mais pas dans le tableau2
+    const idsManquants = idsTableau1.filter(id => !idsTableau2.includes(id));
+
+    idsManquants.forEach(idManquant => {
+      this.linkedHashMap.putOrAdd(idManquant, "DELETE");
+      const indexElementCorrespondant = this.treeMergeForDB.findIndex(item => item.id === idManquant);
+    // Vérifier si l'élément a été trouvé
+      if (indexElementCorrespondant !== -1) {
+        // Supprimer l'élément du tableau this.treemergefromDB
+        this.treeMergeForDB.splice(indexElementCorrespondant, 1);
+      }
+    });
+  }
+
+
+  prependNumberToArray(number: number, array: number[] | null): number[] {
+    return array ? [number, ...array] : [number];
+  }
+
+  transformToPartnerArrays(pids: any[], divorced: any[] | null): { partner: any, exPartnerIds: any[] | null} {
+
+    if (pids == null || pids.length == 0) {
+      return { partner: null, exPartnerIds: null };
+    }
+
+    if (divorced == null) {
+      return { partner: pids[0], exPartnerIds: null };
+    }
+
+    let partner: any | null = null;
+    let exPartnerIds: any[] | null = [];
+
+    for (const pid of pids) {
+      if (!divorced.includes(pid)) {
+        if (partner == null) {
+          partner = pid;
+        } else {
+          exPartnerIds.push(pid);
+        }
+      } else {
+        exPartnerIds.push(pid);
+      }
+    }
+    return { partner, exPartnerIds };
+  }
+
+  updateTempTreeTabForMerge(Tab: any[]): any[] {
+    // Créer une copie indépendante du tableau d'origine
+    const tabCopy = this.deepCopy(Tab);
+  
+    tabCopy.forEach((node) => {
+      node.parent1Id = node.mid;
+      node.parent2Id = node.fid;
+
+  
+      const result = this.transformToPartnerArrays(node.pids, node.divorced);
+      node.partnerId = result.partner
+      node.exPartnersId = result.exPartnerIds
+  
+      delete node.fid;
+      delete node.mid;
+      delete node.pids;
+      delete node.tags;
+      delete node.divorced;
+      delete node.fullName;
+    });
+  
+    return tabCopy;
+  }
   
       const result = this.transformToPartnerArrays(node.pids, node.divorced);
       node.partnerId = result.partner
@@ -497,7 +564,6 @@ export class TreeContentComponent {
                   this.treeTab.push(tempNode);   
               });
               //fin
-
               family.load(this.treeTab);
              this.isReadyToDisplay = false;
            });  
@@ -557,7 +623,6 @@ export class TreeContentComponent {
 
     
     
-
     //fonction qui test les nodes pour Jordan + set les par défault, et remet en forme les champs pour le back
     validateNode(node: any): boolean {
       const requiredProperties = ['lastName', 'firstName', 'id', 'countryOfBirth', 'cityOfBirth', 'dateOfBirth'];
