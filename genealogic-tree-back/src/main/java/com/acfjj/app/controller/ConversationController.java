@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.acfjj.app.model.Conversation;
 import com.acfjj.app.model.Message;
+import com.acfjj.app.model.Node;
 import com.acfjj.app.model.User;
 import com.acfjj.app.utils.Constants;
 import com.acfjj.app.utils.Misc;
@@ -43,9 +44,9 @@ public class ConversationController extends AbstractController {
 		}
 		String successMsg = conversationService.addConversation(user1, user2);
 		Conversation newConv = user1.getConversationWith(user2);
-		if(!Objects.isNull(newConv)) {
+		if (!Objects.isNull(newConv)) {
 			return new Response(newConv.getId(), successMsg, true);
-		} 
+		}
 		return new Response("A failure occured during creation of the conversation.", false);
 	}
 
@@ -58,27 +59,61 @@ public class ConversationController extends AbstractController {
 			return new Response("User not found", false);
 		}
 		Conversation conversation = conversationService.getConversationOfUsers(sender, receiver);
-		if(Objects.isNull(conversation)) {
+		if (Objects.isNull(conversation)) {
 			return new Response("Conversation not found or doesn't exist.", false);
 		}
 		conversationService.addMessageToConversation(
-				new Message(sender, receiver, Misc.truncateString(content, Constants.MAX_LONG_STRING_LENGTH)), conversation);
+				new Message(sender, receiver, Misc.truncateString(content, Constants.MAX_LONG_STRING_LENGTH)),
+				conversation);
 		return new Response("Message successfully sent." + (content.length() > Constants.MAX_LONG_STRING_LENGTH
 				? " But message content was too long and has been truncated."
 				: ""), true);
 	}
 
 	public Response newValidationMessage(long senderId, long receiverId, ValidationType validationType,
-			User concernedUser) {
+			User concernedUser, Long baseNodeId, Long additionNodeId, Long relatedToNodeId, String relationType) {
 		User sender = userService.getUser(senderId);
 		User receiver = userService.getUser(receiverId);
 		if (Objects.isNull(sender) || Objects.isNull(receiver)) {
 			return new Response("User not found", false);
 		}
 		Conversation conversation = conversationService.getConversationOfUsers(sender, receiver);
-		conversationService.addMessageToConversation(new Message(sender, receiver, validationType, concernedUser),
-				conversation);
+
+		if (!Objects.isNull(concernedUser)) {
+			conversationService.addMessageToConversation(new Message(sender, receiver, validationType, concernedUser),
+					conversation);
+		} else if (!Objects.isNull(baseNodeId) && !Objects.isNull(additionNodeId) && !Objects.isNull(relatedToNodeId)
+				&& !Objects.isNull(relationType)) {
+			Node baseNode = nodeService.getNode(baseNodeId);
+			Node additionNode = nodeService.getNode(additionNodeId);
+			Node relatedToNode = nodeService.getNode(relatedToNodeId);
+			if (Objects.isNull(baseNode) || Objects.isNull(additionNode) || Objects.isNull(relatedToNode)) {
+				return new Response("One or more node id is invalid, nodes not found", false);
+			}
+			conversationService.addMessageToConversation(
+					new Message(sender, receiver, validationType, baseNode, additionNode, relatedToNode, relationType),
+					conversation);
+		}
 		return new Response("Success", true);
+	}
+
+	public Response newValidationMessage(long senderId, long receiverId, ValidationType validationType,
+			User concernedUser) {
+		return newValidationMessage(senderId, receiverId, validationType, concernedUser, null, null, null, null);
+	}
+
+	public Response newValidationMessage(long senderId, long receiverId, ValidationType validationType, Long baseNodeId,
+			Long additionNodeId, Long relatedToNodeId, String relationType) {
+		return newValidationMessage(senderId, receiverId, validationType, null, baseNodeId, additionNodeId,
+				relatedToNodeId, relationType);
+	}
+
+	@PostMapping("/validation/newTreeMergeValidation")
+	public Response newTreeMergeValidation(@RequestParam long senderId, @RequestParam long receiverId,
+			@RequestParam long baseNodeId, @RequestParam long additionNodeId, @RequestParam long relatedToNodeId,
+			@RequestParam String relationType) {
+		return newValidationMessage(senderId, receiverId, ValidationType.TREE_MERGE_VALIDATION, baseNodeId,
+				additionNodeId, relatedToNodeId, relationType);
 	}
 
 	@PostMapping("/validation/userValidation")
@@ -89,7 +124,8 @@ public class ConversationController extends AbstractController {
 			return new Response("Validation message not found or has already been validated", false);
 		}
 		User concernedUser = userService.getUser(concernedUserId);
-		if (Objects.isNull(concernedUser) || concernedUserId != validationMsg.getConcernedUserId()) {
+		if (Objects.isNull(concernedUser)
+				|| concernedUserId != (long) validationMsg.getValidationInfos().get("concernedUserId")) {
 			return new Response("Concerned user not found or mismatch", false);
 		}
 		User validator = userService.getUser(validatorId);
@@ -112,16 +148,17 @@ public class ConversationController extends AbstractController {
 		}
 		return new Response(successMsg, true);
 	}
-	
+
 	@PostMapping("/validation/treeMergeValidation")
 	public Response treeMergeValidation(@RequestParam long msgId, @RequestParam long requesterId,
-			@RequestParam long validatorId, @RequestParam Boolean userResponse) {
+			@RequestParam long validatorId, @RequestParam long baseNodeId, @RequestParam long additionNodeId,
+			@RequestParam long relatedToNodeId, @RequestParam String relationType, @RequestParam Boolean userResponse) {
 		Message validationMsg = conversationService.getMessage(msgId);
 		if (Objects.isNull(validationMsg) || !validationMsg.getIsValidation()) {
 			return new Response("Validation message not found or has already been validated", false);
 		}
 		User requester = userService.getUser(requesterId);
-		if (Objects.isNull(requester) || requesterId != validationMsg.getConcernedUserId()) {
+		if (Objects.isNull(requester) || requesterId != validationMsg.getSenderId()) {
 			return new Response("Requester user not found or mismatch", false);
 		}
 		User validator = userService.getUser(validatorId);
@@ -130,9 +167,23 @@ public class ConversationController extends AbstractController {
 		}
 		String successMsg = validationMsg.getValidationType().name() + " successfully "
 				+ (userResponse ? "validated and disable" : "disabled");
-		if (userResponse) {
-			//merge des tree ici
+		Node baseNode = nodeService.getNode(baseNodeId);
+		Node additionNode = nodeService.getNode(additionNodeId);
+		Node relatedToNode = nodeService.getNode(relatedToNodeId);
+		if (Objects.isNull(baseNode) || Objects.isNull(additionNode) || Objects.isNull(relatedToNode)) {
+			return new Response("One or more node id is invalid, nodes not found", false);
 		}
+		if (userResponse) {
+			additionNode.getPersonInfo()
+					.setCountryOfBirth(additionNode.getCountryOfBirth().replace(Constants.TEMPORARY_STR_MAKER, ""));
+			// merge des tree ici
+			// tous les parametre sont pret pr toi jourdan : 
+			// baseNode la node dans le tree de l'autre type (le receiver) 
+			//additionNode la node que le sender à essayer de creeer qui etait stocker en "caché" (ligne 177 la décache)
+			// additionNode à Merge dans baseNode
+			//relatedToNode et relationType Obvious, c'est pour finir la création de la node merged pour faire le merge tree
+		} 
+		//delete addition Node, help ici, jsp comment faire pour supprimer ça
 		conversationService.disableValidation(validationMsg, userResponse, validator);
 		return new Response(successMsg, true);
 	}
