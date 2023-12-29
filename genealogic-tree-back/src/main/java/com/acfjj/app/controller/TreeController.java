@@ -250,7 +250,9 @@ public class TreeController extends AbstractController {
 					node.getCountryOfBirth(), node.getCityOfBirth()) != null && node.getTrees().size() > 1) {
 				treeService.removeNodeFromTree(tree, node);
 			} else if (node.getTrees().size() == 1) {
-				return new Response("Nodes cannot be without tree, so you can't delete this tree", false);
+				return new Response(
+						"Nodes cannot be without tree, so you can't delete this tree, delete all node in the tree is required before",
+						false);
 			} else {
 				deleteNodeFromTree(node, treeId);
 			}
