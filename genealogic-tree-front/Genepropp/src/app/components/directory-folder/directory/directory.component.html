@@ -1,0 +1,7 @@
+<!-- directory.component.html -->
+<div class="w-[70vh] h-[85vh] bg-green-900 overflow-hidden">
+  <div class="h-full overflow-y-auto mx-4 my-4 ">
+    <!-- Boucle pour afficher les entrées de l'annuaire -->
+    <app-directory-element *ngFor="let user of users" [user]="user"></app-directory-element>
+  </div>
+</div>

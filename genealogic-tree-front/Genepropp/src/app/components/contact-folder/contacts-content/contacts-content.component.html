@@ -1,0 +1,6 @@
+<div class="w-full flex flex-col md:flex-row">
+  <app-contacts-chat [contact]="currentContact" class="w-full md:w-2/3"></app-contacts-chat>
+  <app-contacts #contactsComponent [contacts]="contactsForFront" (contactClick)="openChat($event)"
+    (createConversationClick)="createConversation()" (selectUserClick)="handleSelectUser($event)"
+    class="w-full md:w-1/3"></app-contacts>
+</div>
