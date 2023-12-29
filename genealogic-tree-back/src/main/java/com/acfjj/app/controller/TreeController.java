@@ -394,6 +394,7 @@ public class TreeController extends AbstractController {
 			// check if the node is already in the tree
 			if (nodeService.doesNodeBelongToTree(node.getId(), treeId)) {
 				return new Response("Cannot add a node in your tree that is already in your tree", false);
+			}
 			// If you have not created this node (always at this point, could be an else)
 			else if (!existingNode.getCreatedById().equals(userWhoWantsToCreate.getId())) {
 				User creator = existingNode.getCreatedBy();
