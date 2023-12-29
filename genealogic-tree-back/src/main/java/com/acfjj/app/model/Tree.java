@@ -110,7 +110,7 @@ public class Tree {
 
 	@JsonIgnore
 	public boolean isPublic() {
-			return this.getPrivacy() == Constants.TREE_PRIVACY_PUBLIC;
+		return this.getPrivacy() == Constants.TREE_PRIVACY_PUBLIC;
 	}
 
 	public void setIsPublic(Boolean isPublic) {
@@ -134,7 +134,6 @@ public class Tree {
 	}
 
 	public void setViewOfYear(long viewOfYear) {
-		
 		this.viewOfYear = viewOfYear;
 	}
 	
