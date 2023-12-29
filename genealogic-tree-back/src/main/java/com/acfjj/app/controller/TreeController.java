@@ -26,73 +26,26 @@ import java.util.Set;
 @CrossOrigin(origins = "${angular.app.url}")
 @Scope("singleton")
 public class TreeController extends AbstractController {
-	@GetMapping("/trees")
-	public Response getTrees() {
-		return new Response(treeService.getAllTrees());
-	}
-
 	@GetMapping("/tree")
 	public Response getTree(@RequestParam Long treeId) {
-		return new Response(treeService.getTree(treeId));
-	}
-
-	@DeleteMapping("/tree")
-	public Response deleteTree(@RequestParam Long treeId) {
 		Tree tree = treeService.getTree(treeId);
-		for (Node node : tree.getNodes()) {
-			if (userService.getUserByNameAndBirthInfo(node.getLastName(), node.getFirstName(), node.getDateOfBirth(),
-					node.getCountryOfBirth(), node.getCityOfBirth()) != null && node.getTrees().size() > 1) {
-				treeService.removeNodeFromTree(tree, node);
-			} else if (node.getTrees().size() == 1) {
-				return new Response("Nodes cannot be without tree, so you can't delete this tree", false);
-			} else {
-				deleteNodeFromTree(node, treeId);
-			}
+		if (Objects.isNull(tree)) {
+			return new Response("Tree not found", false);
 		}
-		treeService.deleteTree(treeId);
-		return new Response("Success", true);
+		return new Response(tree);
 	}
-
-	@GetMapping("/nodes")
-	public Response getNodes() {
-		return new Response(nodeService.getAllNodes());
-	}
-
-	@GetMapping("/node")
-	public Response getNode(@RequestParam Long nodeId) {
-		return new Response(nodeService.getNode(nodeId));
-	}
-
-	@DeleteMapping("/deletNode")
-	public Response deleteNode(@RequestParam Node node) {
-		Set<TreeNodes> treeNodes = node.getTreeNodes();
-		for (TreeNodes treeNode : treeNodes) {
-			nodeService.removeLinks(node.getId(), treeNode.getTree().getId());
-			nodeService.deleteNode(node.getId());
-			for (Node nodes : nodeService.getAllNodes()) {
-				if (nodes.isOrphan()) {
-					nodeService.deleteNode(nodes.getId());
-				}
-			}
-		}
-		if (!Objects.isNull(nodeService.getNode(node.getId()))) {
-			return new Response("The node has not been deleted, there is a problem", false);
-		}
-		return new Response("The node has been deleted", true);
-	}
-
-	@DeleteMapping("/deleteNode")
-	public Response deleteNodeFromTree(@RequestParam Node node, @RequestParam long treeId) {
-		Long nodeId = node.getId();
+	
+	@PostMapping("/tree/addView")
+	public Response addView(@RequestParam Long treeId) {
 		Tree tree = treeService.getTree(treeId);
-		treeService.removeNodeFromTree(tree, node);
-		node = nodeService.getNode(nodeId);
-		if (!Objects.isNull(node) && node.isOrphan()) {
-			return deleteNode(node);
+		if (Objects.isNull(tree)) {
+			return new Response("Tree not found", false);
 		}
-		return new Response("The node has been removed", true);
+		tree.addAView();
+		treeService.updateTree(tree.getId(), tree);
+		return new Response("Success",true);
 	}
-
+	
 	@PutMapping("/updateNode")
 	public void updateNode(@RequestParam Long nodeId, @RequestParam Node node) {
 		nodeService.updateNode(nodeId, node);
@@ -122,9 +75,14 @@ public class TreeController extends AbstractController {
 	@PostMapping("/updateTree")
 	public Response updateTree(@RequestBody Map<String, Object> requestData, @RequestParam int userId,
 			@RequestParam int treeId) {
-		//Init
+		// Init
 		Long UserId = (long) userId;
 		Long TreeId = (long) treeId;
+		
+		User user = userService.getUser(UserId);
+		if (Objects.isNull(user)) {
+			return new Response("User not found", false);
+		}
 
 		List<LinkedHashMap<String, String>> tree;
 		LinkedHashMap<Long, String> updates;
@@ -139,10 +97,10 @@ public class TreeController extends AbstractController {
 			return new Response("No change detected", false);
 		}
 		LinkedHashMap<Long, Node> existingNodes = new LinkedHashMap<Long, Node>();
-		LinkedHashMap<Long, Node> nodeToAdd = new LinkedHashMap<Long, Node>();
+		LinkedHashMap<Long, Node> nodesToAdd = new LinkedHashMap<Long, Node>();
 		LinkedHashMap<Long, String> unknownRelation = new LinkedHashMap<Long, String>();
 
-		//LHM Check
+		// LHM Check
 		String responseStr = "";
 		boolean responseSuccess = true;
 		for (LinkedHashMap<String, String> node : tree) {
@@ -150,7 +108,7 @@ public class TreeController extends AbstractController {
 			if (!LHMres.getSuccess()) {
 				responseStr += node.containsKey("lastName") && node.containsKey("firstName")
 						? "\n\nFormat problem found in node " + node.get("lastName") + " " + node.get("firstName")
-								+ LHMres.getMessage()  + "\n"
+								+ LHMres.getMessage() + "\n"
 						: "\n\nFormat problem found in node " + node.get("id") + LHMres.getMessage() + "\n";
 				responseSuccess = false;
 			}
@@ -161,12 +119,12 @@ public class TreeController extends AbstractController {
 		responseStr += firstVerifStr != "OK" ? firstVerifStr : "";
 		responseSuccess = firstVerifStr != "OK" ? false : responseSuccess;
 
-		//Séparation des nodes entre celles qui existent et celles à ajouter + init de unknownRelation qui permet de connaitre tous les liens suceptibles d'être utilisés
+		// Separation beteen existing nodes and node to add
+		// Init  unknownRelation => all links that will be used to add nodes
 		for (LinkedHashMap<String, String> node : tree) {
 			Long id = Misc.convertObjectToLong(node.get("id"));
-			// Init node check & process
 			User creator = userService.getUser(id >= 0 ? Misc.convertObjectToLong(node.get("createdById")) : UserId);
-			//securité creator not found
+			// securité creator not found
 
 			Node parent1 = getNodeIfNonNegative(Misc.convertObjectToLong(node.get("parent1Id")));
 			Node parent2 = getNodeIfNonNegative(Misc.convertObjectToLong(node.get("parent2Id")));
@@ -181,7 +139,7 @@ public class TreeController extends AbstractController {
 				}
 				existingNodes.put(id, Node.CastAsNode(node, creator, parent1, parent2, partner));
 			} else {
-				nodeToAdd.put(id, Node.CastAsNode(node, creator, null, null, null));
+				nodesToAdd.put(id, Node.CastAsNode(node, creator, null, null, null));
 				String allRelations = "Parent1." + Misc.convertObjectToLong(node.get("parent1Id")) + ".Parent2."
 						+ Misc.convertObjectToLong(node.get("parent2Id")) + ".Partner."
 						+ Misc.convertObjectToLong(node.get("partnerId"));
@@ -189,7 +147,7 @@ public class TreeController extends AbstractController {
 			}
 		}
 
-		// Verify Permissions
+		// Verify Permissions (Case DELETE and UPDATE)
 		for (Map.Entry<Long, String> nodeUpdate : updates.entrySet()) {
 			Long id = Misc.convertObjectToLong(nodeUpdate.getKey());
 			Node node = nodeService.getNode(id);
@@ -212,23 +170,57 @@ public class TreeController extends AbstractController {
 					responseSuccess = false;
 				}
 			} else {
-				if(nodeUpdate.getValue().equals("UPDATE") || nodeUpdate.getValue().equals("DELETE")) {
-					responseStr += "Cannot update or delete node with id " + id + " because it has not been found in databased\n";
+				if (nodeUpdate.getValue().equals("UPDATE") || nodeUpdate.getValue().equals("DELETE")) {
+					responseStr += "Cannot update or delete node with id " + id
+							+ " because it has not been found in databased\n";
 					responseSuccess = false;
 				}
 			}
 		}
 		//Post Check return if problem
-		if(!responseSuccess) {
+		if (!responseSuccess) {
 			return new Response(responseStr, responseSuccess);
 		}
-		
+
 		// Check all Actions Type are allowed
 		for (Map.Entry<Long, String> newOrUpdatedNode : updates.entrySet()) {
 			String key = newOrUpdatedNode.getValue();
 			if (!Constants.POSSIBLE_NODE_ACTIONS.contains(key)) {
 				return new Response("No Problem was found in the tree, but an action type has an incorrect value : "
-						+ key + " for entry " + newOrUpdatedNode.getKey() + " \nThat is not a normal error, pls contact support.", false);
+						+ key + " for entry " + newOrUpdatedNode.getKey()
+						+ " \nThat is not a normal error, pls contact support.", false);
+			}
+		}
+
+		// Node creation Backs and forths (Case CHILD, PARENT, PARTNER, EXPARTNER,SIBLINGS)
+		System.out.println(nodesToAdd);
+		System.out.println(updates);
+		System.out.println(unknownRelation);
+		for (Map.Entry<Long, String> newOrUpdatedNode : updates.entrySet()) {
+			String key = newOrUpdatedNode.getValue();
+			if (Constants.POSSIBLE_NODE_ACTIONS_CREATION.contains(key)) {
+				long id = Misc.convertObjectToLong(newOrUpdatedNode.getKey());
+				//recherche de la node à ajouter 
+//				switch (key.toUpperCase()) {
+//				case "PARENT":
+//					break;
+//				case "PARTNER":
+//					break;
+//				case "SIBLINGS":
+//					break;
+//				case "EXPARTNER":
+//					break;
+//				case "CHILD":
+//					break;
+//				default:
+//					return new Response("Incorrect Parameter update " + key, false);
+//				}
+//				Node nodeToAdd = null;
+//				System.out.println(key + " " + id);
+//				Response BaFRes = preProcessNodeInTreeCreation(nodeToAdd, treeId, user, null /*à changer avec relatednode*/,key);
+//				if(!BaFRes.getSuccess() || (BaFRes.getSuccess() && !Objects.isNull(BaFRes.getValue()))) {
+//					return BaFRes;
+//				}
 			}
 		}
 
@@ -236,31 +228,27 @@ public class TreeController extends AbstractController {
 		for (Map.Entry<Long, String> newOrUpdatedNode : updates.entrySet()) {
 			Long id = Misc.convertObjectToLong(newOrUpdatedNode.getKey());
 			String key = newOrUpdatedNode.getValue();
-			String[] child = null;
-
-			if (!Objects.isNull(unknownRelation.get(id))) {
-				child = unknownRelation.get(id).split("\\.");
-			}
+			String[] child = Objects.isNull(unknownRelation.get(id)) ? null : unknownRelation.get(id).split("\\.");
 
 			switch (key.toUpperCase()) {
 			case "PARENT":
-				addParentRelations(id, TreeId, child, nodeToAdd, existingNodes, unknownRelation, updates);
+				addParentRelations(id, TreeId, child, nodesToAdd, existingNodes, unknownRelation, updates);
 				break;
 			case "PARTNER":
-				addPartnerRelations(id, TreeId, child, nodeToAdd, existingNodes, unknownRelation, updates);
+				addPartnerRelations(id, TreeId, child, nodesToAdd, existingNodes, unknownRelation, updates);
 				break;
 			case "SIBLINGS":
 				// Useless ATM, so not implemented
 				break;
 //					case "EXPARTNER":
 //						if(!existingNodes.get(id).getExPartnersId().isEmpty() && existingNodes.get(id).getPartnerId() < 0) {
-//							addLinkedNode(treeId, id, nodeToAdd.get(existingNodes.get(id).getPartnerId()), nodeToAdd.get(existingNodes.get(id).getPartnerId()).getPrivacy() ,"Partner",false);
-//							nodeToAdd.remove(nodeService.getNode(id).getPartnerId());
+//							addLinkedNode(treeId, id, nodesToAdd.get(existingNodes.get(id).getPartnerId()), nodesToAdd.get(existingNodes.get(id).getPartnerId()).getPrivacy() ,"Partner",false);
+//							nodesToAdd.remove(nodeService.getNode(id).getPartnerId());
 //							existingNodes.put(nodeService.getNode(id).getPartnerId(), nodeService.getNode(id).getPartner());	
 //						}
 //						break;
 			case "CHILD":
-				addChildRelations(id, TreeId, child, nodeToAdd, existingNodes, unknownRelation, updates);
+				addChildRelations(id, TreeId, child, nodesToAdd, existingNodes, unknownRelation, updates);
 				break;
 			case "UPDATE":
 				nodeService.updateWithoutRelation(id, existingNodes.get(id));
@@ -273,14 +261,87 @@ public class TreeController extends AbstractController {
 			}
 		}
 
-		if (!nodeToAdd.isEmpty()) {
+		if (!nodesToAdd.isEmpty()) {
 			return new Response("Something went wrong", false);
 		}
 
 		return new Response("Tree Updated successfully", true);
 	}
+	
+	public Response deleteTree(@RequestParam Long treeId) {
+		Tree tree = treeService.getTree(treeId);
+		for (Node node : tree.getNodes()) {
+			if (userService.getUserByNameAndBirthInfo(node.getLastName(), node.getFirstName(), node.getDateOfBirth(),
+					node.getCountryOfBirth(), node.getCityOfBirth()) != null && node.getTrees().size() > 1) {
+				treeService.removeNodeFromTree(tree, node);
+			} else if (node.getTrees().size() == 1) {
+				return new Response("Nodes cannot be without tree, so you can't delete this tree", false);
+			} else {
+				deleteNodeFromTree(node, treeId);
+			}
+		}
+		treeService.deleteTree(treeId);
+		return new Response("Success", true);
+	}
 
-	@PutMapping("/node/addNodeWithLink")
+	public Response getNodes() {
+		return new Response(nodeService.getAllNodes());
+	}
+
+	public Response getNode(@RequestParam Long nodeId) {
+		return new Response(nodeService.getNode(nodeId));
+	}
+
+	public Response deleteNode(@RequestParam Node node) {
+		Set<TreeNodes> treeNodes = node.getTreeNodes();
+		for (TreeNodes treeNode : treeNodes) {
+			nodeService.removeLinks(node.getId(), treeNode.getTree().getId());
+			nodeService.deleteNode(node.getId());
+			for (Node nodes : nodeService.getAllNodes()) {
+				if (nodes.isOrphan()) {
+					nodeService.deleteNode(nodes.getId());
+				}
+			}
+		}
+		if (!Objects.isNull(nodeService.getNode(node.getId()))) {
+			return new Response("The node has not been deleted, there is a problem", false);
+		}
+		return new Response("The node has been deleted", true);
+	}
+
+	public Response deleteNodeFromTree(@RequestParam Node node, @RequestParam long treeId) {
+		Long nodeId = node.getId();
+		Tree tree = treeService.getTree(treeId);
+		treeService.removeNodeFromTree(tree, node);
+		node = nodeService.getNode(nodeId);
+		if (!Objects.isNull(node) && node.isOrphan()) {
+			return deleteNode(node);
+		}
+		return new Response("The node has been removed", true);
+	}
+
+	public void updateNode(@RequestParam Long nodeId, @RequestParam Node node) {
+		nodeService.updateNode(nodeId, node);
+	}
+
+	public Response addNode(@RequestParam Node node) {
+		nodeService.addNode(node);
+		node = nodeService.getNode(node.getId());
+		if (Objects.isNull(node)) {
+			return new Response("Fail to create node", false);
+		}
+		return new Response("Success", true);
+	}
+
+	public Response addTree(@RequestParam Tree tree) {
+		treeService.addTree(tree);
+		tree = treeService.getTreeByName(tree.getName());
+		if (Objects.isNull(tree)) {
+			return new Response("Fail to create user's Tree: step 2 failed", false);
+		}
+		return new Response("Success", true);
+	}
+
 	public Response addLinkedNode(@RequestParam Long treeId, @RequestParam long linkedNodeId,
 			@RequestParam Node nodeToAdd, @RequestParam int privacy, @RequestParam String type,
 			@RequestParam boolean alreadyInTree) {
@@ -344,59 +405,46 @@ public class TreeController extends AbstractController {
 
 	// faire les remove links
 
-	public boolean canCreateNodeInTree(Node node, Long treeId,
-			@RequestParam(required = false, defaultValue = "0") Boolean userResponse) {
-		if (nodeService.getNode(node.getId()) != null) {
-			if (userService.getUserByNameAndBirthInfo(node.getLastName(), node.getFirstName(), node.getDateOfBirth(),
-					node.getCountryOfBirth(), node.getCityOfBirth()) != null) {
-//    			if(C est bien lui ?){
-//	    		    if(V1)
-//	    			message à l'autre gars pour qu'il accepte de rejoindre ton arbre
-//	    				return false;
-//	    		    else if V2{
-//	    				if(le user accepte d'aller dans ton arbre){
-//	    					return true;
-//	    			    }
-//	    				else { // il accepte pas
-//	    					if(veux créer en PV){
-//	    						créer lien en PV
-//	    					} else {
-//	    							abandon, on va rien faire
-//	    					  }	
-//	    			
-//	    		        }
-//	    		    }
-//    		    } else if(bonnes infos){
-//    					
-//    				} else {
-//    						restart le process
-//    					}
-			}
-			if (nodeService.doesNodeBelongToTree(node.getId(), treeId) == true) {
-//    			message user already in tree
-				return false;
-			} else {
-//    			Montrer arbre de la node que tu veux ajouter, bien lui ?{
-//    				if(lier vos arbres ?) {
-//    					V1
-//    						Message au créateur pour savoir s'il est ok
-//    					V2
-//    						S'il est ok {
-//    							Lier les arbres
-//    						} else{
-//    							Créer en PV, oui non ?
-//    						}
-//    				}
-//    					Créer en pv ? oui, non
-//    			}
-//    				if(Bonnes infos){
-//    					Créer en pv ? oui, non
-//    				} else {
-//    					abandon
-//    				}    			
-			}
+	public Response preProcessNodeInTreeCreation(Node node, long treeId, User userWhoWantsToCreate, Node relatedToNode,
+			String relationType) {
+		if (!node.isPublic()) { // If the node want to be created in private ok
+			return new Response(null, true);
 		}
-		return true;
+		Node existingNode = nodeService.getNodeByNameAndBirthInfo(node.getLastName(), node.getFirstName(),
+				node.getDateOfBirth(), node.getCountryOfBirth(), node.getCityOfBirth());
+		// If an existing Node has been found
+		if (!Objects.isNull(existingNode) && existingNode.isPublic()) {
+			// check if the node is already in the tree
+			if (nodeService.doesNodeBelongToTree(node.getId(), treeId)) {
+				return new Response("Cannot add a node in your tree that is already in your tree", false);
+			// If you have not created this node (always at this point, could be an else)
+			else if (!existingNode.getCreatedById().equals(userWhoWantsToCreate.getId())) {
+				User creator = existingNode.getCreatedBy();
+				// make the node temporary (invisible to user) and store it in db
+				String temporaryCountryOfBirth = node.getCountryOfBirth() + Constants.TEMPORARY_STR_MAKER;
+				node.getPersonInfo().setCountryOfBirth(temporaryCountryOfBirth);
+				Response tmpNodeCreatRes = addNode(node);
+				if (!tmpNodeCreatRes.getSuccess()) {
+					return tmpNodeCreatRes;
+				}
+				node = nodeService.getNodeByNameAndBirthInfo(node.getLastName(), node.getFirstName(),
+						node.getDateOfBirth(), temporaryCountryOfBirth, node.getCityOfBirth());
+				// response Preparation
+				LinkedHashMap<String, Object> resValue = new LinkedHashMap<String, Object>();
+				resValue.put("specialSuccess", true);
+				resValue.put("nodeToShow", existingNode);
+				String requestYes = "/conversation/validation/newTreeMergeValidation?senderId="
+						+ userWhoWantsToCreate.getId() + "&receiverId=" + creator.getId() + "&baseNodeId="
+						+ existingNode.getId() + "&additionNodeId=" + node.getId() + "&relatedNodeId="
+						+ relatedToNode.getId() + "&relationType=" + relationType;
+				resValue.put("requestYes", requestYes);
+				return new Response(resValue, "A node similar as the one that you want to create ("
+						+ node.getFullNameAndBirthInfo()
+						+ ") as been found in the tree of another user. \nHere is the node. Is that the node you wanna create ?\n If so, click yes and a request to merge the other user tree will be sent. \nOtherwise click no, and change data in the Node or create it in private.",
+						true);
+				}
+		}
+		return new Response(null, true);
 	}
 
 //    faire les sécurités des links
