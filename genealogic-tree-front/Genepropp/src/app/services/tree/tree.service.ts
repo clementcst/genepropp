@@ -43,6 +43,6 @@ export class TreeService {
 
   addView(id: string):Observable<TreeResponce> {
     console.log("j'ajoute +1 à l'arbre"+id)
-    return this.http.get<TreeResponce>(`http://localhost:8080/tree/addView?treeId=${id}`,{responseType: 'json'});
+    return this.http.post<TreeResponce>(`http://localhost:8080/tree/addView?treeId=${id}`,{responseType: 'json'});
   }
 }
