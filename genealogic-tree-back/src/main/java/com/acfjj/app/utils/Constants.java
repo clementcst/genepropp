@@ -28,7 +28,7 @@ public class Constants {
 	public static final LocalDate MAX_DATEOFBIRTH_USER = Misc.getLocalDateTime().toLocalDate().minusYears(18);
 	public static final LocalDate MIN_DATEOFBIRTH = Misc.getLocalDateTime().toLocalDate().minusYears(2000);
 	public static final LocalDate MAX_DATEOFBIRTH = Misc.getLocalDateTime().toLocalDate();
-	public static final int DEFAULT_POSTAL_CODE = 99999;
+	public static final int DEFAULT_POSTAL_CODE = -99999;
 	public static final int MIN_POSTAL_CODE = 00000;
 	public static final int MAX_POSTAL_CODE = 99999;
 	public static final String DEFAULT_NO_PHONE = "+0000000000";
