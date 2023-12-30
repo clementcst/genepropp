@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { TreeService } from '../../../services/tree/tree.service';
 import { UserService } from '../../../services/user/user.service';
+import { CookieManagementService } from '../../../services/cookies/cookie.service';
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
@@ -27,7 +28,7 @@ export class ProfilLeftComponent implements OnInit {
   loadingPicture: boolean = false;
   loadingTree: boolean = false;
 
-  constructor(private treeService : TreeService, private userService : UserService, private cookieService: CookieService) { 
+  constructor(private treeService : TreeService, private userService : UserService, private cookieService: CookieService, private cookieManagementService: CookieManagementService) { 
     this.treeService = treeService;
     this.cookieService = cookieService;
     this.userService = userService;
@@ -76,7 +77,8 @@ export class ProfilLeftComponent implements OnInit {
         setTimeout(() => {
           this.showSuccessMessage = false;
         }, 3000);
-        this.showUserProfil()
+        this.user.profilPictureUrl = inputsData.profilPictureUrl
+        this.cookieManagementService.savePPUrl(this.user.profilPictureUrl);
       }
       else {
         this.loadingPicture = false;
