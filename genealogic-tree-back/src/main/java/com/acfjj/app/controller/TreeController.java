@@ -1,11 +1,9 @@
 package com.acfjj.app.controller;
 
-import org.apache.tomcat.util.bcel.classfile.Constant;
 import org.springframework.context.annotation.Scope;
 import org.springframework.web.bind.annotation.*;
 
 import com.acfjj.app.model.Node;
-import com.acfjj.app.model.PersonInfo;
 import com.acfjj.app.model.Tree;
 import com.acfjj.app.model.TreeNodes;
 import com.acfjj.app.model.User;
@@ -13,9 +11,6 @@ import com.acfjj.app.utils.Constants;
 import com.acfjj.app.utils.Misc;
 import com.acfjj.app.utils.Response;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +29,7 @@ public class TreeController extends AbstractController {
 		}
 		return new Response(tree);
 	}
-	
+
 	@PostMapping("/tree/addView")
 	public Response addView(@RequestParam Long treeId) {
 		Tree tree = treeService.getTree(treeId);
@@ -43,8 +38,8 @@ public class TreeController extends AbstractController {
 		}
 		tree.addAView();
 		treeService.updateTree(tree.getId(), tree);
-		return new Response("Success",true);
-	}	
+		return new Response("Success", true);
+	}
 
 	@SuppressWarnings("unchecked")
 	@PostMapping("/updateTree")
@@ -53,7 +48,7 @@ public class TreeController extends AbstractController {
 		// Init
 		Long UserId = (long) userId;
 		Long TreeId = (long) treeId;
-		
+
 		User user = userService.getUser(UserId);
 		if (Objects.isNull(user)) {
 			return new Response("User not found", false);
@@ -88,14 +83,14 @@ public class TreeController extends AbstractController {
 				responseSuccess = false;
 			}
 		}
-		
+
 		// First Verifications
 		String firstVerifStr = firstVerifications(tree, UserId);
 		responseStr += firstVerifStr != "OK" ? firstVerifStr : "";
 		responseSuccess = firstVerifStr != "OK" ? false : responseSuccess;
 
 		// Separation beteen existing nodes and node to add
-		// Init  unknownRelation => all links that will be used to add nodes
+		// Init unknownRelation => all links that will be used to add nodes
 		for (LinkedHashMap<String, String> node : tree) {
 			Long id = Misc.convertObjectToLong(node.get("id"));
 			User creator = userService.getUser(id >= 0 ? Misc.convertObjectToLong(node.get("createdById")) : UserId);
@@ -152,7 +147,7 @@ public class TreeController extends AbstractController {
 				}
 			}
 		}
-		//Post Check return if problem
+		// Post Check return if problem
 		if (!responseSuccess) {
 			return new Response(responseStr, responseSuccess);
 		}
@@ -167,82 +162,56 @@ public class TreeController extends AbstractController {
 			}
 		}
 
-		// Node creation Backs and forths (Case CHILD, PARENT, PARTNER, EXPARTNER,SIBLINGS)
-		System.out.println(nodesToAdd);
-		System.out.println(updates);
-		System.out.println(unknownRelation);
-		for (Map.Entry<Long, String> newOrUpdatedNode : updates.entrySet()) {
-			String key = newOrUpdatedNode.getValue();
-			if (Constants.POSSIBLE_NODE_ACTIONS_CREATION.contains(key)) {
-				long id = Misc.convertObjectToLong(newOrUpdatedNode.getKey());
-				//recherche de la node à ajouter 
-//				switch (key.toUpperCase()) {
-//				case "PARENT":
-//					break;
-//				case "PARTNER":
-//					break;
-//				case "SIBLINGS":
-//					break;
-//				case "EXPARTNER":
-//					break;
-//				case "CHILD":
-//					break;
-//				default:
-//					return new Response("Incorrect Parameter update " + key, false);
-//				}
-//				Node nodeToAdd = null;
-//				System.out.println(key + " " + id);
-//				Response BaFRes = preProcessNodeInTreeCreation(nodeToAdd, treeId, user, null /*à changer avec relatednode*/,key);
-//				if(!BaFRes.getSuccess() || (BaFRes.getSuccess() && !Objects.isNull(BaFRes.getValue()))) {
-//					return BaFRes;
-//				}
-			}
-		}
+		// parcours update, si child et node d'après est partner du parent, inverser la
+		// création
 
 		// True Process
 		for (Map.Entry<Long, String> newOrUpdatedNode : updates.entrySet()) {
 			Long id = Misc.convertObjectToLong(newOrUpdatedNode.getKey());
 			String key = newOrUpdatedNode.getValue();
-			String[] child = Objects.isNull(unknownRelation.get(id)) ? null : unknownRelation.get(id).split("\\.");
-
-			switch (key.toUpperCase()) {
-			case "PARENT":
-				addParentRelations(id, TreeId, child, nodesToAdd, existingNodes, unknownRelation, updates);
-				break;
-			case "PARTNER":
-				addPartnerRelations(id, TreeId, child, nodesToAdd, existingNodes, unknownRelation, updates);
-				break;
-			case "SIBLINGS":
-				// Useless ATM, so not implemented
-				break;
-//					case "EXPARTNER":
-//						if(!existingNodes.get(id).getExPartnersId().isEmpty() && existingNodes.get(id).getPartnerId() < 0) {
-//							addLinkedNode(treeId, id, nodesToAdd.get(existingNodes.get(id).getPartnerId()), nodesToAdd.get(existingNodes.get(id).getPartnerId()).getPrivacy() ,"Partner",false);
-//							nodesToAdd.remove(nodeService.getNode(id).getPartnerId());
-//							existingNodes.put(nodeService.getNode(id).getPartnerId(), nodeService.getNode(id).getPartner());	
-//						}
-//						break;
-			case "CHILD":
-				addChildRelations(id, TreeId, child, nodesToAdd, existingNodes, unknownRelation, updates);
-				break;
-			case "UPDATE":
-				nodeService.updateWithoutRelation(id, existingNodes.get(id));
-				break;
-			case "DELETE":
-				deleteNodeFromTree(nodeService.getNode(id), TreeId);
-				break;
-			default:
-				return new Response("Incorrect Parameter update " + key, false);
+			if (Constants.POSSIBLE_NODE_ACTIONS_CREATION.contains(key)) {
+				String[] relatedToNodes = Objects.isNull(unknownRelation.get(id)) ? null
+						: unknownRelation.get(id).split("\\.");
+				Response BaFRes = sendPreProcessNodeInTreeCreation(key, id, TreeId, user, relatedToNodes, nodesToAdd,
+						existingNodes, unknownRelation);
+				if (!BaFRes.getSuccess() || (BaFRes.getSuccess() && !Objects.isNull(BaFRes.getValue()))) {
+					return BaFRes;
+				}
+				switch (key.toUpperCase()) {
+				case "PARENT":
+					addParentRelations(id, TreeId, relatedToNodes, nodesToAdd, existingNodes, unknownRelation, updates);
+					break;
+				case "PARTNER":
+					addPartnerRelations(id, TreeId, relatedToNodes, nodesToAdd, existingNodes, unknownRelation,
+							updates);
+					break;
+				case "SIBLINGS":
+					// Useless ATM, so not implemented
+					break;
+				case "EXPARTNER":
+					// Useless ATM, so not implemented
+					break;
+				case "CHILD":
+					addChildRelations(id, TreeId, relatedToNodes, nodesToAdd, existingNodes, unknownRelation, updates);
+					break;
+				case "UPDATE":
+					nodeService.updateWithoutRelation(id, existingNodes.get(id));
+					break;
+				case "DELETE":
+					deleteNodeFromTree(nodeService.getNode(id), TreeId);
+					break;
+				default:
+					return new Response("Incorrect Parameter update " + key, false);
+				}
 			}
 		}
 
 		if (!nodesToAdd.isEmpty()) {
 			return new Response("Something went wrong", false);
 		}
-
 		return new Response("Tree Updated successfully", true);
 	}
-	
+
 	public Response deleteTree(@RequestParam Long treeId) {
 		Tree tree = treeService.getTree(treeId);
 		for (Node node : tree.getNodes()) {
@@ -420,8 +389,9 @@ public class TreeController extends AbstractController {
 						+ node.getFullNameAndBirthInfo()
 						+ ") as been found in the tree of another user. \nHere is the node. Is that the node you wanna create ?\n If so, click yes and a request to merge the other user tree will be sent. \nOtherwise click no, and change data in the Node or create it in private.",
 						true);
-				}
+			}
 		}
+
 		return new Response(null, true);
 	}
 
@@ -472,7 +442,7 @@ public class TreeController extends AbstractController {
 //					Object parent = (Object);
 					Long parent1Id = Misc.convertObjectToLong(node.get("parent1Id"));
 					parent1 = findNodeWithId(tree, parent1Id);
-					if(Objects.isNull(parent1)) {
+					if (Objects.isNull(parent1)) {
 						parent1.put("dateOfBirth", nodeService.getNode(parent1Id).getDateOfBirth().toString());
 						parent1.put("dateOfDeath", null);
 					}
@@ -494,7 +464,7 @@ public class TreeController extends AbstractController {
 				if (node.containsKey("parent2Id") && !Objects.isNull(node.get("parent2Id"))) {
 					Long parent2Id = Misc.convertObjectToLong(node.get("parent2Id"));
 					parent2 = findNodeWithId(tree, parent2Id);
-					if(Objects.isNull(parent2)) {
+					if (Objects.isNull(parent2)) {
 						parent2.put("dateOfBirth", nodeService.getNode(parent2Id).getDateOfBirth().toString());
 						parent2.put("dateOfDeath", null);
 					}
@@ -562,68 +532,70 @@ public class TreeController extends AbstractController {
 		return newUpdates;
 	}
 
-	private void addParentRelations(Long id, Long TreeId, String[] child, LinkedHashMap<Long, Node> nodeToAdd,
+	private void addParentRelations(Long id, Long TreeId, String[] relatedToNodes, LinkedHashMap<Long, Node> nodeToAdd,
 			LinkedHashMap<Long, Node> existingNodes, LinkedHashMap<Long, String> unknownRelation,
 			LinkedHashMap<Long, String> updates) {
 		Long newIdInDb = null;
 
-		if (Misc.convertObjectToLong(child[1]) < 0) {
-			addLinkedNode(TreeId, id, nodeToAdd.get(Misc.convertObjectToLong(child[1])),
-					nodeToAdd.get(Misc.convertObjectToLong(child[1])).getPrivacy(), "PARENT", false);
-			nodeToAdd.remove(Misc.convertObjectToLong(child[1]));
+		if (Misc.convertObjectToLong(relatedToNodes[1]) < 0) {
+			addLinkedNode(TreeId, id, nodeToAdd.get(Misc.convertObjectToLong(relatedToNodes[1])),
+					nodeToAdd.get(Misc.convertObjectToLong(relatedToNodes[1])).getPrivacy(), "PARENT", false);
+			nodeToAdd.remove(Misc.convertObjectToLong(relatedToNodes[1]));
 			existingNodes.put(nodeService.getNode(id).getParent1Id(), nodeService.getNode(id).getParent1());
-			unknownRelation = replaceId(unknownRelation, Misc.convertObjectToLong(child[1]),
+			unknownRelation = replaceId(unknownRelation, Misc.convertObjectToLong(relatedToNodes[1]),
 					nodeService.getNode(id).getParent1Id());
-			updates = replaceIdInUpdates(updates, Misc.convertObjectToLong(child[1]),
+			updates = replaceIdInUpdates(updates, Misc.convertObjectToLong(relatedToNodes[1]),
 					nodeService.getNode(id).getParent1Id());
 			newIdInDb = nodeService.getNode(id).getParent1Id();
 		}
 
-		if (Misc.convertObjectToLong(child[3]) < 0) {
-			if (Objects.isNull(nodeToAdd.get(Misc.convertObjectToLong(child[3]))) && !Objects.isNull(newIdInDb)) {
+		if (Misc.convertObjectToLong(relatedToNodes[3]) < 0) {
+			if (Objects.isNull(nodeToAdd.get(Misc.convertObjectToLong(relatedToNodes[3])))
+					&& !Objects.isNull(newIdInDb)) {
 				addLinkedNode(TreeId, id, existingNodes.get(newIdInDb), existingNodes.get(newIdInDb).getPrivacy(),
 						"Parent", true);
 			} else {
-				addLinkedNode(TreeId, id, nodeToAdd.get(Misc.convertObjectToLong(child[3])),
-						nodeToAdd.get(Misc.convertObjectToLong(child[3])).getPrivacy(), "PARENT", false);
-				nodeToAdd.remove(Misc.convertObjectToLong(child[3]));
+				addLinkedNode(TreeId, id, nodeToAdd.get(Misc.convertObjectToLong(relatedToNodes[3])),
+						nodeToAdd.get(Misc.convertObjectToLong(relatedToNodes[3])).getPrivacy(), "PARENT", false);
+				nodeToAdd.remove(Misc.convertObjectToLong(relatedToNodes[3]));
 				existingNodes.put(nodeService.getNode(id).getParent2Id(), nodeService.getNode(id).getParent2());
-				unknownRelation = replaceId(unknownRelation, Misc.convertObjectToLong(child[3]),
+				unknownRelation = replaceId(unknownRelation, Misc.convertObjectToLong(relatedToNodes[3]),
 						nodeService.getNode(id).getParent2Id());
-				updates = replaceIdInUpdates(updates, Misc.convertObjectToLong(child[3]),
+				updates = replaceIdInUpdates(updates, Misc.convertObjectToLong(relatedToNodes[3]),
 						nodeService.getNode(id).getParent2Id());
 			}
 		}
 	}
 
-	private void addPartnerRelations(Long id, Long TreeId, String[] child, LinkedHashMap<Long, Node> nodeToAdd,
+	private void addPartnerRelations(Long id, Long TreeId, String[] relatedToNodes, LinkedHashMap<Long, Node> nodeToAdd,
 			LinkedHashMap<Long, Node> existingNodes, LinkedHashMap<Long, String> unknownRelation,
 			LinkedHashMap<Long, String> updates) {
-		if (Misc.convertObjectToLong(child[5]) != 0) {
+		if (Misc.convertObjectToLong(relatedToNodes[5]) != 0) {
 			if (Objects.isNull(nodeToAdd.get(id))) {
 				return;
 			} else {
-				addLinkedNode(TreeId, Misc.convertObjectToLong(child[5]), nodeToAdd.get(id),
+				addLinkedNode(TreeId, Misc.convertObjectToLong(relatedToNodes[5]), nodeToAdd.get(id),
 						nodeToAdd.get(id).getPrivacy(), "Partner", false);
 				nodeToAdd.remove(id);
-				existingNodes.put(nodeService.getNode(Misc.convertObjectToLong(child[5])).getPartnerId(),
-						nodeService.getNode(Misc.convertObjectToLong(child[5])).getPartner());
-				unknownRelation = replaceId(unknownRelation, Misc.convertObjectToLong(child[5]),
-						nodeService.getNode(Misc.convertObjectToLong(child[5])).getPartnerId());
-				updates = replaceIdInUpdates(updates, Misc.convertObjectToLong(child[5]),
-						nodeService.getNode(Misc.convertObjectToLong(child[5])).getPartnerId());
+				existingNodes.put(nodeService.getNode(Misc.convertObjectToLong(relatedToNodes[5])).getPartnerId(),
+						nodeService.getNode(Misc.convertObjectToLong(relatedToNodes[5])).getPartner());
+				unknownRelation = replaceId(unknownRelation, Misc.convertObjectToLong(relatedToNodes[5]),
+						nodeService.getNode(Misc.convertObjectToLong(relatedToNodes[5])).getPartnerId());
+				updates = replaceIdInUpdates(updates, Misc.convertObjectToLong(relatedToNodes[5]),
+						nodeService.getNode(Misc.convertObjectToLong(relatedToNodes[5])).getPartnerId());
 			}
 		}
 	}
 
-	private void addChildRelations(Long id, Long TreeId, String[] child, LinkedHashMap<Long, Node> nodeToAdd,
+	private void addChildRelations(Long id, Long TreeId, String[] relatedToNodes, LinkedHashMap<Long, Node> nodeToAdd,
 			LinkedHashMap<Long, Node> existingNodes, LinkedHashMap<Long, String> unknownRelation,
 			LinkedHashMap<Long, String> updates) {
 		Long idInDb = null;
 		int privacy = nodeToAdd.get(id).getPrivacy();
 
-		if (Misc.convertObjectToLong(child[1]) > 0) {
-			addLinkedNode(TreeId, Misc.convertObjectToLong(child[1]), nodeToAdd.get(id), privacy, "CHILD", false);
+		if (Misc.convertObjectToLong(relatedToNodes[1]) > 0) {
+			addLinkedNode(TreeId, Misc.convertObjectToLong(relatedToNodes[1]), nodeToAdd.get(id), privacy, "CHILD",
+					false);
 			Node nodeInDb = nodeService.getNodeByNameAndBirthInfo(nodeToAdd.get(id).getLastName(),
 					nodeToAdd.get(id).getFirstName(), nodeToAdd.get(id).getDateOfBirth(),
 					nodeToAdd.get(id).getCountryOfBirth(), nodeToAdd.get(id).getCityOfBirth());
@@ -633,12 +605,13 @@ public class TreeController extends AbstractController {
 			idInDb = nodeInDb.getId();
 		}
 
-		if (Misc.convertObjectToLong(child[3]) > 0) {
+		if (Misc.convertObjectToLong(relatedToNodes[3]) > 0) {
 			if (Objects.isNull(nodeToAdd.get(Misc.convertObjectToLong(id))) && !Objects.isNull(idInDb)) {
-				addLinkedNode(TreeId, Misc.convertObjectToLong(child[3]), existingNodes.get(idInDb),
+				addLinkedNode(TreeId, Misc.convertObjectToLong(relatedToNodes[3]), existingNodes.get(idInDb),
 						existingNodes.get(idInDb).getPrivacy(), "Child", true);
 			} else {
-				addLinkedNode(TreeId, Misc.convertObjectToLong(child[3]), nodeToAdd.get(id), privacy, "CHILD", false);
+				addLinkedNode(TreeId, Misc.convertObjectToLong(relatedToNodes[3]), nodeToAdd.get(id), privacy, "CHILD",
+						false);
 				Node nodeInDb = nodeService.getNodeByNameAndBirthInfo(nodeToAdd.get(id).getLastName(),
 						nodeToAdd.get(id).getFirstName(), nodeToAdd.get(id).getDateOfBirth(),
 						nodeToAdd.get(id).getCountryOfBirth(), nodeToAdd.get(id).getCityOfBirth());
@@ -649,4 +622,36 @@ public class TreeController extends AbstractController {
 		}
 	}
 
+	private Response sendPreProcessNodeInTreeCreation(String key, Long id, Long treeId, User user,
+			String[] relatedToNodes, Map<Long, Node> nodesToAdd, Map<Long, Node> existingNodes,
+			Map<Long, String> unknownRelation) {
+		Response BaFRes = null;
+		switch (key.toUpperCase()) {
+		case "PARENT":
+			if (Misc.convertObjectToLong(relatedToNodes[1]) < 0) {
+				BaFRes = preProcessNodeInTreeCreation(nodesToAdd.get(Misc.convertObjectToLong(relatedToNodes[1])),
+						treeId, user, nodeService.getNode(id), key);
+			} else if (Misc.convertObjectToLong(relatedToNodes[3]) < 0) {
+				BaFRes = preProcessNodeInTreeCreation(nodesToAdd.get(Misc.convertObjectToLong(relatedToNodes[3])),
+						treeId, user, nodeService.getNode(id), key);
+			}
+			break;
+		case "PARTNER":
+			BaFRes = preProcessNodeInTreeCreation(nodesToAdd.get(id), treeId, user,
+					nodeService.getNode(Misc.convertObjectToLong(relatedToNodes[5])), key);
+			break;
+		case "CHILD":
+			if (Misc.convertObjectToLong(relatedToNodes[1]) < 0) {
+				BaFRes = preProcessNodeInTreeCreation(nodesToAdd.get(id), treeId, user,
+						nodeService.getNode(Misc.convertObjectToLong(relatedToNodes[1])), key);
+			} else if (Misc.convertObjectToLong(relatedToNodes[3]) < 0) {
+				BaFRes = preProcessNodeInTreeCreation(nodesToAdd.get(id), treeId, user,
+						nodeService.getNode(Misc.convertObjectToLong(relatedToNodes[3])), key);
+			}
+			break;
+		default:
+			BaFRes = new Response("Incorrect Parameter update " + key, false);
+		}
+		return BaFRes;
+	}
 }
