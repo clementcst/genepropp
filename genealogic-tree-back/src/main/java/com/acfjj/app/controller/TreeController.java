@@ -34,7 +34,7 @@ public class TreeController extends AbstractController {
 		}
 		return new Response(tree);
 	}
-	
+
 	@PostMapping("/tree/addView")
 	public Response addView(@RequestParam Long treeId) {
 		Tree tree = treeService.getTree(treeId);
@@ -43,8 +43,8 @@ public class TreeController extends AbstractController {
 		}
 		tree.addAView();
 		treeService.updateTree(tree.getId(), tree);
-		return new Response("Success",true);
-	}	
+		return new Response("Success", true);
+	}
 
 	@SuppressWarnings("unchecked")
 	@PostMapping("/updateTree")
@@ -53,13 +53,15 @@ public class TreeController extends AbstractController {
 		// Init
 		Long UserId = (long) userId;
 		Long TreeId = (long) treeId;
-		
+
 		User user = userService.getUser(UserId);
 		if (Objects.isNull(user)) {
 			return new Response("User not found", false);
 		}
-		if(conversationService.userHasTreeMergeValidationsOnGoing(user)) {
-			return new Response("There is a Tree Merge validation process that concerns you on going. Saving your tree is impossible while", false);
+		if (conversationService.userHasTreeMergeValidationsOnGoing(user)) {
+			return new Response(
+					"There is a Tree Merge validation process that concerns you on going. Saving your tree is impossible while",
+					false);
 		}
 
 		List<LinkedHashMap<String, String>> tree;
@@ -91,14 +93,14 @@ public class TreeController extends AbstractController {
 				responseSuccess = false;
 			}
 		}
-		
+
 		// First Verifications
 		String firstVerifStr = firstVerifications(tree, UserId);
 		responseStr += firstVerifStr != "OK" ? firstVerifStr : "";
 		responseSuccess = firstVerifStr != "OK" ? false : responseSuccess;
 
 		// Separation beteen existing nodes and node to add
-		// Init  unknownRelation => all links that will be used to add nodes
+		// Init unknownRelation => all links that will be used to add nodes
 		for (LinkedHashMap<String, String> node : tree) {
 			Long id = Misc.convertObjectToLong(node.get("id"));
 			User creator = userService.getUser(id >= 0 ? Misc.convertObjectToLong(node.get("createdById")) : UserId);
@@ -155,7 +157,7 @@ public class TreeController extends AbstractController {
 				}
 			}
 		}
-		//Post Check return if problem
+		// Post Check return if problem
 		if (!responseSuccess) {
 			return new Response(responseStr, responseSuccess);
 		}
@@ -217,7 +219,7 @@ public class TreeController extends AbstractController {
 
 		return new Response("Tree Updated successfully", true);
 	}
-	
+
 	public Response deleteTree(@RequestParam Long treeId) {
 		Tree tree = treeService.getTree(treeId);
 		for (Node node : tree.getNodes()) {
@@ -374,6 +376,8 @@ public class TreeController extends AbstractController {
 			else if (!existingNode.getCreatedById().equals(userWhoWantsToCreate.getId())) {
 				User creator = existingNode.getCreatedBy();
 				// make the node temporary (invisible to user) and store it in db
+				String resStr = "A node similar as the one that you want to create (" + node.getFullNameAndBirthInfo()
+						+ ") as been found in the tree of another user. \nHere is the node. Is that the node you wanna create ?\n If so, click yes and a request to merge the other user tree will be sent. \nOtherwise click no, and change data in the Node or create it in private.";
 				String temporaryCountryOfBirth = node.getCountryOfBirth() + Constants.TEMPORARY_STR_MAKER;
 				node.getPersonInfo().setCountryOfBirth(temporaryCountryOfBirth);
 				Response tmpNodeCreatRes = addNode(node);
@@ -391,11 +395,8 @@ public class TreeController extends AbstractController {
 						+ existingNode.getId() + "&additionNodeId=" + node.getId() + "&relatedNodeId="
 						+ relatedToNode.getId() + "&relationType=" + relationType;
 				resValue.put("requestYes", requestYes);
-				return new Response(resValue, "A node similar as the one that you want to create ("
-						+ node.getFullNameAndBirthInfo()
-						+ ") as been found in the tree of another user. \nHere is the node. Is that the node you wanna create ?\n If so, click yes and a request to merge the other user tree will be sent. \nOtherwise click no, and change data in the Node or create it in private.",
-						true);
-				}
+				return new Response(resValue, resStr, true);
+			}
 		}
 		return new Response(null, true);
 	}
@@ -447,7 +448,7 @@ public class TreeController extends AbstractController {
 //					Object parent = (Object);
 					Long parent1Id = Misc.convertObjectToLong(node.get("parent1Id"));
 					parent1 = findNodeWithId(tree, parent1Id);
-					if(Objects.isNull(parent1)) {
+					if (Objects.isNull(parent1)) {
 						parent1.put("dateOfBirth", nodeService.getNode(parent1Id).getDateOfBirth().toString());
 						parent1.put("dateOfDeath", null);
 					}
@@ -469,7 +470,7 @@ public class TreeController extends AbstractController {
 				if (node.containsKey("parent2Id") && !Objects.isNull(node.get("parent2Id"))) {
 					Long parent2Id = Misc.convertObjectToLong(node.get("parent2Id"));
 					parent2 = findNodeWithId(tree, parent2Id);
-					if(Objects.isNull(parent2)) {
+					if (Objects.isNull(parent2)) {
 						parent2.put("dateOfBirth", nodeService.getNode(parent2Id).getDateOfBirth().toString());
 						parent2.put("dateOfDeath", null);
 					}
@@ -555,7 +556,8 @@ public class TreeController extends AbstractController {
 		}
 
 		if (Misc.convertObjectToLong(relatedToNodes[3]) < 0) {
-			if (Objects.isNull(nodeToAdd.get(Misc.convertObjectToLong(relatedToNodes[3]))) && !Objects.isNull(newIdInDb)) {
+			if (Objects.isNull(nodeToAdd.get(Misc.convertObjectToLong(relatedToNodes[3])))
+					&& !Objects.isNull(newIdInDb)) {
 				addLinkedNode(TreeId, id, existingNodes.get(newIdInDb), existingNodes.get(newIdInDb).getPrivacy(),
 						"Parent", true);
 			} else {
@@ -598,7 +600,8 @@ public class TreeController extends AbstractController {
 		int privacy = nodeToAdd.get(id).getPrivacy();
 
 		if (Misc.convertObjectToLong(relatedToNodes[1]) > 0) {
-			addLinkedNode(TreeId, Misc.convertObjectToLong(relatedToNodes[1]), nodeToAdd.get(id), privacy, "CHILD", false);
+			addLinkedNode(TreeId, Misc.convertObjectToLong(relatedToNodes[1]), nodeToAdd.get(id), privacy, "CHILD",
+					false);
 			Node nodeInDb = nodeService.getNodeByNameAndBirthInfo(nodeToAdd.get(id).getLastName(),
 					nodeToAdd.get(id).getFirstName(), nodeToAdd.get(id).getDateOfBirth(),
 					nodeToAdd.get(id).getCountryOfBirth(), nodeToAdd.get(id).getCityOfBirth());
@@ -613,7 +616,8 @@ public class TreeController extends AbstractController {
 				addLinkedNode(TreeId, Misc.convertObjectToLong(relatedToNodes[3]), existingNodes.get(idInDb),
 						existingNodes.get(idInDb).getPrivacy(), "Child", true);
 			} else {
-				addLinkedNode(TreeId, Misc.convertObjectToLong(relatedToNodes[3]), nodeToAdd.get(id), privacy, "CHILD", false);
+				addLinkedNode(TreeId, Misc.convertObjectToLong(relatedToNodes[3]), nodeToAdd.get(id), privacy, "CHILD",
+						false);
 				Node nodeInDb = nodeService.getNodeByNameAndBirthInfo(nodeToAdd.get(id).getLastName(),
 						nodeToAdd.get(id).getFirstName(), nodeToAdd.get(id).getDateOfBirth(),
 						nodeToAdd.get(id).getCountryOfBirth(), nodeToAdd.get(id).getCityOfBirth());
