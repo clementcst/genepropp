@@ -17,6 +17,7 @@ export class ProfilRigthComponent implements OnInit {
   showFailedMessage: boolean = false;
   failedMessage: string = '';
   loadingUser: boolean = false;
+  loadingpage2: boolean = false;
 
   constructor(private userService : UserService, private cookieService: CookieService) { 
     this.userService = userService;
@@ -24,12 +25,14 @@ export class ProfilRigthComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.loadingpage2 = true;
     this.showUserProfil()
   }
 
   private showUserProfil() {
     this.userService.getUser(this.cookieService.get('userId')).subscribe((data) => {
       this.user = data.value;
+      this.loadingpage2 = false;
       this.userOnInit = { ...this.user };
       this.inputs1 = [
         { label: "firstname", type: "text", fieldname: "Firstname", value: this.user.firstName, disabled: true },
