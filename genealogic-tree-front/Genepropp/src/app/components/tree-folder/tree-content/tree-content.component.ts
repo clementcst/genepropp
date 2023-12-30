@@ -724,23 +724,28 @@ export class TreeContentComponent {
                 // @ts-ignore
                 if(!response.success){
                   // @ts-ignore
-                  //this.openErrorMergeTreePopupComponent(response.message)
+                  this.openErrorMergeTreePopupComponent(response.message)
+
+                }else{
                   // @ts-ignore
-                  this.openSpecialSuccessPopupComponent(response.message)
+                  if (response.value && response.value.hasOwnProperty("specialSuccess")) {
+                    // La propriété "specialSuccess" existe
+                    console.log("on est en spécial success")
+                    // @ts-ignore
+                    this.openSpecialSuccessPopupComponent(response)
+                  }
+                  location.reload();
+                  //console.log("reload")
                 }
-                // @ts-ignore
-                if (response.value && response.value.hasOwnProperty("specialSuccess")) {
-                  // La propriété "specialSuccess" existe
-                  console.log("on est en spécial success")
-                  // @ts-ignore
-                  this.openSpecialSuccessPopupComponent(response)
-                }
+                
               },
               error => {
                 console.error("Erreur lors de la requête :", error);
                 // Autres actions en cas d'erreur, si nécessaire
-                this.loading = false; // Cacher l'indicateur de chargement en cas d'erreur
-
+                this.loading = false; // Cacher l'indicateur de chargement en cas d'erreur           
+                location.reload();
+                //console.log("reload")
+                
               }
             );
           }
