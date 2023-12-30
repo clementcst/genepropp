@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { UserService } from '../../../services/user/user.service';
+import { CookieManagementService } from '../../../services/cookies/cookie.service';
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
@@ -8,7 +8,7 @@ import { CookieService } from 'ngx-cookie-service';
   styleUrls: ['./nav.component.css']
 })
 export class NavComponent implements OnInit {
-
+  PPurl: string = "";
 
   pages=[
     {link:"/homePage", displayName:"Home"},
@@ -18,17 +18,18 @@ export class NavComponent implements OnInit {
     {link:"/profilPage", displayName:"Profil"},
     { link: "/", displayName: "Log out"}
   ]
-  user: any = {};
 
-  constructor(private userService : UserService, private cookieService: CookieService) { 
-    this.userService = userService;
+  constructor(private cookieService: CookieService, private cookieManagementService: CookieManagementService) { 
     this.cookieService = cookieService;
+    this.cookieManagementService= cookieManagementService;
   }
 
   ngOnInit() : void{ 
-    this.userService.getUser(this.cookieService.get('userId')).subscribe((data) => {
-      this.user = data.value;
-    });
+    this.getPPUrl();
+  }
+
+  getPPUrl() {
+    this.PPurl = this.cookieManagementService.getPPUrl();
   }
 
 }
