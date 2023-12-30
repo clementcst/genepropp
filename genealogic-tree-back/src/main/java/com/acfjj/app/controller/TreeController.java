@@ -537,68 +537,68 @@ public class TreeController extends AbstractController {
 		return newUpdates;
 	}
 
-	private void addParentRelations(Long id, Long TreeId, String[] child, LinkedHashMap<Long, Node> nodeToAdd,
+	private void addParentRelations(Long id, Long TreeId, String[] relatedToNodes, LinkedHashMap<Long, Node> nodeToAdd,
 			LinkedHashMap<Long, Node> existingNodes, LinkedHashMap<Long, String> unknownRelation,
 			LinkedHashMap<Long, String> updates) {
 		Long newIdInDb = null;
 
-		if (Misc.convertObjectToLong(child[1]) < 0) {
-			addLinkedNode(TreeId, id, nodeToAdd.get(Misc.convertObjectToLong(child[1])),
-					nodeToAdd.get(Misc.convertObjectToLong(child[1])).getPrivacy(), "PARENT", false);
-			nodeToAdd.remove(Misc.convertObjectToLong(child[1]));
+		if (Misc.convertObjectToLong(relatedToNodes[1]) < 0) {
+			addLinkedNode(TreeId, id, nodeToAdd.get(Misc.convertObjectToLong(relatedToNodes[1])),
+					nodeToAdd.get(Misc.convertObjectToLong(relatedToNodes[1])).getPrivacy(), "PARENT", false);
+			nodeToAdd.remove(Misc.convertObjectToLong(relatedToNodes[1]));
 			existingNodes.put(nodeService.getNode(id).getParent1Id(), nodeService.getNode(id).getParent1());
-			unknownRelation = replaceId(unknownRelation, Misc.convertObjectToLong(child[1]),
+			unknownRelation = replaceId(unknownRelation, Misc.convertObjectToLong(relatedToNodes[1]),
 					nodeService.getNode(id).getParent1Id());
-			updates = replaceIdInUpdates(updates, Misc.convertObjectToLong(child[1]),
+			updates = replaceIdInUpdates(updates, Misc.convertObjectToLong(relatedToNodes[1]),
 					nodeService.getNode(id).getParent1Id());
 			newIdInDb = nodeService.getNode(id).getParent1Id();
 		}
 
-		if (Misc.convertObjectToLong(child[3]) < 0) {
-			if (Objects.isNull(nodeToAdd.get(Misc.convertObjectToLong(child[3]))) && !Objects.isNull(newIdInDb)) {
+		if (Misc.convertObjectToLong(relatedToNodes[3]) < 0) {
+			if (Objects.isNull(nodeToAdd.get(Misc.convertObjectToLong(relatedToNodes[3]))) && !Objects.isNull(newIdInDb)) {
 				addLinkedNode(TreeId, id, existingNodes.get(newIdInDb), existingNodes.get(newIdInDb).getPrivacy(),
 						"Parent", true);
 			} else {
-				addLinkedNode(TreeId, id, nodeToAdd.get(Misc.convertObjectToLong(child[3])),
-						nodeToAdd.get(Misc.convertObjectToLong(child[3])).getPrivacy(), "PARENT", false);
-				nodeToAdd.remove(Misc.convertObjectToLong(child[3]));
+				addLinkedNode(TreeId, id, nodeToAdd.get(Misc.convertObjectToLong(relatedToNodes[3])),
+						nodeToAdd.get(Misc.convertObjectToLong(relatedToNodes[3])).getPrivacy(), "PARENT", false);
+				nodeToAdd.remove(Misc.convertObjectToLong(relatedToNodes[3]));
 				existingNodes.put(nodeService.getNode(id).getParent2Id(), nodeService.getNode(id).getParent2());
-				unknownRelation = replaceId(unknownRelation, Misc.convertObjectToLong(child[3]),
+				unknownRelation = replaceId(unknownRelation, Misc.convertObjectToLong(relatedToNodes[3]),
 						nodeService.getNode(id).getParent2Id());
-				updates = replaceIdInUpdates(updates, Misc.convertObjectToLong(child[3]),
+				updates = replaceIdInUpdates(updates, Misc.convertObjectToLong(relatedToNodes[3]),
 						nodeService.getNode(id).getParent2Id());
 			}
 		}
 	}
 
-	private void addPartnerRelations(Long id, Long TreeId, String[] child, LinkedHashMap<Long, Node> nodeToAdd,
+	private void addPartnerRelations(Long id, Long TreeId, String[] relatedToNodes, LinkedHashMap<Long, Node> nodeToAdd,
 			LinkedHashMap<Long, Node> existingNodes, LinkedHashMap<Long, String> unknownRelation,
 			LinkedHashMap<Long, String> updates) {
-		if (Misc.convertObjectToLong(child[5]) != 0) {
+		if (Misc.convertObjectToLong(relatedToNodes[5]) != 0) {
 			if (Objects.isNull(nodeToAdd.get(id))) {
 				return;
 			} else {
-				addLinkedNode(TreeId, Misc.convertObjectToLong(child[5]), nodeToAdd.get(id),
+				addLinkedNode(TreeId, Misc.convertObjectToLong(relatedToNodes[5]), nodeToAdd.get(id),
 						nodeToAdd.get(id).getPrivacy(), "Partner", false);
 				nodeToAdd.remove(id);
-				existingNodes.put(nodeService.getNode(Misc.convertObjectToLong(child[5])).getPartnerId(),
-						nodeService.getNode(Misc.convertObjectToLong(child[5])).getPartner());
-				unknownRelation = replaceId(unknownRelation, Misc.convertObjectToLong(child[5]),
-						nodeService.getNode(Misc.convertObjectToLong(child[5])).getPartnerId());
-				updates = replaceIdInUpdates(updates, Misc.convertObjectToLong(child[5]),
-						nodeService.getNode(Misc.convertObjectToLong(child[5])).getPartnerId());
+				existingNodes.put(nodeService.getNode(Misc.convertObjectToLong(relatedToNodes[5])).getPartnerId(),
+						nodeService.getNode(Misc.convertObjectToLong(relatedToNodes[5])).getPartner());
+				unknownRelation = replaceId(unknownRelation, Misc.convertObjectToLong(relatedToNodes[5]),
+						nodeService.getNode(Misc.convertObjectToLong(relatedToNodes[5])).getPartnerId());
+				updates = replaceIdInUpdates(updates, Misc.convertObjectToLong(relatedToNodes[5]),
+						nodeService.getNode(Misc.convertObjectToLong(relatedToNodes[5])).getPartnerId());
 			}
 		}
 	}
 
-	private void addChildRelations(Long id, Long TreeId, String[] child, LinkedHashMap<Long, Node> nodeToAdd,
+	private void addChildRelations(Long id, Long TreeId, String[] relatedToNodes, LinkedHashMap<Long, Node> nodeToAdd,
 			LinkedHashMap<Long, Node> existingNodes, LinkedHashMap<Long, String> unknownRelation,
 			LinkedHashMap<Long, String> updates) {
 		Long idInDb = null;
 		int privacy = nodeToAdd.get(id).getPrivacy();
 
-		if (Misc.convertObjectToLong(child[1]) > 0) {
-			addLinkedNode(TreeId, Misc.convertObjectToLong(child[1]), nodeToAdd.get(id), privacy, "CHILD", false);
+		if (Misc.convertObjectToLong(relatedToNodes[1]) > 0) {
+			addLinkedNode(TreeId, Misc.convertObjectToLong(relatedToNodes[1]), nodeToAdd.get(id), privacy, "CHILD", false);
 			Node nodeInDb = nodeService.getNodeByNameAndBirthInfo(nodeToAdd.get(id).getLastName(),
 					nodeToAdd.get(id).getFirstName(), nodeToAdd.get(id).getDateOfBirth(),
 					nodeToAdd.get(id).getCountryOfBirth(), nodeToAdd.get(id).getCityOfBirth());
@@ -608,12 +608,12 @@ public class TreeController extends AbstractController {
 			idInDb = nodeInDb.getId();
 		}
 
-		if (Misc.convertObjectToLong(child[3]) > 0) {
+		if (Misc.convertObjectToLong(relatedToNodes[3]) > 0) {
 			if (Objects.isNull(nodeToAdd.get(Misc.convertObjectToLong(id))) && !Objects.isNull(idInDb)) {
-				addLinkedNode(TreeId, Misc.convertObjectToLong(child[3]), existingNodes.get(idInDb),
+				addLinkedNode(TreeId, Misc.convertObjectToLong(relatedToNodes[3]), existingNodes.get(idInDb),
 						existingNodes.get(idInDb).getPrivacy(), "Child", true);
 			} else {
-				addLinkedNode(TreeId, Misc.convertObjectToLong(child[3]), nodeToAdd.get(id), privacy, "CHILD", false);
+				addLinkedNode(TreeId, Misc.convertObjectToLong(relatedToNodes[3]), nodeToAdd.get(id), privacy, "CHILD", false);
 				Node nodeInDb = nodeService.getNodeByNameAndBirthInfo(nodeToAdd.get(id).getLastName(),
 						nodeToAdd.get(id).getFirstName(), nodeToAdd.get(id).getDateOfBirth(),
 						nodeToAdd.get(id).getCountryOfBirth(), nodeToAdd.get(id).getCityOfBirth());
