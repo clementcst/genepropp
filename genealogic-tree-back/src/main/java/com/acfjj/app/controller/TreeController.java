@@ -624,4 +624,37 @@ public class TreeController extends AbstractController {
 		}
 	}
 
+	private Response sendPreProcessNodeInTreeCreation(String key, Long id, Long treeId, User user,
+			String[] relatedToNodes, Map<Long, Node> nodesToAdd, Map<Long, Node> existingNodes,
+			Map<Long, String> unknownRelation) {
+		Response BaFRes = null;
+		switch (key.toUpperCase()) {
+		case "PARENT":
+			if (Misc.convertObjectToLong(relatedToNodes[1]) < 0) {
+				BaFRes = preProcessNodeInTreeCreation(nodesToAdd.get(Misc.convertObjectToLong(relatedToNodes[1])),
+						treeId, user, nodeService.getNode(id), key);
+			} else if (Misc.convertObjectToLong(relatedToNodes[3]) < 0) {
+				BaFRes = preProcessNodeInTreeCreation(nodesToAdd.get(Misc.convertObjectToLong(relatedToNodes[3])),
+						treeId, user, nodeService.getNode(id), key);
+			}
+			break;
+		case "PARTNER":
+			BaFRes = preProcessNodeInTreeCreation(nodesToAdd.get(id), treeId, user,
+					nodeService.getNode(Misc.convertObjectToLong(relatedToNodes[5])), key);
+			break;
+		case "CHILD":
+			if (Misc.convertObjectToLong(relatedToNodes[1]) < 0) {
+				BaFRes = preProcessNodeInTreeCreation(nodesToAdd.get(id), treeId, user,
+						nodeService.getNode(Misc.convertObjectToLong(relatedToNodes[1])), key);
+			} else if (Misc.convertObjectToLong(relatedToNodes[3]) < 0) {
+				BaFRes = preProcessNodeInTreeCreation(nodesToAdd.get(id), treeId, user,
+						nodeService.getNode(Misc.convertObjectToLong(relatedToNodes[3])), key);
+			}
+			break;
+		default:
+			BaFRes = new Response("Incorrect Parameter update " + key, false);
+		}
+		return BaFRes;
+	}
+}
 }
