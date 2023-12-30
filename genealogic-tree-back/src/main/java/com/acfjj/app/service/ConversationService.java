@@ -7,6 +7,8 @@ import java.util.Objects;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
+
+import com.acfjj.app.utils.Misc;
 import com.acfjj.app.utils.ValidationType;
 import com.acfjj.app.model.Conversation;
 import com.acfjj.app.model.Message;
@@ -65,10 +67,15 @@ public class ConversationService extends AbstractService {
     	updateConversation(conversation.getId(), conversation);
     }
     
-    public List<Message> getUserValidationsOfConcernedUser(User concernedUser, ValidationType validationType) {
-    	LinkedHashMap<String,Object> validationInfos = new LinkedHashMap<String, Object>();
-    	validationInfos.put("concernedUserId", concernedUser.getId());
-    	return messageRepository.findByValidationInfosAndValidationType(validationInfos, validationType);
+    public List<Message> getUserValidationsOfConcernedUser(User concernedUser) {
+    	ValidationType validationType = ValidationType.USER_VALIDATION;
+    	LinkedHashMap<String,String> validationInfos = new LinkedHashMap<String, String>();
+    	validationInfos.put("concernedUserId", concernedUser.getId().toString());
+    	return messageRepository.findByValidationInfosAndValidationType(Misc.convertToString(validationInfos), validationType);
+    }
+    
+    public boolean userHasTreeMergeValidationsOnGoing(User user) {
+    	return !messageRepository.findByReceiverAndValidationType(user, ValidationType.TREE_MERGE_VALIDATION).isEmpty() || !messageRepository.findBySenderAndValidationType(user, ValidationType.TREE_MERGE_VALIDATION).isEmpty();
     }
     
     public Message getMessage(Long msgId) {
