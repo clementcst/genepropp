@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { TreeService } from '../../../services/tree/tree.service';
 import { UserService } from '../../../services/user/user.service';
+import { CookieManagementService } from '../../../services/cookies/cookie.service';
 import { CookieService } from 'ngx-cookie-service';
 
 @Component({
@@ -24,20 +25,25 @@ export class ProfilLeftComponent implements OnInit {
   successMessageTree: string = '';
   showFailedMessageTree: boolean = false;
   failedMessageTree: string = '';
+  loadingPicture: boolean = false;
+  loadingTree: boolean = false;
+  loadingpage: boolean = false;
 
-  constructor(private treeService : TreeService, private userService : UserService, private cookieService: CookieService) { 
+  constructor(private treeService : TreeService, private userService : UserService, private cookieService: CookieService, private cookieManagementService: CookieManagementService) { 
     this.treeService = treeService;
     this.cookieService = cookieService;
     this.userService = userService;
   }
 
   ngOnInit(): void {
-    this.showUserProfil()
+    this.loadingpage = true;
+    this.showUserProfil();
   }
 
   private showUserProfil() {
     this.treeService.getTree(this.cookieService.get('userId')).subscribe((data) => {
       this.tree = data.value;
+      this.loadingpage = false;
       this.boxs = [
         { title: "Month views", value: this.tree.viewOfMonth },
         { title: "Annual views", value: this.tree.viewOfYear },
@@ -62,19 +68,23 @@ export class ProfilLeftComponent implements OnInit {
   }
 
   submitPicture() {
+    this.loadingPicture = true;
     const inputsData: any = {};
     inputsData.profilPictureUrl = this.newPictureUrl;
     this.userService.updateUser(this.user.id, inputsData).subscribe(response => {
       if(response.success) {
+        this.loadingPicture = false;
         this.successMessage = response.message || 'Modification successful.';
         this.showSuccessMessage = true;
         this.newPictureUrl = '';
         setTimeout(() => {
           this.showSuccessMessage = false;
         }, 3000);
-        this.showUserProfil()
+        this.user.profilPictureUrl = inputsData.profilPictureUrl
+        this.cookieManagementService.savePPUrl(this.user.profilPictureUrl);
       }
       else {
+        this.loadingPicture = false;
         this.failedMessage = response.message || 'Modification failed.';
         this.showFailedMessage = true;
         setTimeout(() => {
@@ -95,10 +105,12 @@ export class ProfilLeftComponent implements OnInit {
   }
 
   logTreeVisibility() {
+    this.loadingTree = true;
     const inputsData: any = {};
     inputsData.treePrivacy = this.treeVisibilityControl.value;
     this.userService.updateUser(this.user.id, inputsData).subscribe(response => {
       if(response.success) {
+        this.loadingTree = false;
         this.successMessageTree = response.message || 'Modification successful.';
         this.showSuccessMessageTree = true;
         setTimeout(() => {
@@ -107,6 +119,7 @@ export class ProfilLeftComponent implements OnInit {
         this.showUserProfil()
       }
       else {
+        this.loadingTree = false;
         this.failedMessageTree = response.message || 'Modification failed.';
         this.showFailedMessageTree = true;
         setTimeout(() => {

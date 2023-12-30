@@ -16,6 +16,7 @@ export class NavElementComponent implements OnInit {
   logout(): void {
     this.cookieService.delete('userId');
     this.cookieService.delete('privateCode');
+    this.cookieService.delete('profilPictureUrl');
   }
 
 }
