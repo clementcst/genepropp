@@ -27,6 +27,7 @@ export class ProfilLeftComponent implements OnInit {
   failedMessageTree: string = '';
   loadingPicture: boolean = false;
   loadingTree: boolean = false;
+  loadingpage: boolean = false;
 
   constructor(private treeService : TreeService, private userService : UserService, private cookieService: CookieService, private cookieManagementService: CookieManagementService) { 
     this.treeService = treeService;
@@ -35,12 +36,14 @@ export class ProfilLeftComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.showUserProfil()
+    this.loadingpage = true;
+    this.showUserProfil();
   }
 
   private showUserProfil() {
     this.treeService.getTree(this.cookieService.get('userId')).subscribe((data) => {
       this.tree = data.value;
+      this.loadingpage = false;
       this.boxs = [
         { title: "Month views", value: this.tree.viewOfMonth },
         { title: "Annual views", value: this.tree.viewOfYear },
