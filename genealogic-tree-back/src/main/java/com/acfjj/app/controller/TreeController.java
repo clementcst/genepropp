@@ -1,11 +1,9 @@
 package com.acfjj.app.controller;
 
-import org.apache.tomcat.util.bcel.classfile.Constant;
 import org.springframework.context.annotation.Scope;
 import org.springframework.web.bind.annotation.*;
 
 import com.acfjj.app.model.Node;
-import com.acfjj.app.model.PersonInfo;
 import com.acfjj.app.model.Tree;
 import com.acfjj.app.model.TreeNodes;
 import com.acfjj.app.model.User;
@@ -13,9 +11,6 @@ import com.acfjj.app.utils.Constants;
 import com.acfjj.app.utils.Misc;
 import com.acfjj.app.utils.Response;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +37,7 @@ public class TreeController extends AbstractController {
 			return new Response("Tree not found", false);
 		}
 		tree.addAView();
+		System.err.println(tree.getViewOfMonth() + tree.getViewOfYear());
 		treeService.updateTree(tree.getId(), tree);
 		return new Response("Success", true);
 	}
