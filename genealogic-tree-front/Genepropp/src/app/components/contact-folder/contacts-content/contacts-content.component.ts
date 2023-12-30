@@ -84,7 +84,10 @@ export class ContactsContentComponent implements OnInit {
         this.newConversationId = response.value;
         let newContact = { senderInfo: user, convId: this.newConversationId};
         this.contactsForFront.push(newContact);
-        this.idAlreadyInConv.push(user.id)
+        this.idAlreadyInConv.push(user.id);
+        if (this.contactsComponent) {
+          this.contactsComponent.updateLoadingConv(false);
+        }
         this.openChat(newContact);
       });
   }

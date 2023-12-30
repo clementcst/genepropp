@@ -16,7 +16,7 @@ export class RegistrationComponent {
   authenticationErrorMsg: string = "An error occurred, please contact support";
   step = 1;
   userResponse = 0;
-  // Déclarer des variables pour stocker les valeurs des champs
+  loading: boolean = false;
   data: any = {
     firstName: '',
     lastName: '',
@@ -61,25 +61,31 @@ export class RegistrationComponent {
   ) { }
 
   onSubmit() {
+    this.loading = true;
     this.resetErrors();
     this.checkErrors();
-    if (this.errors.isdetected) return;
+    if (this.errors.isdetected) {
+      this.loading = false;
+      return;
+    }
 
     this.identificationService.registerResquest(this.data, this.step, this.userResponse)
       .subscribe((response) => {
-        console.log(response);
         if (response.success) {
           if (response.value.nextStep === 1) {
             this.errors.step1error = true;
             this.data.message_error_step1 = response.value.frontMessage;
+            this.loading = false;
             return;
           }
           if (response.value.nextStep === 2) {
             this.step = 2;
             this.userResponse = 1;
             this.openRegistrationPopup(response, response.nextStep);
+            this.loading = false;
             return;
           }
+          this.loading = false;
           this.openPrivateCodePopup(response.value.privateCode);
           this.cookieService.set('userId', response.value.userId);
           this.router.navigate(['homePage']);
@@ -95,6 +101,7 @@ export class RegistrationComponent {
           else {
             this.authenticationErrorMsg = "An error occurred, please contact support";
           }
+          this.loading = false;
           return;
         }
       });

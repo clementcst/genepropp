@@ -28,6 +28,8 @@ export class ContactsChatComponent implements OnInit, AfterViewChecked, OnChange
   myInfo : any = {};
   validationSuccess: boolean = false;
   message: string = "";
+  loading: boolean = false;
+  loadingpage: boolean = false;
 
   constructor(private conversationService: ConversationService, private userService: UserService, private cookieService: CookieService) {
     this.cookieService = cookieService;
@@ -36,6 +38,7 @@ export class ContactsChatComponent implements OnInit, AfterViewChecked, OnChange
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    this.loadingpage = true;
     if (changes['contact'] && !changes['contact'].firstChange) {
       this.receiveMessage();
     }
@@ -54,12 +57,15 @@ export class ContactsChatComponent implements OnInit, AfterViewChecked, OnChange
     if (this.contact) {
       this.conversationService.getConversation(this.contact.convId).subscribe((data) => {
         this.messagetab = data.value;
+        this.loadingpage = false;
         this.messagetab.messages.sort((a: any, b: any) => {
           const dateA = new Date(a.messageDateTime).getTime();
           const dateB = new Date(b.messageDateTime).getTime();
           return dateA - dateB;
         });
+        console.log(this.messagetab)
       });
+      this.loading = false;
     }
   }
 
@@ -82,6 +88,7 @@ export class ContactsChatComponent implements OnInit, AfterViewChecked, OnChange
   }
 
   sendMessage() {
+    this.loading = true;
     const myId = parseFloat(this.cookieService.get('userId'));
     let otherContactId: number;
     if (this.messagetab.userId1 == myId) {
@@ -95,6 +102,10 @@ export class ContactsChatComponent implements OnInit, AfterViewChecked, OnChange
       this.conversationService.newMessage(myId, otherContactId, messageContent)
         .subscribe(response => {
           this.receiveMessage();
+          if (!response.success) {
+            this.loading = false;
+            return
+          }
         });
       this.messageInput.nativeElement.value = '';
     }

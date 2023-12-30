@@ -1,12 +1,14 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { CookieManagementService } from '../../../services/cookies/cookie.service';
+import { CookieService } from 'ngx-cookie-service';
 
 @Component({
   selector: 'app-nav',
   templateUrl: './nav.component.html',
   styleUrls: ['./nav.component.css']
 })
-export class NavComponent {
-
+export class NavComponent implements OnInit {
+  PPurl: string = "";
 
   pages=[
     {link:"/homePage", displayName:"Home"},
@@ -17,8 +19,17 @@ export class NavComponent {
     { link: "/", displayName: "Log out"}
   ]
 
-  constructor() { }
+  constructor(private cookieService: CookieService, private cookieManagementService: CookieManagementService) { 
+    this.cookieService = cookieService;
+    this.cookieManagementService= cookieManagementService;
+  }
 
-  ngOnInit() : void{ }
+  ngOnInit() : void{ 
+    this.getPPUrl();
+  }
+
+  getPPUrl() {
+    this.PPurl = this.cookieManagementService.getPPUrl();
+  }
 
 }

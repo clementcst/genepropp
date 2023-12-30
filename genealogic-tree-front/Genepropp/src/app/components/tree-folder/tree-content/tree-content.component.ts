@@ -6,6 +6,8 @@ import { CookieService } from 'ngx-cookie-service';
 import { MatDialog } from '@angular/material/dialog';
 import { NodeCreationRulesComponent } from '../../PopUps/node-creation-rules/node-creation-rules.component'
 import { ErrorMergeTreePopupComponent } from '../../PopUps/error-merge-tree-popup/error-merge-tree-popup.component'
+import { SpecialSuccessPopupComponent } from '../../PopUps/special-success-popup/special-success-popup.component'
+
 import { ActivatedRoute } from '@angular/router';
 
 import { LinkedHashMap } from '../linked-hashmap/linked-hashmap.component';
@@ -67,6 +69,17 @@ export class TreeContentComponent {
   openErrorMergeTreePopupComponent(errorMessage: any) {
     const dialogRef = this.dialog.open(ErrorMergeTreePopupComponent, {
       data: { data: errorMessage },
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+
+    });
+  }
+
+  openSpecialSuccessPopupComponent(response: any) {
+    const dialogRef = this.dialog.open(SpecialSuccessPopupComponent, {
+      //@ts-ignore
+      data: { data: response },
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -364,14 +377,22 @@ export class TreeContentComponent {
         this.myIDNode = this.TempUserData.relatedNodeId;
         this.myTreeId = this.TempUserData.myTreeId
 
+        
         this.route.queryParams.subscribe(params => {
+
           // Récupérez la valeur du paramètre 'myParam' de l'URL
           if(params['treeId']){
-            this.myTreeId = params['treeId']
-            this.isMyTree = false
+
+            if(!this.TempUserData.isMyTreePublic){
+              this.myTreeId = "noAccessible"
+              this.openErrorMergeTreePopupComponent("This family tree is set to private. Click below to be redirected to the main menu.")
+            }else{
+              this.myTreeId = params['treeId']
+              this.isMyTree = false
+            }    
           }
         });
-        console.log("voici le treeid de celui qui va arriver : "+this.myTreeId)
+        //console.log("voici le treeid de celui qui va arriver : "+this.myTreeId)
 
         const tree = document.getElementById('tree');
         //console.log("Voici tis is ..."+this.isMyTree)
@@ -471,7 +492,7 @@ export class TreeContentComponent {
                       firstName: node.firstName,
                       lastName: node.lastName,
                       privacy: node.privacy == 0 ? 'private' : node.privacy == 2 ? 'public' : 'restricted',
-                      fullName:node.firstName + " " + node.lastName,
+                      fullName: node.firstName + " " + node.lastName + (node.isAUserNode ? " (user)" : ""),
                       id: node.id, 
                       pids:this.getPartnerIds(node.partnerId,node.exPartnersId),
                       divorced: node.exPartnersId,
@@ -497,7 +518,7 @@ export class TreeContentComponent {
                   this.treeTab.push(tempNode);   
               });
               //fin
-
+              this.treeService.addView(this.myTreeId);
               family.load(this.treeTab);
              this.isReadyToDisplay = false;
            });  
@@ -699,11 +720,20 @@ export class TreeContentComponent {
               response => {
                 console.log("Réponse reçue avec succès :", response);
                 // Autres actions après une réponse réussie, si nécessaire
-                this.loading = false; // Cacher l'indicateur de chargement en cas d'erreur
+                this.loading = false; // Cacher l'indicateur de chargement en cas de réponse
                 // @ts-ignore
                 if(!response.success){
                   // @ts-ignore
-                  this.openErrorMergeTreePopupComponent(response.message)
+                  //this.openErrorMergeTreePopupComponent(response.message)
+                  // @ts-ignore
+                  this.openSpecialSuccessPopupComponent(response.message)
+                }
+                // @ts-ignore
+                if (response.value && response.value.hasOwnProperty("specialSuccess")) {
+                  // La propriété "specialSuccess" existe
+                  console.log("on est en spécial success")
+                  // @ts-ignore
+                  this.openSpecialSuccessPopupComponent(response)
                 }
               },
               error => {

@@ -1,8 +1,14 @@
-<nav class="bg-green-900 dark:bg-green-900 h-[10vh]  w-full z-20 top-0 left-0 border-b border-green-300 dark:border-green-600">
-    <div class="max-w-screen-xl flex items-center justify-center mx-auto p-4">
+<nav class="bg-green-900 dark:bg-green-900 h-[10vh] w-full z-20 top-0 left-0 border-b border-green-300 dark:border-green-600">
+    <div class="max-w-screen-xl flex items-center justify-between mx-auto p-4">
+        <a [routerLink]="['/homePage']">
+            <img src="../../../../assets/media/logo_genepropp.png" alt="Genepropp Logo" class="h-12 w-16 rounded-full">
+        </a>
         <ul class="flex space-x-8" *ngFor="let page of pages">
             <app-nav-element [page]="page"></app-nav-element>
         </ul>
+        <a [routerLink]="['/profilPage']">
+            <img src="{{ PPurl }}" alt="Profil Picture" class="h-12 w-16 rounded-full">
+        </a>
     </div>
 </nav>
 
