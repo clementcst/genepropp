@@ -367,7 +367,7 @@ public class TreeController extends AbstractController {
 		// If an existing Node has been found
 		if (!Objects.isNull(existingNode) && existingNode.isPublic()) {
 			// check if the node is already in the tree
-			if (nodeService.doesNodeBelongToTree(node.getId(), treeId)) {
+			if (nodeService.doesNodeBelongToTree(existingNode.getId(), treeId)) {
 				return new Response("Cannot add a node in your tree that is already in your tree", false);
 			}
 			// If you have not created this node (always at this point, could be an else)
@@ -656,4 +656,5 @@ public class TreeController extends AbstractController {
 		}
 		return BaFRes;
 	}
+
 }
