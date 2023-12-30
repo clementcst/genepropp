@@ -170,72 +170,44 @@ public class TreeController extends AbstractController {
 			}
 		}
 
-		// Node creation Backs and forths (Case CHILD, PARENT, PARTNER, EXPARTNER,SIBLINGS)
-		System.out.println(nodesToAdd);
-		System.out.println(updates);
-		System.out.println(unknownRelation);
-		for (Map.Entry<Long, String> newOrUpdatedNode : updates.entrySet()) {
-			String key = newOrUpdatedNode.getValue();
-			if (Constants.POSSIBLE_NODE_ACTIONS_CREATION.contains(key)) {
-				long id = Misc.convertObjectToLong(newOrUpdatedNode.getKey());
-				//recherche de la node à ajouter 
-//				switch (key.toUpperCase()) {
-//				case "PARENT":
-//					break;
-//				case "PARTNER":
-//					break;
-//				case "SIBLINGS":
-//					break;
-//				case "EXPARTNER":
-//					break;
-//				case "CHILD":
-//					break;
-//				default:
-//					return new Response("Incorrect Parameter update " + key, false);
-//				}
-//				Node nodeToAdd = null;
-//				System.out.println(key + " " + id);
-//				Response BaFRes = preProcessNodeInTreeCreation(nodeToAdd, treeId, user, null /*à changer avec relatednode*/,key);
-//				if(!BaFRes.getSuccess() || (BaFRes.getSuccess() && !Objects.isNull(BaFRes.getValue()))) {
-//					return BaFRes;
-//				}
-			}
-		}
-
 		// True Process
 		for (Map.Entry<Long, String> newOrUpdatedNode : updates.entrySet()) {
 			Long id = Misc.convertObjectToLong(newOrUpdatedNode.getKey());
 			String key = newOrUpdatedNode.getValue();
-			String[] child = Objects.isNull(unknownRelation.get(id)) ? null : unknownRelation.get(id).split("\\.");
-
-			switch (key.toUpperCase()) {
-			case "PARENT":
-				addParentRelations(id, TreeId, child, nodesToAdd, existingNodes, unknownRelation, updates);
-				break;
-			case "PARTNER":
-				addPartnerRelations(id, TreeId, child, nodesToAdd, existingNodes, unknownRelation, updates);
-				break;
-			case "SIBLINGS":
-				// Useless ATM, so not implemented
-				break;
-//					case "EXPARTNER":
-//						if(!existingNodes.get(id).getExPartnersId().isEmpty() && existingNodes.get(id).getPartnerId() < 0) {
-//							addLinkedNode(treeId, id, nodesToAdd.get(existingNodes.get(id).getPartnerId()), nodesToAdd.get(existingNodes.get(id).getPartnerId()).getPrivacy() ,"Partner",false);
-//							nodesToAdd.remove(nodeService.getNode(id).getPartnerId());
-//							existingNodes.put(nodeService.getNode(id).getPartnerId(), nodeService.getNode(id).getPartner());	
-//						}
-//						break;
-			case "CHILD":
-				addChildRelations(id, TreeId, child, nodesToAdd, existingNodes, unknownRelation, updates);
-				break;
-			case "UPDATE":
-				nodeService.updateWithoutRelation(id, existingNodes.get(id));
-				break;
-			case "DELETE":
-				deleteNodeFromTree(nodeService.getNode(id), TreeId);
-				break;
-			default:
-				return new Response("Incorrect Parameter update " + key, false);
+			if (Constants.POSSIBLE_NODE_ACTIONS_CREATION.contains(key)) {
+				String[] relatedToNodes = Objects.isNull(unknownRelation.get(id)) ? null
+						: unknownRelation.get(id).split("\\.");
+				Response BaFRes = sendPreProcessNodeInTreeCreation(key, id, TreeId, user, relatedToNodes, nodesToAdd,
+						existingNodes, unknownRelation);
+				if (!BaFRes.getSuccess() || (BaFRes.getSuccess() && !Objects.isNull(BaFRes.getValue()))) {
+					return BaFRes;
+				}
+				switch (key.toUpperCase()) {
+				case "PARENT":
+					addParentRelations(id, TreeId, relatedToNodes, nodesToAdd, existingNodes, unknownRelation, updates);
+					break;
+				case "PARTNER":
+					addPartnerRelations(id, TreeId, relatedToNodes, nodesToAdd, existingNodes, unknownRelation,
+							updates);
+					break;
+				case "SIBLINGS":
+					// Useless ATM, so not implemented
+					break;
+				case "EXPARTNER":
+					// Useless ATM, so not implemented
+					break;
+				case "CHILD":
+					addChildRelations(id, TreeId, relatedToNodes, nodesToAdd, existingNodes, unknownRelation, updates);
+					break;
+				case "UPDATE":
+					nodeService.updateWithoutRelation(id, existingNodes.get(id));
+					break;
+				case "DELETE":
+					deleteNodeFromTree(nodeService.getNode(id), TreeId);
+					break;
+				default:
+					return new Response("Incorrect Parameter update " + key, false);
+				}
 			}
 		}
 
