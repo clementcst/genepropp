@@ -47,7 +47,8 @@ public enum ValidationType {
 			Node relatedToNode = (Node) objList.get(2);
 			String validationMsg = this.validationMsg;
 			validationMsg += "\n Here is my tree";
-			validationMsg += "\n link to my tree : " + msg.getSender().getMyTreeId();
+			validationMsg += "\n link to my tree : "
+			+ "<a class=\"text-green-700 hover:underline\" ng-reflect-router-link=\"/myTreePage\" ng-reflect-query-params=\"[object Object]\" href=\"/myTreePage?treeId="+ msg.getSender().getMyTreeId()+"\">View Tree</a>" ;
 			validationMsg += "\n Our trees would be link from the node in your tree : " + baseNode.toString();
 			validationMsg += "\n and will be linked with this node in my tree : " + relatedToNode.toString();
 			validationMsg += "\n as " + msg.getValidationInfos().get("relationType");

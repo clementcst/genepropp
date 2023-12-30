@@ -49,7 +49,7 @@ public class AccountController extends AbstractController {
 			return new Response("Incorrect password", false);
 		}
 		if (!user.isValidated()) {
-			List<Message> validations = conversationService.getUserValidationsOfConcernedUser(user, ValidationType.USER_VALIDATION);
+			List<Message> validations = conversationService.getUserValidationsOfConcernedUser(user);
 			LocalDateTime earliestDateTime =  validations.stream()
 			        .map(Message::getMessageDateTime)
 			        .min(Comparator.naturalOrder()).orElse(null);

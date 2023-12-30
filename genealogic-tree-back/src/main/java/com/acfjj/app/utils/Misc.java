@@ -329,4 +329,33 @@ public class Misc {
 			}
 		}
 	}
+	
+	// Function to convert LinkedHashMap<String, String> to String
+    public static String convertToString(LinkedHashMap<String, String> map) {
+        StringBuilder jsonString = new StringBuilder("{");
+        for (String key : map.keySet()) {
+            jsonString.append("\"").append(key).append("\":\"").append(map.get(key)).append("\",");
+        }
+        if (jsonString.length() > 1) {
+            jsonString.deleteCharAt(jsonString.length() - 1); // Remove the trailing comma
+        }
+        jsonString.append("}");
+        return jsonString.toString();
+    }
+
+    // Function to convert String to LinkedHashMap<String, String>
+    public static LinkedHashMap<String, String> convertFromString(String jsonString) {
+        LinkedHashMap<String, String> map = new LinkedHashMap<>();
+        if (jsonString != null && jsonString.length() > 2) {
+            jsonString = jsonString.substring(1, jsonString.length() - 1); // Remove leading and trailing curly braces
+            String[] keyValuePairs = jsonString.split(",");
+            for (String pair : keyValuePairs) {
+                String[] entry = pair.split(":");
+                String key = entry[0].replace("\"", "").trim();
+                String value = entry[1].replace("\"", "").trim();
+                map.put(key, value);
+            }
+        }
+        return map;
+    }
 }

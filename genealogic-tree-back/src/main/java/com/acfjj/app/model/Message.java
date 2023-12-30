@@ -4,11 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Objects;
-
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 import com.acfjj.app.utils.Constants;
 import com.acfjj.app.utils.Misc;
@@ -52,8 +48,9 @@ public class Message {
 	 	
 	 	//for validations
 	 	private ValidationType validationType;
-	 	@JdbcTypeCode(SqlTypes.JSON)
-	 	private LinkedHashMap<String,Object> validationInfos;
+
+	 	@Column(length = Constants.MAX_LONG_STRING_LENGTH)
+	 	private String validationInfos;
 	 	
 	 	public Message() {
 	 		super();
@@ -66,18 +63,21 @@ public class Message {
 			this.conversation = null;
 			this.validationType = validationType;
 			this.messageDateTime = Misc.getLocalDateTime();	
-			this.validationInfos = new LinkedHashMap<>();
+			LinkedHashMap<String,String> LHMvalidationInfos = new LinkedHashMap<>();
 			if (!Objects.isNull(concernedUser) && !Objects.isNull(validationType)) {
-				this.validationInfos.put("concernedUserId", concernedUser.getId());
+				LHMvalidationInfos.put("concernedUserId", concernedUser.getId().toString());
 				this.setContent(validationType.getValidationMsg(concernedUser));
+				this.setValidationInfos(LHMvalidationInfos);
 			} else if (!Objects.isNull(baseNode) && !Objects.isNull(additionNode) && !Objects.isNull(validationType)) {
-				this.validationInfos.put("baseNodeId",baseNode.getId());
-				this.validationInfos.put("additionNodeId",additionNode.getId());
-				this.validationInfos.put("relatedToNodeId",relatedToNode.getId());
-				this.validationInfos.put("relationType",relationType);
+				LHMvalidationInfos.put("baseNodeId",baseNode.getId().toString());
+				LHMvalidationInfos.put("additionNodeId",additionNode.getId().toString());
+				LHMvalidationInfos.put("relatedToNodeId",relatedToNode.getId().toString());
+				LHMvalidationInfos.put("relationType",relationType);
+				this.setValidationInfos(LHMvalidationInfos);
 				this.setContent(validationType.getValidationMsg(new ArrayList<Object>(Arrays.asList(this, baseNode, relatedToNode))));
 			} else {
 				this.setContent(content);
+				this.setValidationInfos(null);
 			}
 		}
 	 	
@@ -160,11 +160,11 @@ public class Message {
 			}
 		}
 		@JsonIgnore
-		public LinkedHashMap<String, Object> getValidationInfos() {
-			return validationInfos;
+		public LinkedHashMap<String, String> getValidationInfos() {
+			return Objects.isNull(validationInfos) ? null : Misc.convertFromString(validationInfos);
 		}
-		public void setValidationInfos(LinkedHashMap<String, Object> validationInfos) {
-			this.validationInfos = validationInfos;
+		public void setValidationInfos(LinkedHashMap<String, String> validationInfos) {
+			this.validationInfos = Objects.isNull(validationInfos) ? null : Misc.convertToString(validationInfos);
 		}
 
 		public void disableValidation(boolean response, User validator) {

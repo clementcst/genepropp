@@ -330,6 +330,10 @@ public class Node {
 		return treesId;
 	}
 	
+	public boolean getIsAUserNode() {
+		return !Objects.isNull(this.getPersonInfo().getRelatedUser());
+	}
+	
 	@Override
 	public boolean equals(Object obj) {
 	    if (this == obj) {

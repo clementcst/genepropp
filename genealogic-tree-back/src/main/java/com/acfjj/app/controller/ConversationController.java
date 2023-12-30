@@ -125,15 +125,14 @@ public class ConversationController extends AbstractController {
 		}
 		User concernedUser = userService.getUser(concernedUserId);
 		if (Objects.isNull(concernedUser)
-				|| concernedUserId != (long) validationMsg.getValidationInfos().get("concernedUserId")) {
+				|| concernedUserId != Long.parseLong(validationMsg.getValidationInfos().get("concernedUserId"))) {
 			return new Response("Concerned user not found or mismatch", false);
 		}
 		User validator = userService.getUser(validatorId);
 		if (Objects.isNull(validator) || validatorId != validationMsg.getReceiverId()) {
 			return new Response("Validator user not found or mismatch", false);
 		}
-		List<Message> similarValidations = conversationService.getUserValidationsOfConcernedUser(concernedUser,
-				ValidationType.USER_VALIDATION);
+		List<Message> similarValidations = conversationService.getUserValidationsOfConcernedUser(concernedUser);
 		if (!similarValidations.contains(validationMsg)) {
 			return new Response("Validation message and concerned user mismatch", false);
 		}
