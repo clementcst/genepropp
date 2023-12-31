@@ -403,7 +403,10 @@ export class TreeContentComponent {
             field_0: "fullName",
             img_0: "profilPictureUrl"
             },
-
+            searchFiledsAbbreviation: {        
+              tel: 'phone',
+              n: 'name'
+            },
             editForm: {
               titleBinding: "fullName",
               photoBinding: "profilPictureUrl",
@@ -516,7 +519,9 @@ export class TreeContentComponent {
                       this.treeTab.push(tempNode);   
                   });
                   //fin
-                  if(!this.isMyTree) this.treeService.addView(this.myTreeId);
+                  if(!this.isMyTree){
+                    this.treeService.addView(this.myTreeId).subscribe()
+                  } 
                   family.load(this.treeTab);
                 this.isReadyToDisplay = false;
                 }
