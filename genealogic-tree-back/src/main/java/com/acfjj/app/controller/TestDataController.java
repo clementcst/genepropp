@@ -65,9 +65,6 @@ public class TestDataController extends AbstractController {
 			user.setValidated(validated);
 			userService.updateUser(user.getId(), user);
 		}
-		User adminFab = userService.getUserByEmail("fabien@mail");
-		adminFab.setIsAdmin(true);
-		userService.updateUser(adminFab.getId(), adminFab);
 		for (Response response : responses) {
 			if (!response.getSuccess()) {
 				return new Response(responses, "One or more failure occured", false);
