@@ -37,6 +37,7 @@ public class TreeController extends AbstractController {
 			return new Response("Tree not found", false);
 		}
 		tree.addAView();
+		System.err.println(tree.getViewOfMonth() + tree.getViewOfYear());
 		treeService.updateTree(tree.getId(), tree);
 		return new Response("Success", true);
 	}
@@ -53,7 +54,12 @@ public class TreeController extends AbstractController {
 		if (Objects.isNull(user)) {
 			return new Response("User not found", false);
 		}
-
+		if (conversationService.userHasTreeMergeValidationsOnGoing(user)) {
+			return new Response(
+					"There is a Tree Merge validation process that concerns you on going. Saving your tree is impossible while",
+					false);
+		}
+		
 		List<LinkedHashMap<String, String>> tree;
 		LinkedHashMap<Long, String> updates;
 		try {
@@ -209,6 +215,7 @@ public class TreeController extends AbstractController {
 		if (!nodesToAdd.isEmpty()) {
 			return new Response("Something went wrong", false);
 		}
+		
 		return new Response("Tree Updated successfully", true);
 	}
 	
@@ -430,6 +437,8 @@ public class TreeController extends AbstractController {
 			else if (!existingNode.getCreatedById().equals(userWhoWantsToCreate.getId())) {
 				User creator = existingNode.getCreatedBy();
 				// make the node temporary (invisible to user) and store it in db
+				String resStr = "A node similar as the one that you want to create (" + node.getFullNameAndBirthInfo()
+						+ ") as been found in the tree of another user. \nHere is the node. Is that the node you wanna create ?\n If so, click yes and a request to merge the other user tree will be sent. \nOtherwise click no, and change data in the Node or create it in private.";
 				String temporaryCountryOfBirth = node.getCountryOfBirth() + Constants.TEMPORARY_STR_MAKER;
 				node.getPersonInfo().setCountryOfBirth(temporaryCountryOfBirth);
 				Response tmpNodeCreatRes = addNode(node);
@@ -447,13 +456,9 @@ public class TreeController extends AbstractController {
 						+ existingNode.getId() + "&additionNodeId=" + node.getId() + "&relatedNodeId="
 						+ relatedToNode.getId() + "&relationType=" + relationType;
 				resValue.put("requestYes", requestYes);
-				return new Response(resValue, "A node similar as the one that you want to create ("
-						+ node.getFullNameAndBirthInfo()
-						+ ") as been found in the tree of another user. \nHere is the node. Is that the node you wanna create ?\n If so, click yes and a request to merge the other user tree will be sent. \nOtherwise click no, and change data in the Node or create it in private.",
-						true);
+				return new Response(resValue, resStr, true);
 			}
 		}
-
 		return new Response(null, true);
 	}
 
