@@ -382,20 +382,12 @@ export class TreeContentComponent {
 
           // Récupérez la valeur du paramètre 'myParam' de l'URL
           if(params['treeId']){
-
-            if(!this.TempUserData.isMyTreePublic){
-              this.myTreeId = "noAccessible"
-              this.openErrorMergeTreePopupComponent("This family tree is set to private. Click below to be redirected to the main menu.")
-            }else{
-              this.myTreeId = params['treeId']
-              this.isMyTree = false
-            }    
+            this.myTreeId = params['treeId']
+            this.isMyTree = false  
           }
         });
-        //console.log("voici le treeid de celui qui va arriver : "+this.myTreeId)
 
         const tree = document.getElementById('tree');
-        //console.log("Voici tis is ..."+this.isMyTree)
         if (tree) {
           let familyConfig: any = {
 
@@ -475,52 +467,59 @@ export class TreeContentComponent {
             this.treeService.getTree(this.myTreeId).subscribe((data) => {
 
               this.TempTreeFromDB = data.value;
-              this.treeFromDB =  this.TempTreeFromDB.nodes;
 
-              console.log("FROM DB");
-              console.log(this.treeFromDB)
+              //cas ou arbre est privé
+              if(this.TempTreeFromDB.privacy == 1 && !this.isMyTree){
+                this.openErrorMergeTreePopupComponent("This family tree is set to private. Click below to be redirected to the main menu.")
+              }else{
 
-              //enleve les id qu'on ne connait pas + créer une liste pour les rajouter apres
-              console.log(this.getAllIds(this.treeFromDB))
-              this.createTabForSaveUnknowID(this.treeFromDB,this.getAllIds(this.treeFromDB))
+                  this.treeFromDB =  this.TempTreeFromDB.nodes;
 
-              console.log(this.tabForSaveUnknowID)
+                  console.log("FROM DB");
+                  console.log(this.treeFromDB)
 
-              //remplissage depuis la database
-              this.treeFromDB.forEach((node: any) => {
-                  let tempNode = {
-                      firstName: node.firstName,
-                      lastName: node.lastName,
-                      privacy: node.privacy == 0 ? 'private' : node.privacy == 2 ? 'public' : 'restricted',
-                      fullName: node.firstName + " " + node.lastName + (node.isAUserNode ? " (user)" : ""),
-                      id: node.id, 
-                      pids:this.getPartnerIds(node.partnerId,node.exPartnersId),
-                      divorced: node.exPartnersId,
-                      tags: this.getTags(node.gender,node.id),
-                      
-                      gender : node.gender == 1 ? 'male' : node.gende == 0 ? 'female' : 'other',
-                      profilPictureUrl: node.profilPictureUrl,
-                      dateOfBirth : node.dateOfBirth,
-                      dateOfDeath : node.dateOfDeath,
+                  //enleve les id qu'on ne connait pas + créer une liste pour les rajouter apres
+                  console.log(this.getAllIds(this.treeFromDB))
+                  this.createTabForSaveUnknowID(this.treeFromDB,this.getAllIds(this.treeFromDB))
 
-                      cityOfBirth: node.cityOfBirth,
-                      countryOfBirth: node.countryOfBirth,
+                  console.log(this.tabForSaveUnknowID)
 
-                      adress: node.adress,
-                      postalCode: node.postalCode,
-                      nationality: node.nationality,
+                  //remplissage depuis la database
+                  this.treeFromDB.forEach((node: any) => {
+                      let tempNode = {
+                          firstName: node.firstName,
+                          lastName: node.lastName,
+                          privacy: node.privacy == 0 ? 'private' : node.privacy == 2 ? 'public' : 'restricted',
+                          fullName: node.firstName + " " + node.lastName + (node.isAUserNode ? " (user)" : ""),
+                          id: node.id, 
+                          pids:this.getPartnerIds(node.partnerId,node.exPartnersId),
+                          divorced: node.exPartnersId,
+                          tags: this.getTags(node.gender,node.id),
+                          
+                          gender : node.gender == 1 ? 'male' : node.gende == 0 ? 'female' : 'other',
+                          profilPictureUrl: node.profilPictureUrl,
+                          dateOfBirth : node.dateOfBirth,
+                          dateOfDeath : node.dateOfDeath,
 
-                      mid: node.parent1Id == null ? null :  node.parent1Id,
-                      fid: node.parent2Id == null ? null :  node.parent2Id,
+                          cityOfBirth: node.cityOfBirth,
+                          countryOfBirth: node.countryOfBirth,
 
-                  };
+                          adress: node.adress,
+                          postalCode: node.postalCode,
+                          nationality: node.nationality,
 
-                  this.treeTab.push(tempNode);   
-              });
-              //fin
-              this.treeService.addView(this.myTreeId);
-              family.load(this.treeTab);
-             this.isReadyToDisplay = false;
+                          mid: node.parent1Id == null ? null :  node.parent1Id,
+                          fid: node.parent2Id == null ? null :  node.parent2Id,
+
+                      };
+
+                      this.treeTab.push(tempNode);   
+                  });
+                  //fin
+                  if(!this.isMyTree) this.treeService.addView(this.myTreeId);
+                  family.load(this.treeTab);
+                this.isReadyToDisplay = false;
+                }
            });  
         }// fin if tree
       });
