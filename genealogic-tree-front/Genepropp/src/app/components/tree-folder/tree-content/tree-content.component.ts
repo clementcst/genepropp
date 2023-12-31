@@ -93,13 +93,13 @@ export class TreeContentComponent {
   
   
   IDlist(tableau1: any[], tableau2: any[]): void {
-    console.log("id dans le tableau de la db")
+   // console.log("id dans le tableau de la db")
     tableau1.forEach((node) => {
-      console.log(node.id)
+      //console.log(node.id)
     });
-    console.log("id dans le tableau de le merge tab")
+   // console.log("id dans le tableau de le merge tab")
     tableau2.forEach((node) => {
-      console.log(node.id)
+     // console.log(node.id)
     });
   }
 
@@ -218,15 +218,14 @@ export class TreeContentComponent {
   
       if (existingItem) {
         let ParentsKeyHaveChanged = false
-        let KeyHaveChanged = false
+        let KeyHaveChanged = false;
         let KeyNotDisplayChanges = false;
         Object.keys(createdItem).forEach((key) => {
             if(!this.isEqual(existingItem[key],createdItem[key])){
               KeyHaveChanged = true
               if(key == 'parent1Id' || key == 'parent2Id') { ParentsKeyHaveChanged = true; } 
-              if(key == 'partnerId' || "exPartnerIds" ){ 
-                KeyNotDisplayChanges = true }
-              console.log("le param "+key+" de "+existingItem.id+" a changé !"+existingItem[key]+"-->"+createdItem[key])
+              if(key == 'partnerId' || key == "exPartnerIds" ){ KeyNotDisplayChanges = true; }
+              //console.log("le param "+key+" de "+existingItem.id+" a changé !"+existingItem[key]+"-->"+createdItem[key])
               if( key == "exPartnersId" || key == "treesId") {
                 existingItem[key] = this.convertToString(createdItem[key] )
               }else{
@@ -234,11 +233,13 @@ export class TreeContentComponent {
               }
             } 
         });
-        if(KeyHaveChanged  && ParentsKeyHaveChanged) this.linkedHashMap.putOrAdd(existingItem.id, "PARENT");
-            if(KeyHaveChanged  && ParentsKeyHaveChanged == false && KeyNotDisplayChanges == false ){
-              console.log("on rajoute update dans la hash, la valeur de KeyNotDisplayChanges = "+KeyNotDisplayChanges)
-              this.linkedHashMap.putOrAdd(existingItem.id, "UPDATE");
-            } 
+        if(KeyHaveChanged  && ParentsKeyHaveChanged) {this.linkedHashMap.putOrAdd(existingItem.id, "PARENT"); }
+        //console.log("voici l'état des variable : "+KeyHaveChanged+"  "+ParentsKeyHaveChanged+"   "+KeyNotDisplayChanges)
+        if(KeyHaveChanged  && ParentsKeyHaveChanged == false && KeyNotDisplayChanges == false )
+        {
+          //console.log("on rajoute update dans la hash, la valeur de KeyNotDisplayChanges = "+KeyNotDisplayChanges)
+          this.linkedHashMap.putOrAdd(existingItem.id, "UPDATE");
+        } 
         
       } else { //nouveau élement 
 
@@ -481,11 +482,9 @@ export class TreeContentComponent {
                   console.log("FROM DB");
                   console.log(this.treeFromDB)
 
-                  //enleve les id qu'on ne connait pas + créer une liste pour les rajouter apres
-                  console.log(this.getAllIds(this.treeFromDB))
                   this.createTabForSaveUnknowID(this.treeFromDB,this.getAllIds(this.treeFromDB))
 
-                  console.log(this.tabForSaveUnknowID)
+                  //console.log(this.tabForSaveUnknowID)
 
                   //remplissage depuis la database
                   this.treeFromDB.forEach((node: any) => {
