@@ -737,7 +737,7 @@ export class TreeContentComponent {
                     // @ts-ignore
                     this.openSpecialSuccessPopupComponent(response)
                   }
-                  location.reload();
+                  //location.reload();
                   //console.log("reload")
                 }
                 
