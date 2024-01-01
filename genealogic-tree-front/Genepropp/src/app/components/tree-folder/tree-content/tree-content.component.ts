@@ -736,9 +736,11 @@ export class TreeContentComponent {
                     console.log("on est en spécial success")
                     // @ts-ignore
                     this.openSpecialSuccessPopupComponent(response)
-                  }
-                  //location.reload();
+                  }else{
+                  location.reload();
                   //console.log("reload")
+                  }
+                
                 }
                 
               },
