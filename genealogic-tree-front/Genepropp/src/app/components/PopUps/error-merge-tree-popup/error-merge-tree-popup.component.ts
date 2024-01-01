@@ -27,6 +27,7 @@ export class ErrorMergeTreePopupComponent {
       //console.log("redirection 2 ....")
       this.dialogRef.close({ action: 'Submit' });
     }
+    location.reload();
   }
 
 }
