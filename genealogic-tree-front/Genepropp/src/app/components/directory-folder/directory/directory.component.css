@@ -11,6 +11,12 @@
   
   /* Piste de la barre de défilement */
   ::-webkit-scrollbar-track {
-    background-color: #CBD5E0;
+    background-color: rgba(20,83,45,255);
     border-radius: 6px;
   }
+
+  /* directory.component.css */
+.search-bar {
+  width: 95%; /* Utilise la largeur à 100% */
+  margin-left: 2.5%;
+}

@@ -42,6 +42,7 @@ import { TreeContentComponent } from './components/tree-folder/tree-content/tree
 import { LinkedHashMap } from './components/tree-folder/linked-hashmap/linked-hashmap.component';
 import { NodeCreationRulesComponent } from './components/PopUps/node-creation-rules/node-creation-rules.component';
 import { ErrorMergeTreePopupComponent } from './components/PopUps/error-merge-tree-popup/error-merge-tree-popup.component';
+import { SpecialSuccessPopupComponent } from './components/PopUps/special-success-popup/special-success-popup.component';
 
 
 
@@ -78,7 +79,8 @@ import { ErrorMergeTreePopupComponent } from './components/PopUps/error-merge-tr
     TreeContentComponent,
     LinkedHashMap,
     NodeCreationRulesComponent,
-    ErrorMergeTreePopupComponent
+    ErrorMergeTreePopupComponent,
+    SpecialSuccessPopupComponent
   ],
   imports: [
     BrowserModule,

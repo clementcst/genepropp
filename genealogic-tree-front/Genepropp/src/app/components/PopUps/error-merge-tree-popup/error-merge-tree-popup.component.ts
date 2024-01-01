@@ -1,5 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-error-merge-tree-popup',
@@ -10,12 +11,23 @@ export class ErrorMergeTreePopupComponent {
 
   constructor(
     public dialogRef: MatDialogRef<ErrorMergeTreePopupComponent>,
-    @Inject(MAT_DIALOG_DATA) public errorMessage: any
-    ) {}
+    @Inject(MAT_DIALOG_DATA) public errorMessage: any,
+    private router: Router
+    ) {
+      dialogRef.disableClose = true;
+    }
 
   valider() {
-    console.log(this.errorMessage)
-    this.dialogRef.close({action: 'Submit'});
+
+    if (this.errorMessage.data == "This family tree is set to private. Click below to be redirected to the main menu.") {
+      // Redirection vers le menu principal (/homeMenu)
+      this.dialogRef.close({ action: 'Submit' });
+      this.router.navigate(['/homePage']);
+    } else {
+      //console.log("redirection 2 ....")
+      this.dialogRef.close({ action: 'Submit' });
+    }
+    location.reload();
   }
 
 }

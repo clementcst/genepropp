@@ -11,7 +11,6 @@ export class NavComponent implements OnInit {
   PPurl: string = "";
 
   pages=[
-    {link:"/homePage", displayName:"Home"},
     {link:"/myTreePage", displayName:"My Tree"},
     {link:"/contactPage", displayName:"Contacts"},
     {link:"/directoryPage", displayName:"Directory"},

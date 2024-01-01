@@ -41,5 +41,13 @@ export class TreeService {
 
   }
 
+  addView(id: string):Observable<TreeResponce> {
+    console.log("j'ajoute +1 à l'arbre "+id)
+    return this.http.post<TreeResponce>(`http://localhost:8080/tree/addView?treeId=${id}`,{responseType: 'json'});
+  }
 
+  wantToMergeNode(valueRequestYes: string):Observable<TreeResponce> {
+    console.log("value :"+valueRequestYes)
+    return this.http.post<TreeResponce>(`http://localhost:8080${valueRequestYes}`,{responseType: 'json'});
+  }
 }
