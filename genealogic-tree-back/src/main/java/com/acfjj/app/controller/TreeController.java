@@ -135,10 +135,12 @@ public class TreeController extends AbstractController {
 							+ " does not belong to you, you cannot update it\n";
 					responseSuccess = false;
 				}
+				Node nodeInDb = nodeService.getNodeByNameAndBirthInfo(currentNode.getLastName(),
+						currentNode.getFirstName(), currentNode.getDateOfBirth(),
+						currentNode.getCountryOfBirth(), currentNode.getCityOfBirth());
+
 				if ("UPDATE".equals(nodeUpdate.getValue().toUpperCase())
-						&& !Objects.isNull(nodeService.getNodeByNameAndBirthInfo(currentNode.getLastName(),
-								currentNode.getFirstName(), currentNode.getDateOfBirth(),
-								currentNode.getCountryOfBirth(), currentNode.getCityOfBirth()))) {
+						&& !Objects.isNull(nodeInDb) && nodeInDb.getId() != currentNode.getId()) {
 					responseStr += "Cannot update the node with these info : "
 							+ nodeService.getNode(id).getFullNameAndBirthInfo()
 							+ " because it already exist in the database. Try to create it from start to go further in a merge procedure\n";

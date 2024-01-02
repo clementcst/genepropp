@@ -6,6 +6,7 @@ import com.acfjj.app.model.Node;
 import com.acfjj.app.model.PersonInfo;
 import com.acfjj.app.model.Tree;
 import com.acfjj.app.model.TreeNodes;
+import com.acfjj.app.model.User;
 import com.acfjj.app.utils.Misc;
 
 import java.time.LocalDate;
@@ -206,10 +207,11 @@ public class NodeService extends AbstractService {
     public void updateWithoutRelation(Long id, Node node) {
     	Node existingNode = getNode(id);
         if (getNode(id) != null && node.getId() == id) {
+        	PersonInfo person = existingNode.getPersonInfo();
+           	node.getPersonInfo().setId(person.getId());
         	existingNode.setPersonInfo(node.getPersonInfo());
         	existingNode.setPrivacy(node.getPrivacy());
-        	existingNode.setDateOfDeath(node.getDateOfDeath());
-        	System.out.println(existingNode);
+        	existingNode.setDateOfDeath(node.getDateOfDeath()); 
             personInfoRepository.save(existingNode.getPersonInfo());
             nodeRepository.save(existingNode);
         }
@@ -250,13 +252,16 @@ public class NodeService extends AbstractService {
     	return Misc.findMaxFrequency(diffList);
     }
     
-    public Node getNodeByNameAndBirthInfo(String lastName, String firstName, LocalDate dateOfBirth, String countryOfBirth, String cityofBirth) {
-		for(PersonInfo person : personInfoRepository.findByLastNameAndFirstNameAndDateOfBirthAndCountryOfBirthAndCityOfBirth(lastName, firstName, dateOfBirth, countryOfBirth, cityofBirth)) {
-			if(!Objects.isNull(person)) {
-				return nodeRepository.findByPersonInfo(person);
-			}
-		}		
-		return null;
+    public Node getNodeByNameAndBirthInfo(String lastName, String firstName, LocalDate dateOfBirth, String countryOfBirth, String cityofBirth) {    	
+    	Node nodeFound = null;
+		List<PersonInfo> personInfoFounds = personInfoRepository
+				.findByLastNameAndFirstNameAndDateOfBirthAndCountryOfBirthAndCityOfBirth(lastName, firstName,
+						dateOfBirth, countryOfBirth, cityofBirth);
+		if (!personInfoFounds.isEmpty()) {
+			PersonInfo personInfoFound = personInfoFounds.get(0);
+			nodeFound = nodeRepository.findByPersonInfo(personInfoFound);
+		}
+		return nodeFound;
 	}
 
     public Node getPublicNodeByNameAndBirthInfo(String lastName, String firstName, LocalDate dateOfBirth, String countryOfBirth, String cityofBirth) {
