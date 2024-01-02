@@ -36,9 +36,10 @@ public class Node {
 	@ManyToOne
 	@JoinColumn(name = "created_by_user_id")
 	private User createdBy;
+
 	private int privacy;
+
 	private boolean hasChild;
-	private LocalDate dateOfDeath;
 
 	@JsonIgnore
 	@ManyToOne
@@ -70,8 +71,7 @@ public class Node {
 		super();
 	}
 
-	public Node(Long id, PersonInfo personInfo, User createdBy, Node parent1, Node parent2, int privacy,
-			LocalDate dateOfDeath) {
+	public Node(Long id, PersonInfo personInfo, User createdBy, Node parent1, Node parent2, int privacy) {
 		this();
 		if (!Objects.isNull(id)) {
 			this.id = id;
@@ -82,11 +82,6 @@ public class Node {
 		this.parent2 = parent2;
 		this.privacy = privacy;
 		this.hasChild = false;
-		this.dateOfDeath = dateOfDeath;
-	}
-
-	public Node(Long id, PersonInfo personInfo, User createdBy, Node parent1, Node parent2, int privacy) {
-		this(id, personInfo, createdBy, parent1, parent2, privacy, null);
 	}
 
 	public Node(Long id, PersonInfo personInfo, User createdBy, int privacy) {
@@ -112,27 +107,6 @@ public class Node {
 			String profilPictureUrl) {
 		this(id, lastName, firstname, gender, dateOfBirth, countryOfBirth, cityOfBirth, createdBy, null, null, privacy,
 				nationality, adress, postalCode, profilPictureUrl);
-	}
-
-	public Node(Long id, String lastName, String firstname, int gender, LocalDate dateOfBirth, String countryOfBirth,
-			String cityOfBirth, User createdBy, Node parent1, Node parent2, int privacy, String nationality,
-			String adress, int postalCode, String profilPictureUrl, LocalDate dateOfDeath) {
-		this(id, new PersonInfo(lastName, firstname, gender, dateOfBirth, countryOfBirth, cityOfBirth, false,
-				nationality, adress, postalCode, profilPictureUrl), createdBy, parent1, parent2, privacy, dateOfDeath);
-	}
-
-	public Node(Long id, String lastName, String firstname, int gender, LocalDate dateOfBirth, String countryOfBirth,
-			String cityOfBirth, User createdBy, Node parent1, int privacy, String nationality, String adress,
-			int postalCode, String profilPictureUrl, LocalDate dateOfDeath) {
-		this(id, lastName, firstname, gender, dateOfBirth, countryOfBirth, cityOfBirth, createdBy, parent1, null,
-				privacy, nationality, adress, postalCode, profilPictureUrl, dateOfDeath);
-	}
-
-	public Node(Long id, String lastName, String firstname, int gender, LocalDate dateOfBirth, String countryOfBirth,
-			String cityOfBirth, User createdBy, int privacy, String nationality, String adress, int postalCode,
-			String profilPictureUrl, LocalDate dateOfDeath) {
-		this(id, lastName, firstname, gender, dateOfBirth, countryOfBirth, cityOfBirth, createdBy, null, null, privacy,
-				nationality, adress, postalCode, profilPictureUrl, dateOfDeath);
 	}
 
 	/* Getters & Setters */
@@ -349,14 +323,6 @@ public class Node {
 		return personInfo.isDead();
 	}
 
-	public LocalDate getDateOfDeath() {
-		return dateOfDeath;
-	}
-
-	public void setDateOfDeath(LocalDate dateOfDeath) {
-		this.dateOfDeath = dateOfDeath;
-	}
-
 	public String getNationality() {
 		return personInfo.getNationality();
 	}
@@ -447,38 +413,30 @@ public class Node {
 			postalCode = Constants.DEFAULT_POSTAL_CODE;
 		}
 		String ppUrl = keys.contains("profilPictureUrl") ? data.get("profilPictureUrl") : null;
-		LocalDate dateOfDeath;
-		try {
-			dateOfDeath = (keys.contains("dateOfDeath") && !Objects.isNull(data.get("dateOfDeath")))
-					? LocalDate.parse(data.get("dateOfDeath"))
-					: null;
-		} catch (Exception e) {
-			dateOfDeath = null;
-		}
+//				: Constants.DEFAULT_PP_URL;
+
 		Node node = new Node(id, lastname, firstname, gender, dateOfBirth, countryOfBirth, cityOfBirth, createdBy,
-				parent1, parent2, privacy, nationality, adress, postalCode, ppUrl, dateOfDeath);
+				parent1, parent2, privacy, nationality, adress, postalCode, ppUrl);
 		node.setPartner(partner);
 		return node;
 	}
 
 	public static Node merge(Node baseNode, Node additionNode) {
 		PersonInfo baseNodePI = baseNode.getPersonInfo();
-		baseNodePI.setLastName(
-				Objects.isNull(baseNodePI.getLastName()) ? additionNode.getLastName() : baseNodePI.getLastName());
-		baseNodePI.setFirstName(
-				Objects.isNull(baseNodePI.getFirstName()) ? additionNode.getFirstName() : baseNodePI.getFirstName());
+		baseNodePI.setLastName(Objects.isNull(baseNodePI.getLastName()) ? additionNode.getLastName()
+				: baseNodePI.getLastName());
+		baseNodePI.setFirstName(Objects.isNull(baseNodePI.getFirstName()) ? additionNode.getFirstName()
+				: baseNodePI.getFirstName());
 		baseNodePI.setCountryOfBirth(Objects.isNull(baseNodePI.getCountryOfBirth()) ? additionNode.getCountryOfBirth()
 				: baseNodePI.getCountryOfBirth());
 		baseNodePI.setCityOfBirth(Objects.isNull(baseNodePI.getCityOfBirth()) ? additionNode.getCityOfBirth()
 				: baseNodePI.getCityOfBirth());
 		baseNodePI.setDateOfBirth(Objects.isNull(baseNodePI.getDateOfBirth()) ? additionNode.getDateOfBirth()
 				: baseNodePI.getDateOfBirth());
-		baseNodePI.setProfilPictureUrl(
-				Objects.isNull(baseNodePI.getProfilPictureUrl()) ? additionNode.getProfilPictureUrl()
-						: baseNodePI.getProfilPictureUrl());
-		baseNodePI.setPostalCode(
-				baseNodePI.getPostalCode() == Constants.DEFAULT_POSTAL_CODE ? additionNode.getPostalCode()
-						: baseNodePI.getPostalCode());
+		baseNodePI.setProfilPictureUrl(Objects.isNull(baseNodePI.getProfilPictureUrl()) ? additionNode.getProfilPictureUrl()
+				: baseNodePI.getProfilPictureUrl());
+		baseNodePI.setPostalCode(baseNodePI.getPostalCode() == Constants.DEFAULT_POSTAL_CODE ? additionNode.getPostalCode()
+				: baseNodePI.getPostalCode());
 		baseNodePI.setNationality(Objects.isNull(baseNodePI.getNationality()) ? additionNode.getNationality()
 				: baseNodePI.getNationality());
 		baseNode.setPrivacy(Constants.NODE_PRIVACY_PUBLIC);
@@ -487,19 +445,10 @@ public class Node {
 
 	@Override
 	public String toString() {
-	    return "Node [id=" + id +
-	            ", personInfo=" + personInfo +
-	            ", createdById=" + createdBy.getId() +
-	            ", privacy=" + privacy +
-	            ", parent1=" + getParent1Id() +
-	            ", parent2=" + getParent2Id() +
-	            ", partner=" + getPartnerId() +
-	            ", exPartners=" + getExPartnersId() +
-	            ", siblings=" + getSiblingsId() +
-	            ", trees=" + getTreesId() +
-	            ", dateOfDeath=" + dateOfDeath +  
-	            "]";
+		return "Node [id=" + id + ", personInfo=" + personInfo + ", createdById=" + createdBy.getId() + ", privacy="
+				+ privacy + ", parent1=" + getParent1Id() + ", parent2=" + getParent2Id() + ", partner="
+				+ getPartnerId() + ", exPartners=" + getExPartnersId() + ", siblings=" + getSiblingsId() + ", trees="
+				+ getTreesId() + "]";
 	}
-
 
 }
