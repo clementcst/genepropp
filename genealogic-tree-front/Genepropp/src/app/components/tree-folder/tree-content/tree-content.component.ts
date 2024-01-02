@@ -724,6 +724,7 @@ export class TreeContentComponent {
                 console.log("Réponse reçue avec succès :", response);
                 // Autres actions après une réponse réussie, si nécessaire
                 this.loading = false; // Cacher l'indicateur de chargement en cas de réponse
+
                 // @ts-ignore
                 if(!response.success){
                   // @ts-ignore
@@ -732,15 +733,13 @@ export class TreeContentComponent {
                 }else{
                   // @ts-ignore
                   if (response.value && response.value.hasOwnProperty("specialSuccess")) {
-                    // La propriété "specialSuccess" existe
-                    console.log("on est en spécial success")
-                    // @ts-ignore
-                    this.openSpecialSuccessPopupComponent(response)
+                       console.log("on est en spécial success")
+                       // @ts-ignore
+                      this.openSpecialSuccessPopupComponent(response)
                   }else{
-                  location.reload();
-                  //console.log("reload")
+                      location.reload();
                   }
-                
+                  
                 }
                 
               },
