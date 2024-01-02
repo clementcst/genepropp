@@ -27,9 +27,9 @@ Then, make sure you have all dependencies
 To have a good Angular environment, type in your console :
 
 - Move to your angular project
- ```
+  ```
   cd genealogic-tree-front\Genepropp
- ```
+  ```
 
 - Install angular environment
   ```
@@ -55,7 +55,7 @@ To have a good Angular environment, type in your console :
 
 ## Execution
 
-First, launch the [GenTreeApp file](genealogic-tree-back/src/main/java/com/acfjj/app/GenealogicTreeApplication.java) with your JEE environment.
+First, launch the [GenTreeApp file](genealogic-tree-back/src/main/java/com/acfjj/app/GenTreeApp.java) with your JEE environment.
 Make sure your have [Springboot installed](README.md#Prerequisites)
 
 Then, run angular project
