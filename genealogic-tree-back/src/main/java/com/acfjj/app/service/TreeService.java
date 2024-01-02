@@ -84,29 +84,6 @@ public class TreeService extends AbstractService {
 		return treeRepository.findByPrivacy(0);
 	}
 
-//    public void deleteNodeFromTree(Long nodeId, Long treeId) {
-//    les vérifs sont à faire ici
-//    	//sécurité de user
-//        Tree tree = getTree(treeId);
-//        if (tree != null) {
-//        	 Set<TreeNodes> treeNodes = tree.getTreeNodes();
-//
-//        	 for (TreeNodes treeNode : treeNodes) {
-//        		 if(treeNode.getNode().getId().equals(nodeId)) {
-//        			 if(treeNode.getTree() != null && treeNode.getTree().getId().equals(treeId)) {
-//        				 removeNodeFromTree(tree, treeNode.getNode());
-//        				 tree = getTree(treeId);
-//        			 }
-//        			 treeNodesRepository.delete(treeNode);
-//
-//        		 }
-//        	 }
-//             nodeRepository.deleteById(nodeId);
-//
-//             treeRepository.save(tree);
-//        } 
-//    }
-
 	public void addNodeToTree(Tree tree, Node node, int privacy, int depth) {
 		if (tree != null && node != null) {
 			Set<TreeNodes> treeNodes = tree.getTreeNodes();
@@ -227,7 +204,6 @@ public class TreeService extends AbstractService {
 	}
 
 	public void removeNodeFromTree(Tree tree, Node node) {
-		Long treeId = tree.getId();
 		if (tree != null && node != null) {
 			Set<TreeNodes> treeNodes = tree.getTreeNodes();
 			if (treeNodes != null) {
@@ -242,19 +218,14 @@ public class TreeService extends AbstractService {
 					nodeRepository.save(node);
 					treeNodesRepository.delete(nodeToRemove);
 					treeRepository.save(tree);
-					tree = getTree(treeId);
 				}
 			}
 		}
 	}
 	
 	// Tree1 est l'arbre dans lequel la node existe déjà et tree2 celui dans lequel on veut l'ajouter
-	public void treeMerge(Long treeId1, Long treeId2, Long nodeId, String newLink) {
-		Tree tree1 = getTree(treeId1);
-        Tree tree2 = getTree(treeId2);
-        Node commonNode = nodeRepository.findById(nodeId).orElse(null);
-
-		
+	public void treeMerge(Tree tree1, Tree tree2, Node baseNode, Node relatedToNode, Node nodeToMerge, String newLink) {		
+        Node commonNode = Node.merge(baseNode, nodeToMerge);
 		if (tree1 == null || tree2 == null || commonNode == null || newLink == null) {
             throw new IllegalArgumentException("Parameters cannot be null");
         }
@@ -265,37 +236,28 @@ public class TreeService extends AbstractService {
                 && !newLink.equalsIgnoreCase("partner")){
         	throw new IllegalArgumentException("The relation is not valid");
         }
-        // Merge dans un sens
-        mergeTreeInto(tree1, tree2, commonNode, newLink);
-        // Merge dans l'autre
-        mergeTreeInto(tree2, tree1, commonNode, newLink);
+        // Merge in the first tree
+        mergeTreeInto(tree1, relatedToNode, commonNode, newLink);
+        // Merge in the second one
+        mergeTreeInto(tree2, commonNode, relatedToNode, newLink);
 	}
 	
-	private void mergeTreeInto(Tree sourceTree, Tree targetTree, Node commonNode, String newLink) {
-		for (TreeNodes treeNode : sourceTree.getTreeNodes()) {
-            Node node = treeNode.getNode();
-            
-            if (!targetTree.getNodes().contains(node)) {
-                addNodeToTree(targetTree, node, treeNode.getPrivacy(), treeNode.getDepth());
-
-                updateRelations(targetTree, node, commonNode, newLink);
-            }
-        }
+	private void mergeTreeInto(Tree tree, Node commonNode, Node relatedToNode, String newLink) {
+		
+		switch(newLink.toUpperCase()) {
+			case "PARENT":
+				addParentToNodeInTree(tree.getId(), relatedToNode, commonNode, commonNode.getPrivacy());
+				break;
+			case "PARTNER":
+				addPartnerToNodeInTree(tree.getId(), relatedToNode, commonNode, commonNode.getPrivacy());
+				break;
+			case "CHILD":
+				addChildToNodeInTree(tree.getId(), relatedToNode, commonNode, commonNode.getPrivacy());
+				break;
+			default : 	
+				System.err.println("Wrong link, you cannot merge");
+		}
     }
 	
-	private void updateRelations(Tree tree, Node sourceNode, Node commonNode, String newLink) {
-        switch (newLink.toUpperCase()) {
-            case "PARENT":
-                addParentToNodeInTree(tree.getId(), sourceNode, commonNode, commonNode.getPrivacy());
-                break;
-            case "PARTNER":
-                addPartnerToNodeInTree(tree.getId(), sourceNode, commonNode, commonNode.getPrivacy());
-                break;
-            case "CHILD":
-                addChildToNodeInTree(tree.getId(), commonNode, sourceNode, commonNode.getPrivacy());
-                break;            
-            default:
-                throw new IllegalArgumentException("The relation is not valid");
-        }
-    }
+	
 }
