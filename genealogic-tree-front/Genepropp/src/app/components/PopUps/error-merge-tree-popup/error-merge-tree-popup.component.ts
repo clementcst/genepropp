@@ -21,13 +21,14 @@ export class ErrorMergeTreePopupComponent {
 
     if (this.errorMessage.data == "This family tree is set to private. Click below to be redirected to the main menu.") {
       // Redirection vers le menu principal (/homeMenu)
+      this.router.navigate(['homePage']);
       this.dialogRef.close({ action: 'Submit' });
-      this.router.navigate(['/homePage']);
     } else {
       //console.log("redirection 2 ....")
       this.dialogRef.close({ action: 'Submit' });
+      location.reload();
     }
-    location.reload();
+    
   }
 
 }
