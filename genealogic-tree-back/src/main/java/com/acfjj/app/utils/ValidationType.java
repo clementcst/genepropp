@@ -37,7 +37,7 @@ public enum ValidationType {
 			msg.setContent(disabledMsg);
 		}
 	},
-	TREE_MERGE_VALIDATION("Hello, I want to merge my tree with you. ") {
+	TREE_MERGE_VALIDATION("Hello, I want to create a link with a node of which you're the creator. ") {
 		@Override
 		public String getValidationMsg(Object obj) {
 			@SuppressWarnings("unchecked")
@@ -46,12 +46,12 @@ public enum ValidationType {
 			Node baseNode = (Node) objList.get(1);
 			Node relatedToNode = (Node) objList.get(2);
 			String validationMsg = this.validationMsg;
-			validationMsg += "\n Here is my tree";
+			validationMsg += "\n\n The node concerned in your tree is this one : \n" + baseNode.toString();
+			validationMsg += "\n\n and will be linked with this node in my tree : \n" + relatedToNode.toString();
+			validationMsg += "\n\n The relation beetween them would be : " + msg.getValidationInfos().get("relationType");
+			validationMsg += "\n\n Here is my tree";
 			validationMsg += "\n link to my tree : "
 			+ "<a class=\"text-green-700 hover:underline\" ng-reflect-router-link=\"/myTreePage\" ng-reflect-query-params=\"[object Object]\" href=\"/myTreePage?treeId="+ msg.getSender().getMyTreeId()+"\">View Tree</a>" ;
-			validationMsg += "\n Our trees would be link from the node in your tree : " + baseNode.toString();
-			validationMsg += "\n and will be linked with this node in my tree : " + relatedToNode.toString();
-			validationMsg += "\n as " + msg.getValidationInfos().get("relationType");
 			return validationMsg;
 		}
 
