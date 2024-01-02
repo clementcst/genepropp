@@ -37,7 +37,6 @@ public class TreeController extends AbstractController {
 			return new Response("Tree not found", false);
 		}
 		tree.addAView();
-		System.err.println(tree.getViewOfMonth() + tree.getViewOfYear());
 		treeService.updateTree(tree.getId(), tree);
 		return new Response("Success", true);
 	}
@@ -127,11 +126,22 @@ public class TreeController extends AbstractController {
 		for (Map.Entry<Long, String> nodeUpdate : updates.entrySet()) {
 			Long id = Misc.convertObjectToLong(nodeUpdate.getKey());
 			Node node = nodeService.getNode(id);
+			Node currentNode = ("UPDATE".equals(nodeUpdate.getValue().toUpperCase())
+					|| "DELETE".equals(nodeUpdate.getValue().toUpperCase())) ? existingNodes.get(id) : null;
 			if (!Objects.isNull(node)) {
 				if ("UPDATE".equals(nodeUpdate.getValue().toUpperCase())
 						&& nodeService.getNode(id).getCreatedById() != UserId) {
 					responseStr += "the node of " + nodeService.getNode(id).getFullName()
 							+ " does not belong to you, you cannot update it\n";
+					responseSuccess = false;
+				}
+				if ("UPDATE".equals(nodeUpdate.getValue().toUpperCase())
+						&& !Objects.isNull(nodeService.getNodeByNameAndBirthInfo(currentNode.getLastName(),
+								currentNode.getFirstName(), currentNode.getDateOfBirth(),
+								currentNode.getCountryOfBirth(), currentNode.getCityOfBirth()))) {
+					responseStr += "Cannot update the node with these info : "
+							+ nodeService.getNode(id).getFullNameAndBirthInfo()
+							+ " because it already exist in the database. Try to create it from start to go further in a merge procedure\n";
 					responseSuccess = false;
 				}
 				if ("DELETE".equals(nodeUpdate.getValue().toUpperCase())
@@ -167,7 +177,8 @@ public class TreeController extends AbstractController {
 						+ " \nThat is not a normal error, pls contact support.", false);
 			}
 		}
-		// Reorder updates to align Parent and Partner elements based on relationships in unknownRelation
+		// Reorder updates to align Parent and Partner elements based on relationships
+		// in unknownRelation		
 		updates = reorderUpdates(updates, unknownRelation);
 		// True Process
 		for (Map.Entry<Long, String> newOrUpdatedNode : updates.entrySet()) {
@@ -182,7 +193,7 @@ public class TreeController extends AbstractController {
 					if (!Objects.isNull(BaFRes) && !BaFRes.getSuccess() || !Objects.isNull(BaFRes)  && (BaFRes.getSuccess() && !Objects.isNull(BaFRes.getValue()))) {
 						return BaFRes;
 					}
-				}				
+				}	
 				switch (key.toUpperCase()) {
 				case "PARENT":
 					addParentRelations(id, TreeId, relatedToNodes, nodesToAdd, existingNodes, unknownRelation, updates);
@@ -367,6 +378,7 @@ public class TreeController extends AbstractController {
 			privacy = nodeToAdd.getPrivacy();
 		}
 		Node linkedNode = nodeService.getNode(linkedNodeId);
+		
 		switch (type.toUpperCase()) {
 		case "PARENT":
 			if (linkedNode.getParent1() == nodeToAdd || linkedNode.getParent2() == nodeToAdd) {
