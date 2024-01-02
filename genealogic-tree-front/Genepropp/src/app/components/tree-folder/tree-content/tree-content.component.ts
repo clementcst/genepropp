@@ -405,8 +405,6 @@ export class TreeContentComponent {
             img_0: "profilPictureUrl"
             },
             searchFiledsAbbreviation: {        
-              tel: 'phone',
-              n: 'name'
             },
             editForm: {
               titleBinding: "fullName",
