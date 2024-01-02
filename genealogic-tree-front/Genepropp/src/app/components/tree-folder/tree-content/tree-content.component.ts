@@ -223,6 +223,7 @@ export class TreeContentComponent {
         Object.keys(createdItem).forEach((key) => {
             if(!this.isEqual(existingItem[key],createdItem[key])){
               KeyHaveChanged = true
+              console.log("le param "+key+" de "+existingItem.id+" a changé !"+existingItem[key]+"-->"+createdItem[key])
               if(key == 'parent1Id' || key == 'parent2Id') { ParentsKeyHaveChanged = true; } 
               if(key == 'partnerId' || key == "exPartnerIds" ){ KeyNotDisplayChanges = true; }
               //console.log("le param "+key+" de "+existingItem.id+" a changé !"+existingItem[key]+"-->"+createdItem[key])
@@ -237,7 +238,7 @@ export class TreeContentComponent {
         //console.log("voici l'état des variable : "+KeyHaveChanged+"  "+ParentsKeyHaveChanged+"   "+KeyNotDisplayChanges)
         if(KeyHaveChanged  && ParentsKeyHaveChanged == false && KeyNotDisplayChanges == false )
         {
-          //console.log("on rajoute update dans la hash, la valeur de KeyNotDisplayChanges = "+KeyNotDisplayChanges)
+         
           this.linkedHashMap.putOrAdd(existingItem.id, "UPDATE");
         } 
         
@@ -250,14 +251,21 @@ export class TreeContentComponent {
         if(createdItem.exPartnersId != null){
           this.linkedHashMap.putOrAdd(createdItem.id, "PARTNER");
         } 
-        
-        if(createdItem.parent2Id != null){
-          this.linkedHashMap.putOrAdd(createdItem.id, "CHILD");
 
+        if(createdItem.parent2Id != null){
+          if(createdItem.parent2Id < 0){
+            this.linkedHashMap.putOrAdd(createdItem.id, "PARENT");
+          }else{
+            this.linkedHashMap.putOrAdd(createdItem.id, "CHILD");
+          }
         } 
         if(createdItem.parent1Id != null){
-          this.linkedHashMap.putOrAdd(createdItem.id, "CHILD");
-        } 
+          if(createdItem.parent1Id < 0){
+            this.linkedHashMap.putOrAdd(createdItem.id, "PARENT");
+          }else{
+            this.linkedHashMap.putOrAdd(createdItem.id, "CHILD");
+           }
+        }
         
         treeFromDB.push(createdItem)
       }
@@ -496,7 +504,7 @@ export class TreeContentComponent {
                           divorced: node.exPartnersId,
                           tags: this.getTags(node.gender,node.id),
                           
-                          gender : node.gender == 1 ? 'male' : node.gende == 0 ? 'female' : 'other',
+                          gender : node.gender == 1 ? 'male' : node.gender == 0 ? 'female' : 'other',
                           profilPictureUrl: node.profilPictureUrl,
                           dateOfBirth : node.dateOfBirth,
                           dateOfDeath : node.dateOfDeath,
