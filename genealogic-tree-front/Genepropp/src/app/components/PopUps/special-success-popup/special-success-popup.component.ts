@@ -22,13 +22,13 @@ export class SpecialSuccessPopupComponent {
 
   valider() {
     console.log(this.data.data.value.requestYes)
-    this.treeService.wantToMergeNode(this.data.data.value.requestYes)
+    this.treeService.wantToMergeNode(this.data.data.value.requestYes).subscribe()
     this.dialogRef.close({action: 'Submit'});
+    location.reload();
   }
 
   pasValider() {
     this.dialogRef.close({action: 'Submit'});
-    location.reload();
   }
 
 }

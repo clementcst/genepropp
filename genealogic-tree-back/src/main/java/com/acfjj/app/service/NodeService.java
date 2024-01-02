@@ -134,10 +134,68 @@ public class NodeService extends AbstractService {
        }  
        node.setHasChild(false);
        updateNode(node.getId(),node);  
-       //si est parent, delete lien parent enfant
-
    }
 
+   public void removeLinksInTree(Long nodeId, Long treeId) {
+	    Tree tree = treeRepository.findById(treeId).orElse(null);
+
+	    if (!Objects.isNull(tree)) {
+	        Node node = getNode(nodeId);
+
+	        if (!Objects.isNull(node)) {
+	            Set<TreeNodes> treeNodes = tree.getTreeNodes();
+
+	            removeParentFromNode(node, node.getParent1(), treeNodes);
+	            removeParentFromNode(node, node.getParent2(), treeNodes);
+
+	            if (!Objects.isNull(node.getPartner())) {
+	                Node partner = node.getPartner();
+	                node.setPartner(null);
+	                updateNode(node.getId(), node);
+	                partner.setPartner(null);
+	                updateNode(partner.getId(), partner);
+	            }
+
+	            if (node.getHasChild()) {
+	                for (TreeNodes treeNode : treeNodes) {
+	                    if (treeNode.getNode().getParent1Id() == node.getId()) {
+	                        treeNode.getNode().setParent1(null);
+	                        updateNode(treeNode.getNode().getId(), treeNode.getNode());
+	                    }
+	                    if (treeNode.getNode().getParent2Id() == node.getId()) {
+	                        treeNode.getNode().setParent2(null);
+	                        updateNode(treeNode.getNode().getId(), treeNode.getNode());
+	                    }
+	                }
+	                node.setHasChild(false);
+	            }
+
+	            updateNode(node.getId(), node);
+	        }
+	    }
+	}
+
+	private void removeParentFromNode(Node node, Node parent, Set<TreeNodes> treeNodes) {
+	    if (!Objects.isNull(parent) && parent.getTrees().contains(node.getTree())) {
+	        Boolean hasChild = false;
+	        for (TreeNodes treeNode : treeNodes) {
+	            if (treeNode.getNode().getParent1Id() == parent.getId() ||
+	                treeNode.getNode().getParent2Id() == parent.getId()) {
+	                hasChild = true;
+	            }
+	        }
+	        parent.setHasChild(hasChild);
+	        updateNode(parent.getId(), parent);
+	        if (parent.equals(node.getParent1())) {
+	            node.setParent1(null);
+	        } else if (parent.equals(node.getParent2())) {
+	            node.setParent2(null);
+	        }
+	        updateNode(node.getId(), node);
+	    }
+	}
+
+   
     public void updateNode(Long id, Node node) {
         if (getNode(id) != null && node.getId() == id) {
             nodeRepository.save(node);

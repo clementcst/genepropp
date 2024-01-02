@@ -93,13 +93,13 @@ export class TreeContentComponent {
   
   
   IDlist(tableau1: any[], tableau2: any[]): void {
-    console.log("id dans le tableau de la db")
+   // console.log("id dans le tableau de la db")
     tableau1.forEach((node) => {
-      console.log(node.id)
+      //console.log(node.id)
     });
-    console.log("id dans le tableau de le merge tab")
+   // console.log("id dans le tableau de le merge tab")
     tableau2.forEach((node) => {
-      console.log(node.id)
+     // console.log(node.id)
     });
   }
 
@@ -218,15 +218,14 @@ export class TreeContentComponent {
   
       if (existingItem) {
         let ParentsKeyHaveChanged = false
-        let KeyHaveChanged = false
+        let KeyHaveChanged = false;
         let KeyNotDisplayChanges = false;
         Object.keys(createdItem).forEach((key) => {
             if(!this.isEqual(existingItem[key],createdItem[key])){
               KeyHaveChanged = true
               if(key == 'parent1Id' || key == 'parent2Id') { ParentsKeyHaveChanged = true; } 
-              if(key == 'partnerId' || "exPartnerIds" ){ 
-                KeyNotDisplayChanges = true }
-              console.log("le param "+key+" de "+existingItem.id+" a changé !"+existingItem[key]+"-->"+createdItem[key])
+              if(key == 'partnerId' || key == "exPartnerIds" ){ KeyNotDisplayChanges = true; }
+              //console.log("le param "+key+" de "+existingItem.id+" a changé !"+existingItem[key]+"-->"+createdItem[key])
               if( key == "exPartnersId" || key == "treesId") {
                 existingItem[key] = this.convertToString(createdItem[key] )
               }else{
@@ -234,11 +233,13 @@ export class TreeContentComponent {
               }
             } 
         });
-        if(KeyHaveChanged  && ParentsKeyHaveChanged) this.linkedHashMap.putOrAdd(existingItem.id, "PARENT");
-            if(KeyHaveChanged  && ParentsKeyHaveChanged == false && KeyNotDisplayChanges == false ){
-              console.log("on rajoute update dans la hash, la valeur de KeyNotDisplayChanges = "+KeyNotDisplayChanges)
-              this.linkedHashMap.putOrAdd(existingItem.id, "UPDATE");
-            } 
+        if(KeyHaveChanged  && ParentsKeyHaveChanged) {this.linkedHashMap.putOrAdd(existingItem.id, "PARENT"); }
+        //console.log("voici l'état des variable : "+KeyHaveChanged+"  "+ParentsKeyHaveChanged+"   "+KeyNotDisplayChanges)
+        if(KeyHaveChanged  && ParentsKeyHaveChanged == false && KeyNotDisplayChanges == false )
+        {
+          //console.log("on rajoute update dans la hash, la valeur de KeyNotDisplayChanges = "+KeyNotDisplayChanges)
+          this.linkedHashMap.putOrAdd(existingItem.id, "UPDATE");
+        } 
         
       } else { //nouveau élement 
 
@@ -382,20 +383,12 @@ export class TreeContentComponent {
 
           // Récupérez la valeur du paramètre 'myParam' de l'URL
           if(params['treeId']){
-
-            if(!this.TempUserData.isMyTreePublic){
-              this.myTreeId = "noAccessible"
-              this.openErrorMergeTreePopupComponent("This family tree is set to private. Click below to be redirected to the main menu.")
-            }else{
-              this.myTreeId = params['treeId']
-              this.isMyTree = false
-            }    
+            this.myTreeId = params['treeId']
+            this.isMyTree = false  
           }
         });
-        //console.log("voici le treeid de celui qui va arriver : "+this.myTreeId)
 
         const tree = document.getElementById('tree');
-        //console.log("Voici tis is ..."+this.isMyTree)
         if (tree) {
           let familyConfig: any = {
 
@@ -411,7 +404,8 @@ export class TreeContentComponent {
             field_0: "fullName",
             img_0: "profilPictureUrl"
             },
-
+            searchFiledsAbbreviation: {        
+            },
             editForm: {
               titleBinding: "fullName",
               photoBinding: "profilPictureUrl",
@@ -475,52 +469,59 @@ export class TreeContentComponent {
             this.treeService.getTree(this.myTreeId).subscribe((data) => {
 
               this.TempTreeFromDB = data.value;
-              this.treeFromDB =  this.TempTreeFromDB.nodes;
 
-              console.log("FROM DB");
-              console.log(this.treeFromDB)
+              //cas ou arbre est privé
+              if(this.TempTreeFromDB.privacy == 1 && !this.isMyTree){
+                this.openErrorMergeTreePopupComponent("This family tree is set to private. Click below to be redirected to the main menu.")
+              }else{
 
-              //enleve les id qu'on ne connait pas + créer une liste pour les rajouter apres
-              console.log(this.getAllIds(this.treeFromDB))
-              this.createTabForSaveUnknowID(this.treeFromDB,this.getAllIds(this.treeFromDB))
+                  this.treeFromDB =  this.TempTreeFromDB.nodes;
 
-              console.log(this.tabForSaveUnknowID)
+                  console.log("FROM DB");
+                  console.log(this.treeFromDB)
 
-              //remplissage depuis la database
-              this.treeFromDB.forEach((node: any) => {
-                  let tempNode = {
-                      firstName: node.firstName,
-                      lastName: node.lastName,
-                      privacy: node.privacy == 0 ? 'private' : node.privacy == 2 ? 'public' : 'restricted',
-                      fullName: node.firstName + " " + node.lastName + (node.isAUserNode ? " (user)" : ""),
-                      id: node.id, 
-                      pids:this.getPartnerIds(node.partnerId,node.exPartnersId),
-                      divorced: node.exPartnersId,
-                      tags: this.getTags(node.gender,node.id),
-                      
-                      gender : node.gender == 1 ? 'male' : node.gende == 0 ? 'female' : 'other',
-                      profilPictureUrl: node.profilPictureUrl,
-                      dateOfBirth : node.dateOfBirth,
-                      dateOfDeath : node.dateOfDeath,
+                  this.createTabForSaveUnknowID(this.treeFromDB,this.getAllIds(this.treeFromDB))
 
-                      cityOfBirth: node.cityOfBirth,
-                      countryOfBirth: node.countryOfBirth,
+                  //console.log(this.tabForSaveUnknowID)
 
-                      adress: node.adress,
-                      postalCode: node.postalCode,
-                      nationality: node.nationality,
+                  //remplissage depuis la database
+                  this.treeFromDB.forEach((node: any) => {
+                      let tempNode = {
+                          firstName: node.firstName,
+                          lastName: node.lastName,
+                          privacy: node.privacy == 0 ? 'private' : node.privacy == 2 ? 'public' : 'restricted',
+                          fullName: node.firstName + " " + node.lastName + (node.isAUserNode ? " (user)" : ""),
+                          id: node.id, 
+                          pids:this.getPartnerIds(node.partnerId,node.exPartnersId),
+                          divorced: node.exPartnersId,
+                          tags: this.getTags(node.gender,node.id),
+                          
+                          gender : node.gender == 1 ? 'male' : node.gende == 0 ? 'female' : 'other',
+                          profilPictureUrl: node.profilPictureUrl,
+                          dateOfBirth : node.dateOfBirth,
+                          dateOfDeath : node.dateOfDeath,
 
-                      mid: node.parent1Id == null ? null :  node.parent1Id,
-                      fid: node.parent2Id == null ? null :  node.parent2Id,
+                          cityOfBirth: node.cityOfBirth,
+                          countryOfBirth: node.countryOfBirth,
 
-                  };
+                          adress: node.adress,
+                          postalCode: node.postalCode,
+                          nationality: node.nationality,
 
-                  this.treeTab.push(tempNode);   
-              });
-              //fin
-              this.treeService.addView(this.myTreeId);
-              family.load(this.treeTab);
-             this.isReadyToDisplay = false;
+                          mid: node.parent1Id == null ? null :  node.parent1Id,
+                          fid: node.parent2Id == null ? null :  node.parent2Id,
+
+                      };
+
+                      this.treeTab.push(tempNode);   
+                  });
+                  //fin
+                  if(!this.isMyTree){
+                    this.treeService.addView(this.myTreeId).subscribe()
+                  } 
+                  family.load(this.treeTab);
+                this.isReadyToDisplay = false;
+                }
            });  
         }// fin if tree
       });
@@ -721,26 +722,32 @@ export class TreeContentComponent {
                 console.log("Réponse reçue avec succès :", response);
                 // Autres actions après une réponse réussie, si nécessaire
                 this.loading = false; // Cacher l'indicateur de chargement en cas de réponse
+
                 // @ts-ignore
                 if(!response.success){
                   // @ts-ignore
-                  //this.openErrorMergeTreePopupComponent(response.message)
+                  this.openErrorMergeTreePopupComponent(response.message)
+
+                }else{
                   // @ts-ignore
-                  this.openSpecialSuccessPopupComponent(response.message)
+                  if (response.value && response.value.hasOwnProperty("specialSuccess")) {
+                       console.log("on est en spécial success")
+                       // @ts-ignore
+                      this.openSpecialSuccessPopupComponent(response)
+                  }else{
+                      location.reload();
+                  }
+                  
                 }
-                // @ts-ignore
-                if (response.value && response.value.hasOwnProperty("specialSuccess")) {
-                  // La propriété "specialSuccess" existe
-                  console.log("on est en spécial success")
-                  // @ts-ignore
-                  this.openSpecialSuccessPopupComponent(response)
-                }
+                
               },
               error => {
                 console.error("Erreur lors de la requête :", error);
                 // Autres actions en cas d'erreur, si nécessaire
-                this.loading = false; // Cacher l'indicateur de chargement en cas d'erreur
-
+                this.loading = false; // Cacher l'indicateur de chargement en cas d'erreur           
+                location.reload();
+                //console.log("reload")
+                
               }
             );
           }
