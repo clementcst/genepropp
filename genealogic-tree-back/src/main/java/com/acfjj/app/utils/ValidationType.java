@@ -52,7 +52,6 @@ public enum ValidationType {
 			validationMsg += "\n\n Here is my tree";
 			validationMsg += "\n link to my tree : "
 			+ "<a class=\"text-green-700 hover:underline\" ng-reflect-router-link=\"/myTreePage\" ng-reflect-query-params=\"[object Object]\" href=\"/myTreePage?treeId="+ msg.getSender().getMyTreeId()+"\">View Tree</a>" ;
-		
 			return validationMsg;
 		}
 

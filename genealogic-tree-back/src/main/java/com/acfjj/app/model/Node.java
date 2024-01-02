@@ -487,7 +487,7 @@ public class Node {
 
 	@Override
 	public String toString() {
-	    return "Node [id=" + id +
+		return "Node [id=" + id +
 	            ", personInfo=" + personInfo +
 	            ", createdById=" + createdBy.getId() +
 	            ", privacy=" + privacy +
@@ -500,6 +500,4 @@ public class Node {
 	            ", dateOfDeath=" + dateOfDeath +  
 	            "]";
 	}
-
-
 }
