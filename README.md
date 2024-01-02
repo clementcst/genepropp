@@ -1,14 +1,14 @@
 # Genepropp
 
 
-This site lets you generate and view family trees. Each user can add members to his or her tree. A written chat system allows users to exchange information, validate users in their tree, etc...
+This website lets you generate and view family trees. Each user can add members to his or her tree. A written chat system allows users to exchange information, validate users in their tree, etc...
 Users can modify their account information, as well as the information on the nodes that make up their tree.
 
 
 ## Prerequisites
 
 OS Windows, may work with Linux.
-Make sure you have installed ```nodeJS```, ```Tomcat```, ```Springboot``` and ```git```
+Make sure you have installed [```nodeJS```](https://nodejs.org/en), [```Tomcat```](https://tomcat.apache.org/), [```Springboot```](https://spring.io/projects/spring-boot/) and [```git``` ](https://git-scm.com/downloads)
 
 
 ## Installing
