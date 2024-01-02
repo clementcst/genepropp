@@ -85,6 +85,35 @@ public class Node {
 		this.dateOfDeath = dateOfDeath;
 	}
 
+	public Node(Long id, PersonInfo personInfo, User createdBy, Node parent1, Node parent2, int privacy) {
+		this(id, personInfo, createdBy, parent1, parent2, privacy, null);
+	}
+
+	public Node(Long id, PersonInfo personInfo, User createdBy, int privacy) {
+		this(id, personInfo, createdBy, null, null, privacy);
+	}
+
+	public Node(Long id, String lastName, String firstname, int gender, LocalDate dateOfBirth, String countryOfBirth,
+			String cityOfBirth, User createdBy, Node parent1, Node parent2, int privacy, String nationality,
+			String adress, int postalCode, String profilPictureUrl) {
+		this(id, new PersonInfo(lastName, firstname, gender, dateOfBirth, countryOfBirth, cityOfBirth, false,
+				nationality, adress, postalCode, profilPictureUrl), createdBy, parent1, parent2, privacy);
+	}
+
+	public Node(Long id, String lastName, String firstname, int gender, LocalDate dateOfBirth, String countryOfBirth,
+			String cityOfBirth, User createdBy, Node parent1, int privacy, String nationality, String adress,
+			int postalCode, String profilPictureUrl) {
+		this(id, lastName, firstname, gender, dateOfBirth, countryOfBirth, cityOfBirth, createdBy, parent1, null,
+				privacy, nationality, adress, postalCode, profilPictureUrl);
+	}
+
+	public Node(Long id, String lastName, String firstname, int gender, LocalDate dateOfBirth, String countryOfBirth,
+			String cityOfBirth, User createdBy, int privacy, String nationality, String adress, int postalCode,
+			String profilPictureUrl) {
+		this(id, lastName, firstname, gender, dateOfBirth, countryOfBirth, cityOfBirth, createdBy, null, null, privacy,
+				nationality, adress, postalCode, profilPictureUrl);
+	}
+
 	public Node(Long id, String lastName, String firstname, int gender, LocalDate dateOfBirth, String countryOfBirth,
 			String cityOfBirth, User createdBy, Node parent1, Node parent2, int privacy, String nationality,
 			String adress, int postalCode, String profilPictureUrl, LocalDate dateOfDeath) {
