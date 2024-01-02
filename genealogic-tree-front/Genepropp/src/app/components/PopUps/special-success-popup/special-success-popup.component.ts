@@ -29,7 +29,6 @@ export class SpecialSuccessPopupComponent {
 
   pasValider() {
     this.dialogRef.close({action: 'Submit'});
-    location.reload();
   }
 
 }
