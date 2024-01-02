@@ -59,6 +59,7 @@ public class ConversationController extends AbstractController {
 			return new Response("User not found", false);
 		}
 		Conversation conversation = conversationService.getConversationOfUsers(sender, receiver);
+		
 		if (Objects.isNull(conversation)) {
 			return new Response("Conversation not found or doesn't exist.", false);
 		}
@@ -78,7 +79,13 @@ public class ConversationController extends AbstractController {
 			return new Response("User not found", false);
 		}
 		Conversation conversation = conversationService.getConversationOfUsers(sender, receiver);
-
+		if(Objects.isNull(conversation)) {
+			Response newConvRes = newConversation(senderId, receiverId);
+			if(!newConvRes.getSuccess()) {
+				return newConvRes;
+			}
+			conversation = conversationService.getConversationOfUsers(sender, receiver);
+		}
 		if (!Objects.isNull(concernedUser)) {
 			conversationService.addMessageToConversation(new Message(sender, receiver, validationType, concernedUser),
 					conversation);

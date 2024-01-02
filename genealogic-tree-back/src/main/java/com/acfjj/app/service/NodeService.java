@@ -150,8 +150,10 @@ public class NodeService extends AbstractService {
         if (getNode(id) != null && node.getId() == id) {
         	existingNode.setPersonInfo(node.getPersonInfo());
         	existingNode.setPrivacy(node.getPrivacy());
-            personInfoRepository.save(node.getPersonInfo());
-            nodeRepository.save(node);
+        	existingNode.setDateOfDeath(node.getDateOfDeath());
+        	System.out.println(existingNode);
+            personInfoRepository.save(existingNode.getPersonInfo());
+            nodeRepository.save(existingNode);
         }
     }
 

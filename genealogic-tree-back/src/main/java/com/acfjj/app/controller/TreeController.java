@@ -37,7 +37,6 @@ public class TreeController extends AbstractController {
 			return new Response("Tree not found", false);
 		}
 		tree.addAView();
-		System.err.println(tree.getViewOfMonth() + tree.getViewOfYear());
 		treeService.updateTree(tree.getId(), tree);
 		return new Response("Success", true);
 	}
@@ -127,11 +126,22 @@ public class TreeController extends AbstractController {
 		for (Map.Entry<Long, String> nodeUpdate : updates.entrySet()) {
 			Long id = Misc.convertObjectToLong(nodeUpdate.getKey());
 			Node node = nodeService.getNode(id);
+			Node currentNode = ("UPDATE".equals(nodeUpdate.getValue().toUpperCase())
+					|| "DELETE".equals(nodeUpdate.getValue().toUpperCase())) ? existingNodes.get(id) : null;
 			if (!Objects.isNull(node)) {
 				if ("UPDATE".equals(nodeUpdate.getValue().toUpperCase())
 						&& nodeService.getNode(id).getCreatedById() != UserId) {
 					responseStr += "the node of " + nodeService.getNode(id).getFullName()
 							+ " does not belong to you, you cannot update it\n";
+					responseSuccess = false;
+				}
+				if ("UPDATE".equals(nodeUpdate.getValue().toUpperCase())
+						&& !Objects.isNull(nodeService.getNodeByNameAndBirthInfo(currentNode.getLastName(),
+								currentNode.getFirstName(), currentNode.getDateOfBirth(),
+								currentNode.getCountryOfBirth(), currentNode.getCityOfBirth()))) {
+					responseStr += "Cannot update the node with these info : "
+							+ nodeService.getNode(id).getFullNameAndBirthInfo()
+							+ " because it already exist in the database. Try to create it from start to go further in a merge procedure\n";
 					responseSuccess = false;
 				}
 				if ("DELETE".equals(nodeUpdate.getValue().toUpperCase())
@@ -157,7 +167,7 @@ public class TreeController extends AbstractController {
 		if (!responseSuccess) {
 			return new Response(responseStr, responseSuccess);
 		}
-
+		
 		// Check all Actions Type are allowed
 		for (Map.Entry<Long, String> newOrUpdatedNode : updates.entrySet()) {
 			String key = newOrUpdatedNode.getValue();
@@ -167,18 +177,22 @@ public class TreeController extends AbstractController {
 						+ " \nThat is not a normal error, pls contact support.", false);
 			}
 		}
-
+		// Reorder updates to align Parent and Partner elements based on relationships in unknownRelation
+		updates = reorderUpdates(updates, unknownRelation);
 		// True Process
 		for (Map.Entry<Long, String> newOrUpdatedNode : updates.entrySet()) {
 			Long id = Misc.convertObjectToLong(newOrUpdatedNode.getKey());
 			String key = newOrUpdatedNode.getValue();
-			if (Constants.POSSIBLE_NODE_ACTIONS_CREATION.contains(key)) {
+			if (Constants.POSSIBLE_NODE_ACTIONS.contains(key)) {
 				String[] relatedToNodes = Objects.isNull(unknownRelation.get(id)) ? null
 						: unknownRelation.get(id).split("\\.");
-				Response BaFRes = sendPreProcessNodeInTreeCreation(key, id, TreeId, user, relatedToNodes, nodesToAdd,
-						existingNodes, unknownRelation);
-				if (!BaFRes.getSuccess() || (BaFRes.getSuccess() && !Objects.isNull(BaFRes.getValue()))) {
-					return BaFRes;
+				if (Constants.POSSIBLE_NODE_ACTIONS_CREATION.contains(key)) {
+					Response BaFRes = sendPreProcessNodeInTreeCreation(key, id, TreeId, user, relatedToNodes,
+							nodesToAdd, existingNodes, unknownRelation);
+					if (!Objects.isNull(BaFRes) && !BaFRes.getSuccess()
+							|| !Objects.isNull(BaFRes) && (BaFRes.getSuccess() && !Objects.isNull(BaFRes.getValue()))) {
+						return BaFRes;
+					}
 				}
 				switch (key.toUpperCase()) {
 				case "PARENT":
@@ -214,6 +228,73 @@ public class TreeController extends AbstractController {
 		}
 
 		return new Response("Tree Updated successfully", true);
+	}
+
+	private static LinkedHashMap<Long, String> reorderUpdates(LinkedHashMap<Long, String> updates,
+			LinkedHashMap<Long, String> unknownRelation) {
+		LinkedHashMap<Long, String> tmpUpdates = new LinkedHashMap<>(updates);
+
+		for (Map.Entry<Long, String> entry : tmpUpdates.entrySet()) {
+			Long id = Misc.convertObjectToLong(entry.getKey());
+			String value = entry.getValue();
+			// Check if value is Parent
+			if ("CHILD".equals(value.toUpperCase())) {
+				// Check next element
+				Map.Entry<Long, String> nextEntry = getNextEntry(tmpUpdates, id);
+				if (nextEntry != null && "PARTNER".equals(nextEntry.getValue().toUpperCase())) {
+					// Check if next element is also a parent
+					String[] relatedToNodes = Objects.isNull(unknownRelation.get(id)) ? null
+							: unknownRelation.get(id).split("\\.");
+					if (relatedToNodes != null
+							&& Misc.convertObjectToLong(relatedToNodes[1]) == Misc
+									.convertObjectToLong(nextEntry.getKey())
+							|| relatedToNodes != null && Misc.convertObjectToLong(relatedToNodes[3]) == Misc
+									.convertObjectToLong(nextEntry.getKey())) {
+						// swap elements
+						updates = swapElements(updates, id, Misc.convertObjectToLong(nextEntry.getKey()));
+					}
+				}
+			}
+		}
+		return updates;
+	}
+
+	@SuppressWarnings("unlikely-arg-type")
+	private static LinkedHashMap<Long, String> swapElements(LinkedHashMap<Long, String> map, Long key1, Long key2) {
+		LinkedHashMap<Long, String> updatedMap = new LinkedHashMap<>();
+
+		for (Map.Entry<Long, String> entry : map.entrySet()) {
+			if (Misc.convertObjectToLong(entry.getKey()) == key1) {
+				break;
+			}
+			updatedMap.put(Misc.convertObjectToLong(entry.getKey()), entry.getValue());
+		}
+		updatedMap.put(key2, map.get(key2.toString()));
+		updatedMap.put(key1, map.get(key1.toString()));
+		boolean afterkey2 = false;
+		for (Map.Entry<Long, String> entry : map.entrySet()) {
+			if (Misc.convertObjectToLong(entry.getKey()) == key2) {
+				afterkey2 = true;
+				continue;
+			}
+			if (afterkey2) {
+				updatedMap.put(Misc.convertObjectToLong(entry.getKey()), entry.getValue());
+			}
+		}
+		return updatedMap;
+	}
+
+	private static Map.Entry<Long, String> getNextEntry(LinkedHashMap<Long, String> updates, Long id) {
+		boolean found = false;
+		for (Map.Entry<Long, String> entry : updates.entrySet()) {
+			if (found) {
+				return entry;
+			}
+			if (Misc.convertObjectToLong(entry.getKey()) == (id)) {
+				found = true;
+			}
+		}
+		return null;
 	}
 
 	public Response deleteTree(@RequestParam Long treeId) {
@@ -373,7 +454,7 @@ public class TreeController extends AbstractController {
 				User creator = existingNode.getCreatedBy();
 				// make the node temporary (invisible to user) and store it in db
 				String resStr = "A node similar as the one that you want to create (" + node.getFullNameAndBirthInfo()
-						+ ") as been found in the tree of another user. \nHere is the node. Is that the node you wanna create ?\n If so, click yes and a request to merge the other user tree will be sent. \nOtherwise click no, and change data in the Node or create it in private.";
+						+ ") as been found in the tree of another user. \nHere is the node. Is that the node you wanna create ?\n If so, click yes and a request to the other user will be sent, to ask him/her to validate the link. \nOtherwise click no, and change data in the Node or create it in private.";
 				String temporaryCountryOfBirth = node.getCountryOfBirth() + Constants.TEMPORARY_STR_MAKER;
 				node.getPersonInfo().setCountryOfBirth(temporaryCountryOfBirth);
 				Response tmpNodeCreatRes = addNode(node);
@@ -449,15 +530,16 @@ public class TreeController extends AbstractController {
 						parent1.put("dateOfDeath", null);
 					}
 					if (!Misc.parentIsOlder((String) parent1.get("dateOfBirth"), (String) node.get("dateOfBirth"))) {
-						returnStr += "\t- The node " + parent1.get("firstName") + " " + parent1.get("lastName")
+						returnStr += "\t- The node of " + parent1.get("firstName") + " " + parent1.get("lastName")
 								+ " is too young to be " + node.get("firstName") + " " + node.get("lastName")
 								+ "'s parent.\n";
 						thereIsAProb = true;
 					}
 					if (!Misc.parentWasAlive((String) parent1.get("dateOfDeath"), (String) node.get("dateOfBirth"))) {
-						returnStr += "\t- The node " + parent1.get("fisrtName") + " " + parent1.get("lastName")
-								+ " was dead at the date of the birth indicated in the node of " + node.get("firstName")
-								+ " " + node.get("lastName") + "\n";
+						returnStr += "\t- The node of " + parent1.get("firstName") + " " + parent1.get("lastName")
+								+ " has its date of Death before the date of the birth indicated in the node of "
+								+ node.get("firstName") + " " + node.get("lastName")
+								+ " which is not possible because it's suppose to be the node of its parent\n";
 						thereIsAProb = true;
 					}
 
