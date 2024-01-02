@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.acfjj.app.model.Conversation;
 import com.acfjj.app.model.Message;
 import com.acfjj.app.model.Node;
+import com.acfjj.app.model.Tree;
 import com.acfjj.app.model.User;
 import com.acfjj.app.utils.Constants;
 import com.acfjj.app.utils.Misc;
@@ -78,6 +79,13 @@ public class ConversationController extends AbstractController {
 			return new Response("User not found", false);
 		}
 		Conversation conversation = conversationService.getConversationOfUsers(sender, receiver);
+        if(Objects.isNull(conversation)) {
+            Response newConvRes = newConversation(senderId, receiverId);
+            if(!newConvRes.getSuccess()) {
+                return newConvRes;
+            }
+            conversation = conversationService.getConversationOfUsers(sender, receiver);
+        }
 
 		if (!Objects.isNull(concernedUser)) {
 			conversationService.addMessageToConversation(new Message(sender, receiver, validationType, concernedUser),
@@ -169,12 +177,15 @@ public class ConversationController extends AbstractController {
 		Node baseNode = nodeService.getNode(baseNodeId);
 		Node additionNode = nodeService.getNode(additionNodeId);
 		Node relatedToNode = nodeService.getNode(relatedToNodeId);
+		Tree tree1 = userService.getUser(validatorId).getMyTree();
+		Tree tree2 = userService.getUser(requesterId).getMyTree();
 		if (Objects.isNull(baseNode) || Objects.isNull(additionNode) || Objects.isNull(relatedToNode)) {
 			return new Response("One or more node id is invalid, nodes not found", false);
 		}
 		if (userResponse) {
 			additionNode.getPersonInfo()
 					.setCountryOfBirth(additionNode.getCountryOfBirth().replace(Constants.TEMPORARY_STR_MAKER, ""));
+			treeService.treeMerge(tree1, tree2, baseNode, relatedToNode, additionNode, relationType);
 			// merge des tree ici
 			// tous les parametre sont pret pr toi jourdan : 
 			// baseNode la node dans le tree de l'autre type (le receiver) 

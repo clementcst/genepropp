@@ -63,7 +63,7 @@ public class ConversationService extends AbstractService {
     public void addMessageToConversation(Message message, Conversation conversation) {
     	messageRepository.save(message);
     	conversation.addMessage(message);
-    	messageRepository.save(message);
+//    	messageRepository.save(message);
     	updateConversation(conversation.getId(), conversation);
     }
     

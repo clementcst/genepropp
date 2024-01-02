@@ -100,7 +100,7 @@ public class TreeController extends AbstractController {
 		for (LinkedHashMap<String, String> node : tree) {
 			Long id = Misc.convertObjectToLong(node.get("id"));
 			User creator = userService.getUser(id >= 0 ? Misc.convertObjectToLong(node.get("createdById")) : UserId);
-			// securité creator not found
+			// security creator not found
 
 			Node parent1 = getNodeIfNonNegative(Misc.convertObjectToLong(node.get("parent1Id")));
 			Node parent2 = getNodeIfNonNegative(Misc.convertObjectToLong(node.get("parent2Id")));
@@ -329,6 +329,7 @@ public class TreeController extends AbstractController {
 	public Response deleteNodeFromTree(@RequestParam Node node, @RequestParam long treeId) {
 		Long nodeId = node.getId();
 		Tree tree = treeService.getTree(treeId);
+		nodeService.removeLinksInTree(node.getId(), tree.getId());
 		treeService.removeNodeFromTree(tree, node);
 		node = nodeService.getNode(nodeId);
 		if (!Objects.isNull(node) && node.isOrphan()) {
@@ -366,12 +367,6 @@ public class TreeController extends AbstractController {
 			privacy = nodeToAdd.getPrivacy();
 		}
 		Node linkedNode = nodeService.getNode(linkedNodeId);
-//    	if(!alreadyInTree) {
-//    		if(!canCreateNodeInTree(nodeToAdd, treeId)){
-//    			return new Response("Node cannot be added", false);
-//    		}
-//    	}
-//    	if(autorizedLink(treeId, linkedNode, nodeToAdd)) {
 		switch (type.toUpperCase()) {
 		case "PARENT":
 			if (linkedNode.getParent1() == nodeToAdd || linkedNode.getParent2() == nodeToAdd) {
@@ -422,7 +417,7 @@ public class TreeController extends AbstractController {
 
 	public Response preProcessNodeInTreeCreation(Node node, long treeId, User userWhoWantsToCreate, Node relatedToNode,
 			String relationType) {
-		if (!node.isPublic()) { // If the node want to be created in private ok
+		if (Objects.isNull(node) || !node.isPublic()) { // If the node want to be created in private ok
 			return new Response(null, true);
 		}
 		Node existingNode = nodeService.getNodeByNameAndBirthInfo(node.getLastName(), node.getFirstName(),
@@ -430,7 +425,7 @@ public class TreeController extends AbstractController {
 		// If an existing Node has been found
 		if (!Objects.isNull(existingNode) && existingNode.isPublic()) {
 			// check if the node is already in the tree
-			if (nodeService.doesNodeBelongToTree(node.getId(), treeId)) {
+			if (nodeService.doesNodeBelongToTree(existingNode.getId(), treeId)) {
 				return new Response("Cannot add a node in your tree that is already in your tree", false);
 			}
 			// If you have not created this node (always at this point, could be an else)
@@ -453,7 +448,7 @@ public class TreeController extends AbstractController {
 				resValue.put("nodeToShow", existingNode);
 				String requestYes = "/conversation/validation/newTreeMergeValidation?senderId="
 						+ userWhoWantsToCreate.getId() + "&receiverId=" + creator.getId() + "&baseNodeId="
-						+ existingNode.getId() + "&additionNodeId=" + node.getId() + "&relatedNodeId="
+						+ existingNode.getId() + "&additionNodeId=" + node.getId() + "&relatedToNodeId="
 						+ relatedToNode.getId() + "&relationType=" + relationType;
 				resValue.put("requestYes", requestYes);
 				return new Response(resValue, resStr, true);
@@ -637,8 +632,8 @@ public class TreeController extends AbstractController {
 	}
 
 	private void addParentRelations(Long id, Long TreeId, String[] relatedToNodes, LinkedHashMap<Long, Node> nodeToAdd,
-			LinkedHashMap<Long, Node> existingNodes, LinkedHashMap<Long, String> unknownRelation,
-			LinkedHashMap<Long, String> updates) {
+		LinkedHashMap<Long, Node> existingNodes, LinkedHashMap<Long, String> unknownRelation,
+		LinkedHashMap<Long, String> updates) {
 		Long newIdInDb = null;
 
 		if (Misc.convertObjectToLong(relatedToNodes[1]) < 0) {
@@ -672,8 +667,8 @@ public class TreeController extends AbstractController {
 	}
 
 	private void addPartnerRelations(Long id, Long TreeId, String[] relatedToNodes, LinkedHashMap<Long, Node> nodeToAdd,
-			LinkedHashMap<Long, Node> existingNodes, LinkedHashMap<Long, String> unknownRelation,
-			LinkedHashMap<Long, String> updates) {
+		LinkedHashMap<Long, Node> existingNodes, LinkedHashMap<Long, String> unknownRelation,
+		LinkedHashMap<Long, String> updates) {
 		if (Misc.convertObjectToLong(relatedToNodes[5]) != 0) {
 			if (Objects.isNull(nodeToAdd.get(id))) {
 				return;
@@ -692,8 +687,8 @@ public class TreeController extends AbstractController {
 	}
 
 	private void addChildRelations(Long id, Long TreeId, String[] relatedToNodes, LinkedHashMap<Long, Node> nodeToAdd,
-			LinkedHashMap<Long, Node> existingNodes, LinkedHashMap<Long, String> unknownRelation,
-			LinkedHashMap<Long, String> updates) {
+		LinkedHashMap<Long, Node> existingNodes, LinkedHashMap<Long, String> unknownRelation,
+		LinkedHashMap<Long, String> updates) {
 		Long idInDb = null;
 		int privacy = nodeToAdd.get(id).getPrivacy();
 
