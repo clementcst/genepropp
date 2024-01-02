@@ -224,9 +224,7 @@ public class TreeService extends AbstractService {
 	}
 	
 	// Tree1 est l'arbre dans lequel la node existe déjà et tree2 celui dans lequel on veut l'ajouter
-	public void treeMerge(Tree tree1, Tree tree2, Node baseNode, Node relatedToNode, Node nodeToMerge, String newLink) {
-		System.out.println("plus que le merge");
-		
+	public void treeMerge(Tree tree1, Tree tree2, Node baseNode, Node relatedToNode, Node nodeToMerge, String newLink) {		
         Node commonNode = Node.merge(baseNode, nodeToMerge);
 		if (tree1 == null || tree2 == null || commonNode == null || newLink == null) {
             throw new IllegalArgumentException("Parameters cannot be null");
