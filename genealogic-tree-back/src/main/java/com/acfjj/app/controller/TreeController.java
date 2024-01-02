@@ -94,7 +94,7 @@ public class TreeController extends AbstractController {
 		responseStr += firstVerifStr != "OK" ? firstVerifStr : "";
 		responseSuccess = firstVerifStr != "OK" ? false : responseSuccess;
 
-		// Separation beteen existing nodes and node to add
+		// Separation between existing nodes and node to add
 		// Init unknownRelation => all links that will be used to add nodes
 		for (LinkedHashMap<String, String> node : tree) {
 			Long id = Misc.convertObjectToLong(node.get("id"));
@@ -167,7 +167,7 @@ public class TreeController extends AbstractController {
 		if (!responseSuccess) {
 			return new Response(responseStr, responseSuccess);
 		}
-		
+
 		// Check all Actions Type are allowed
 		for (Map.Entry<Long, String> newOrUpdatedNode : updates.entrySet()) {
 			String key = newOrUpdatedNode.getValue();
@@ -177,7 +177,8 @@ public class TreeController extends AbstractController {
 						+ " \nThat is not a normal error, pls contact support.", false);
 			}
 		}
-		// Reorder updates to align Parent and Partner elements based on relationships in unknownRelation
+		// Reorder updates to align Parent and Partner elements based on relationships
+		// in unknownRelation
 		updates = reorderUpdates(updates, unknownRelation);
 		// True Process
 		for (Map.Entry<Long, String> newOrUpdatedNode : updates.entrySet()) {
@@ -380,12 +381,12 @@ public class TreeController extends AbstractController {
 			privacy = nodeToAdd.getPrivacy();
 		}
 		Node linkedNode = nodeService.getNode(linkedNodeId);
-//    	if(!alreadyInTree) {
-//    		if(!canCreateNodeInTree(nodeToAdd, treeId)){
-//    			return new Response("Node cannot be added", false);
-//    		}
-//    	}
-//    	if(autorizedLink(treeId, linkedNode, nodeToAdd)) {
+//		    	if(!alreadyInTree) {
+//		    		if(!canCreateNodeInTree(nodeToAdd, treeId)){
+//		    			return new Response("Node cannot be added", false);
+//		    		}
+//		    	}
+//		    	if(autorizedLink(treeId, linkedNode, nodeToAdd)) {
 		switch (type.toUpperCase()) {
 		case "PARENT":
 			if (linkedNode.getParent1() == nodeToAdd || linkedNode.getParent2() == nodeToAdd) {
@@ -430,11 +431,9 @@ public class TreeController extends AbstractController {
 			return new Response("Fail to create node in Tree", false);
 		}
 		return new Response("Success", true);
-//    	}   
-//    	return new Response("Link not possible", false);
+//		    	}   
+//		    	return new Response("Link not possible", false);
 	}
-
-	// faire les remove links
 
 	public Response preProcessNodeInTreeCreation(Node node, long treeId, User userWhoWantsToCreate, Node relatedToNode,
 			String relationType) {
@@ -446,7 +445,7 @@ public class TreeController extends AbstractController {
 		// If an existing Node has been found
 		if (!Objects.isNull(existingNode) && existingNode.isPublic()) {
 			// check if the node is already in the tree
-			if (nodeService.doesNodeBelongToTree(existingNode.getId(), treeId)) {
+			if (nodeService.doesNodeBelongToTree(node.getId(), treeId)) {
 				return new Response("Cannot add a node in your tree that is already in your tree", false);
 			}
 			// If you have not created this node (always at this point, could be an else)
@@ -454,7 +453,7 @@ public class TreeController extends AbstractController {
 				User creator = existingNode.getCreatedBy();
 				// make the node temporary (invisible to user) and store it in db
 				String resStr = "A node similar as the one that you want to create (" + node.getFullNameAndBirthInfo()
-						+ ") as been found in the tree of another user. \nHere is the node. Is that the node you wanna create ?\n If so, click yes and a request to the other user will be sent, to ask him/her to validate the link. \nOtherwise click no, and change data in the Node or create it in private.";
+						+ ") as been found in the tree of another user. \nHere is the node. Is that the node you wanna create ?\n If so, click yes and a request to merge the other user tree will be sent. \nOtherwise click no, and change data in the Node or create it in private.";
 				String temporaryCountryOfBirth = node.getCountryOfBirth() + Constants.TEMPORARY_STR_MAKER;
 				node.getPersonInfo().setCountryOfBirth(temporaryCountryOfBirth);
 				Response tmpNodeCreatRes = addNode(node);
@@ -478,9 +477,9 @@ public class TreeController extends AbstractController {
 		return new Response(null, true);
 	}
 
-//    faire les sécurités des links
+//		    faire les sécurités des links
 	public boolean autorizedLink(Long treeId, Node node, Node nodeToLink) {
-//    	Tree tree = treeService.getTree(treeId);
+//		    	Tree tree = treeService.getTree(treeId);
 		if (node != null) {
 			if (node.getParent1() == nodeToLink) {
 				return false;
@@ -509,65 +508,106 @@ public class TreeController extends AbstractController {
 		return true;
 	}
 
-	@SuppressWarnings("null")
 	private String firstVerifications(List<LinkedHashMap<String, String>> tree, Long userConnectedId) {
 		String returnStr = "One or more logical problem has been found in your tree, so it has not been saved :\n";
-		Boolean thereIsAProb = false;
+		boolean thereIsAProb = false;
+
 		for (LinkedHashMap<String, String> node : tree) {
-//			if(!Misc.birthIsPossible((String) node.get("dateOfBirth"), (String) node.get("dateOfDeath"))) {
-//				returnStr += "\t- The node of " + node.get("fisrtName") + " " + node.get("fisrtName") + "'s date of death is before his/her date of birth.\n";
-//				thereIsAProb = true;
-//			}			
-			if (node != null) {
-				LinkedHashMap<String, String> parent1;
-				LinkedHashMap<String, String> parent2;
-				if (node.containsKey("parent1Id") && !Objects.isNull(node.get("parent1Id"))) {
-//					Object parent = (Object);
-					Long parent1Id = Misc.convertObjectToLong(node.get("parent1Id"));
-					parent1 = findNodeWithId(tree, parent1Id);
-					if (Objects.isNull(parent1)) {
-						parent1.put("dateOfBirth", nodeService.getNode(parent1Id).getDateOfBirth().toString());
-						parent1.put("dateOfDeath", null);
-					}
-					if (!Misc.parentIsOlder((String) parent1.get("dateOfBirth"), (String) node.get("dateOfBirth"))) {
-						returnStr += "\t- The node of " + parent1.get("firstName") + " " + parent1.get("lastName")
-								+ " is too young to be " + node.get("firstName") + " " + node.get("lastName")
-								+ "'s parent.\n";
-						thereIsAProb = true;
-					}
-					if (!Misc.parentWasAlive((String) parent1.get("dateOfDeath"), (String) node.get("dateOfBirth"))) {
-						returnStr += "\t- The node of " + parent1.get("firstName") + " " + parent1.get("lastName")
-								+ " has its date of Death before the date of the birth indicated in the node of "
-								+ node.get("firstName") + " " + node.get("lastName")
-								+ " which is not possible because it's suppose to be the node of its parent\n";
-						thereIsAProb = true;
-					}
+			String firstName = node.get("firstName");
+			String lastName = node.get("lastName");
+			String dateOfBirth = node.get("dateOfBirth");
+			Long nodeId = Misc.convertObjectToLong(node.get("id"));
 
+			if (!Misc.birthIsPossible(dateOfBirth, node.get("dateOfDeath"))) {
+				returnStr += "\t- The node of " + firstName + " " + lastName
+						+ "'s date of death is before his/her date of birth.\n";
+				thereIsAProb = true;
+			}
+
+			if (nodeId > 0) {
+				int nodePrivacy = nodeService.getNode(nodeId).getPrivacy();
+				int elementPrivacy = (int) Misc.convertObjectToLong(node.get("privacy"));
+
+				if (elementPrivacy < nodePrivacy) {
+					returnStr += "\t- It is not allowed to make the node " + firstName + " " + lastName
+							+ " more private than it already is.\n";
+					thereIsAProb = true;
 				}
+			}
 
-				if (node.containsKey("parent2Id") && !Objects.isNull(node.get("parent2Id"))) {
-					Long parent2Id = Misc.convertObjectToLong(node.get("parent2Id"));
-					parent2 = findNodeWithId(tree, parent2Id);
-					if (Objects.isNull(parent2)) {
-						parent2.put("dateOfBirth", nodeService.getNode(parent2Id).getDateOfBirth().toString());
-						parent2.put("dateOfDeath", null);
-					}
-					if (!Misc.parentIsOlder((String) parent2.get("dateOfBirth"), (String) node.get("dateOfBirth"))) {
-						returnStr += "\t- The node " + parent2.get("firstName") + " " + parent2.get("lastName")
-								+ " is too young to be " + node.get("firstName") + " " + node.get("lastName")
-								+ "'s parent.\n";
-						thereIsAProb = true;
-					}
-					if (!Misc.parentWasAlive((String) parent2.get("dateOfDeath"), (String) node.get("dateOfBirth"))) {
-						returnStr += "\t- The node " + parent2.get("fisrtName") + " " + parent2.get("lastName")
-								+ " was dead at the date of the birth indicated in the node of " + node.get("firstName")
-								+ " " + node.get("lastName") + "\n";
-						thereIsAProb = true;
-					}
+			if (node != null) {
+				checkParentValidity(tree, returnStr, thereIsAProb, node, "parent1Id", "firstName", "lastName",
+						"dateOfBirth", "dateOfDeath");
+				checkParentValidity(tree, returnStr, thereIsAProb, node, "parent2Id", "firstName", "lastName",
+						"dateOfBirth", "dateOfDeath");
+				if (!Objects.isNull(node.get("partnerId")) && !node.get("partnerId").equals("null")) {
+					checkPartnerValidity(tree, returnStr, thereIsAProb, node, "partnerId", "firstName", "lastName",
+							"dateOfBirth", "dateOfDeath");
 				}
 			}
 		}
+
 		return !thereIsAProb ? "OK" : returnStr;
+	}
+
+	@SuppressWarnings("null")
+	private void checkParentValidity(List<LinkedHashMap<String, String>> tree, String returnStr, boolean thereIsAProb,
+			LinkedHashMap<String, String> node, String parentIdKey, String firstNameKey, String lastNameKey,
+			String dateOfBirthKey, String dateOfDeathKey) {
+		if (node.containsKey(parentIdKey) && !Objects.isNull(node.get(parentIdKey))) {
+			Long parentId = Misc.convertObjectToLong(node.get(parentIdKey));
+			LinkedHashMap<String, String> parent = findNodeWithId(tree, parentId);
+
+			if (Objects.isNull(parent)) {
+				parent.put("dateOfBirth", nodeService.getNode(parentId).getDateOfBirth().toString());
+				parent.put("dateOfDeath", null);
+			}
+
+			String parentFirstName = parent.get(firstNameKey);
+			String parentLastName = parent.get(lastNameKey);
+			String parentDateOfBirth = parent.get(dateOfBirthKey);
+
+			if (!Misc.parentIsOlder(parentDateOfBirth, node.get(dateOfBirthKey))) {
+				returnStr += "\t- The node " + parentFirstName + " " + parentLastName + " is too young to be "
+						+ node.get(firstNameKey) + " " + node.get(lastNameKey) + "'s parent.\n";
+				thereIsAProb = true;
+			}
+
+			if (!Misc.parentWasAlive(parent.get(dateOfDeathKey), node.get(dateOfBirthKey))) {
+				returnStr += "\t- The node " + parentFirstName + " " + parentLastName
+						+ " was dead at the date of the birth indicated in the node of " + node.get(firstNameKey) + " "
+						+ node.get(lastNameKey) + "\n";
+				thereIsAProb = true;
+			}
+		}
+	}
+
+	@SuppressWarnings("null")
+	private void checkPartnerValidity(List<LinkedHashMap<String, String>> tree, String returnStr, boolean thereIsAProb,
+			LinkedHashMap<String, String> node, String partnerIdKey, String firstNameKey, String lastNameKey,
+			String dateOfBirthKey, String dateOfDeathKey) {
+		if (node.containsKey(partnerIdKey) && !Objects.isNull(node.get(partnerIdKey))) {
+			Long partnerId = Misc.convertObjectToLong(node.get(partnerIdKey));
+			LinkedHashMap<String, String> partner = findNodeWithId(tree, partnerId);
+
+			if (Objects.isNull(partner)) {
+				partner.put("dateOfBirth", nodeService.getNode(partnerId).getDateOfBirth().toString());
+				partner.put("dateOfDeath", null);
+			}
+			String partnerFirstName = partner.get(firstNameKey);
+			String partnerLastName = partner.get(lastNameKey);
+			String partnerDateOfBirth = partner.get(dateOfBirthKey);
+			String partnerDateOfDeath = partner.get(dateOfDeathKey);
+
+			if (Misc.birthIsPossible(partnerDateOfBirth, partnerDateOfDeath)
+					&& Misc.birthIsPossible(node.get(dateOfBirthKey), node.get(dateOfDeathKey))
+					&& !Misc.parentWasAlive(partnerDateOfDeath, node.get(dateOfBirthKey))
+					&& !Misc.parentWasAlive(node.get(dateOfDeathKey), partnerDateOfBirth)) {
+				returnStr += "\t- The nodes " + firstNameKey + " " + lastNameKey + " and " + partnerFirstName + " "
+						+ partnerLastName + " have inconsistent birth and death dates.\n";
+				thereIsAProb = true;
+			}
+		}
 	}
 
 	private static LinkedHashMap<String, String> findNodeWithId(List<LinkedHashMap<String, String>> tree, Long id) {
@@ -588,11 +628,10 @@ public class TreeController extends AbstractController {
 		for (Map.Entry<Long, String> entry : relationsMap.entrySet()) {
 			Long key = entry.getKey();
 			String relationsString = entry.getValue();
-
 			String[] parts = relationsString.split("\\.");
 
 			for (int i = 1; i < parts.length; i += 2) {
-				if (Long.parseLong(parts[i]) == oldId) {
+				if (Misc.convertObjectToLong(parts[i]) == oldId) {
 					parts[i] = String.valueOf(idInDb);
 				}
 			}
@@ -663,9 +702,9 @@ public class TreeController extends AbstractController {
 				nodeToAdd.remove(id);
 				existingNodes.put(nodeService.getNode(Misc.convertObjectToLong(relatedToNodes[5])).getPartnerId(),
 						nodeService.getNode(Misc.convertObjectToLong(relatedToNodes[5])).getPartner());
-				unknownRelation = replaceId(unknownRelation, Misc.convertObjectToLong(relatedToNodes[5]),
+				unknownRelation = replaceId(unknownRelation, id,
 						nodeService.getNode(Misc.convertObjectToLong(relatedToNodes[5])).getPartnerId());
-				updates = replaceIdInUpdates(updates, Misc.convertObjectToLong(relatedToNodes[5]),
+				updates = replaceIdInUpdates(updates, id,
 						nodeService.getNode(Misc.convertObjectToLong(relatedToNodes[5])).getPartnerId());
 			}
 		}
@@ -738,5 +777,4 @@ public class TreeController extends AbstractController {
 		}
 		return BaFRes;
 	}
-
 }
