@@ -52,6 +52,15 @@ springBoot {
     mainClass = 'com.acfjj.app.GenTreeApp'
 }
 
+bootJar {
+    archiveBaseName = 'genealogic-tree-back'
+    archiveVersion = '1.0.0'
+}
+
+processResources {
+    duplicatesStrategy = 'exclude'
+}
+
 compileJava.options.encoding = 'UTF-8'
 
 tasks.named('test') {
