@@ -28,7 +28,7 @@ To have a good Angular environment, type in your console :
 
 - Move to your angular project
   ```
-  cd genealogic-tree-front\Genepropp
+  cd genealogic-tree-front
   ```
 
 - Install angular environment
