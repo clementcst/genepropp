@@ -45,8 +45,8 @@ export class LoginComponent implements OnInit{
       .subscribe((response) => {
         if (response.success) {
           this.loading = false;
-          this.cookieService.set('userId', response.value);
-          this.cookieService.set('privateCode', "a faire");
+          this.cookieService.set('userId', response.value.userId);
+          this.cookieService.set('privateCode', response.value.privateCode);
           this.router.navigate(['homePage']);
         }
         else {
