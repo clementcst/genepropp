@@ -43,23 +43,23 @@ export class ProfilLeftComponent implements OnInit {
   private showUserProfil() {
     this.treeService.getTree(this.cookieService.get('userId')).subscribe((data) => {
       this.tree = data.value;
-      this.loadingpage = false;
       this.boxs = [
         { title: "Month views", value: this.tree.viewOfMonth },
         { title: "Annual views", value: this.tree.viewOfYear },
         { title: "Tree length", value: this.tree.nodes.length }
       ];
-    });
-    this.userService.getUser(this.cookieService.get('userId')).subscribe((data) => {
-      this.user = data.value;
-      if (this.user.isMyTreePublic) {
-        const visibilityRadio = document.getElementById('inline-radio-public') as HTMLInputElement;
-        visibilityRadio.checked = true;
-      } 
-      else {
-        const visibilityRadio = document.getElementById('inline-radio-private') as HTMLInputElement;
-        visibilityRadio.checked = true;
-      }
+      this.loadingpage = false;
+      this.userService.getUser(this.cookieService.get('userId')).subscribe((data) => {
+        this.user = data.value;
+        if (this.user.isMyTreePublic) {
+          const visibilityRadio = document.getElementById('inline-radio-public') as HTMLInputElement;
+          visibilityRadio.checked = true;
+        }
+        else {
+          const visibilityRadio = document.getElementById('inline-radio-private') as HTMLInputElement;
+          visibilityRadio.checked = true;
+        }
+      });
     });
   }
 
