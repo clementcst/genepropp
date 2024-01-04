@@ -47,7 +47,7 @@ export class ProfilLeftComponent implements OnInit {
       this.boxs = [
         { title: "Month views", value: this.tree.viewOfMonth },
         { title: "Annual views", value: this.tree.viewOfYear },
-        { title: "Tree length", value: this.tree.id }
+        { title: "Tree length", value: this.tree.nodes.length }
       ];
     });
     this.userService.getUser(this.cookieService.get('userId')).subscribe((data) => {
