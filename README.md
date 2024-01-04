@@ -76,4 +76,3 @@ http://localhost:4200/
 * **CASSIET Clement** _alias_ [@Clément](https://github.com/clementcst)
 * **CERF Fabien** _alias_ [@Fab780](https://github.com/Fab780)
 * **GAUTIER Jordan** _alias_ [@JordanG2](https://github.com/JordanG2)
-* **LEGRAND Joan** _alias_ [@LegJo](https://github.com/LegJo)
