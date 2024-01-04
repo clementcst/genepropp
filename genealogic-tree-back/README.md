@@ -48,6 +48,9 @@ The `settings.gradle` file specifies the root project name.
 rootProject.name = 'genealogic-tree-back'
 ```
 
+### Javadoc
+  under folder javadoc
+
 # GenTree Back-End
 
 This is the back-end part of the GenTree application.
@@ -98,7 +101,7 @@ This is the back-end part of the GenTree application.
     angular.app.url=http://localhost:4200
     ```
 
-## Spirng Boot Dependencies
+## Spring Boot Dependencies
 
 - Spring Data JPA
 - Spring Data JDBC
@@ -112,7 +115,7 @@ This is the back-end part of the GenTree application.
 
 1. Clone the repository.
 2. Navigate to the `genealogic-tree-back` directory.
-3. Execute the `GenTreeApp.java` file.
+3. Execute the `GenTreeApp.java` file. (`GenTreeAppTest.java` with Junit5 to run tests)
 4. The back-end will start, and you can access it at [http://localhost:8080](http://localhost:8080).
 
 Note: Make sure you have MySQL installed, and the database configurations in `application.properties` are appropriate.
