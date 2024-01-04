@@ -37,33 +37,36 @@ public class AccountController extends AbstractController {
 	ConversationController conversationController;
 
 	@GetMapping("/login")
-	public Response login(@RequestParam String privateCode, @RequestParam String password) {
-		if(!Misc.isStringSafe(password) || !Misc.isStringSafe(privateCode)) {
-			return new Response("XSS tentative, your ip has been reported to admins.", false);
-		}
-		User user = userService.getUserByPrivateCode(privateCode);
-		if (Objects.isNull(user)) {
-			return new Response("Incorrect private code", false);
-		}
-		if (!passwordCompare(user, password)) {
-			return new Response("Incorrect password", false);
-		}
-		if (!user.isValidated()) {
-			List<Message> validations = conversationService.getUserValidationsOfConcernedUser(user);
-			LocalDateTime earliestDateTime =  validations.stream()
-			        .map(Message::getMessageDateTime)
-			        .min(Comparator.naturalOrder()).orElse(null);
-			String frontMsg = "User not validated by Admin. Validation request datetime: " + Misc.formatLocalDateTimeToString(earliestDateTime) + ". ";
-			if(Misc.isOneMonthOld(earliestDateTime)) {
-				frontMsg += "\nIt's been more than a month, You can consider that it has been refused. \nContact support to get more info";
-			} else {
-				frontMsg += "\nPlease retry later or contact support to get more info.";
-			}
-			return new Response(frontMsg, false);
-		}
-		return new Response(user.getId(), "Login Success", true);
-	}
-
+        public Response login(@RequestParam String privateCode, @RequestParam String password) {
+        if(!Misc.isStringSafe(password) || !Misc.isStringSafe(privateCode)) {
+            return new Response("XSS tentative, your ip has been reported to admins.", false);
+        }
+        User user = userService.getUserByPrivateCode(privateCode);
+        if (Objects.isNull(user)) {
+            return new Response("Incorrect private code", false);
+        }
+        if (!passwordCompare(user, password)) {
+            return new Response("Incorrect password", false);
+        }
+        if (!user.isValidated()) {
+            List<Message> validations = conversationService.getUserValidationsOfConcernedUser(user);
+            LocalDateTime earliestDateTime =  validations.stream()
+                    .map(Message::getMessageDateTime)
+                    .min(Comparator.naturalOrder()).orElse(null);
+            String frontMsg = "User not validated by Admin. Validation request datetime: " + Misc.formatLocalDateTimeToString(earliestDateTime) + ". ";
+            if(Misc.isOneMonthOld(earliestDateTime)) {
+                frontMsg += "\nIt's been more than a month, You can consider that it has been refused. \nContact support to get more info";
+            } else {
+                frontMsg += "\nPlease retry later or contact support to get more info.";
+            }
+            return new Response(frontMsg, false);
+        }
+        LinkedHashMap<String, String> resValue = new LinkedHashMap<>();
+        resValue.put("userId", user.getId().toString());
+        resValue.put("privateCode", user.getPrivateCode());
+        return new Response(resValue, "Login Success", true);
+        }
+	
 	@PostMapping("/registration")
 	public Response registration(@RequestParam int step, @RequestBody LinkedHashMap<String, String> dataLHM,
 			@RequestParam(required = false, defaultValue = "0") Boolean userResponse) {
