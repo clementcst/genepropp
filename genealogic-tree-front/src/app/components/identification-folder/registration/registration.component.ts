@@ -88,6 +88,7 @@ export class RegistrationComponent {
           this.loading = false;
           this.openPrivateCodePopup(response.value.privateCode);
           this.cookieService.set('userId', response.value.userId);
+          this.cookieService.set('privateCode', response.value.privateCode);
           this.router.navigate(['homePage']);
         }
         else {
