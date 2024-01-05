@@ -1,0 +1,9 @@
+com.acfjj.app
+com.acfjj.app.controller
+com.acfjj.app.model
+com.acfjj.app.repository
+com.acfjj.app.service
+com.acfjj.app.utils
+com.acfjj.test
+com.acfjj.test.model
+com.acfjj.test.service
