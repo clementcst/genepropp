@@ -6,7 +6,7 @@ import { CookieService } from 'ngx-cookie-service';
 import { MatDialog } from '@angular/material/dialog';
 import { NodeCreationRulesComponent } from '../../PopUps/node-creation-rules/node-creation-rules.component'
 import { ErrorMergeTreePopupComponent } from '../../PopUps/error-merge-tree-popup/error-merge-tree-popup.component'
-import { SpecialSuccessPopupComponent } from '../../PopUps/special-success-popup/special-success-popup.component'
+import { SpecialSuccessPopupComponent } from '../../PopUps/special-success-popup/special-success-popup.component' 
 
 import { ActivatedRoute } from '@angular/router';
 
