@@ -1,0 +1,33 @@
+
+installation angular fois : 
+
+Set-ExecutionPolicy bypass
+npm i -g npm@latest
+npm i -g @angular/cli@latest
+ng version 
+
+
+creer projet:
+
+ng new NOMDUFUTURDOSSIERDEPROJET
+
+start projet:
+
+cd dans le folder du projet
+npm install ngx-cookie-service
+npm i @balkangraph/familytree.js
+
+npm start
+ou 
+ng server 
+
+open your browser on http://localhost:4200/
+
+compilation projet:
+ng serve
+
+ensuite regarder le boss: 
+https://www.youtube.com/watch?v=veWCyDERSi4&list=PLiptPVzCHOl52onYxgo8hb-D0UzcUMcVY&pp=iAQB
+
+
+
