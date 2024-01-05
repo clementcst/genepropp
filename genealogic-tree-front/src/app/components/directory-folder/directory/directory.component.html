@@ -1,0 +1,11 @@
+<!-- directory.component.html -->
+<div class="w-[70vh] h-[85vh] bg-green-900 overflow-hidden">
+  <div class="flex items-center mx-4 my-4">
+    <input type="text" placeholder="Search by First name and Last name" [(ngModel)]="searchText" class="p-2 border border-gray-500 rounded-lg search-bar" (input)="onSearchChange()">
+  </div>
+  <div class="h-[72vh] overflow-y-auto mx-4 my-4">
+    <!-- Boucle pour afficher les entrées de l'annuaire -->
+    <app-directory-element *ngFor="let user of filteredUsers" [user]="user"></app-directory-element>
+</div>
+
+</div>

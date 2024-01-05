@@ -1,0 +1,62 @@
+Gestion des graphes:
+-Delete User & Delete Person Node => vérif si Person Info is Orphan si oui => delete Person Info 
+-Update User & Update Person Node => update linked person Info
+-Unique Identifier pour User & Person Info & Person Node => equals
+-Create User => 				
+	check si PersonInfo existant correspondant (avec Unique Identifier) 
+	Si oui => 
+		Si PersonInfo relatedUserID != null (user existe déjà) => 
+		Si oui => Message doublon non possiblé
+		else =>	
+			Montrer au User : es tu bien de cette personne (user connecté au personInfo trouvé) ? 
+			Si oui (Faire confirmer que les infos reseignées sont ok) => 
+				attendre validation admin	
+				Replace PersonInfo, 
+					on remplace les infos du PersonInfo en dB par celles pas en dB (user à créer),
+					Lier PersonInfo avec user créé
+					Save User + update PersonInfo dans la dB		
+			Si non => etes vous sûr de vos infos ?
+				Si oui => Compte avec nouveau personInfo 
+				Si non => restart process create User
+	Si non => Save User + save PersonInfo dans la dB
+-Create Person Node
+	check si PersonNode pas privé existant correspondant (avec Unique Identifier)		
+	Si oui => 
+		Si PersonInfo lié à la personNode relatedUserID != null (c est un user) 
+		Si oui =>
+			Message : C est bien ce gars là ?
+			Si oui =>
+				message à l'autre gars pour qu'il accepte de rejoindre ton arbre
+				Si oui => 
+					update les TreeNodes des 2 users
+				Si non =>  Voulez vous la créer en pv ?
+					Oui => créer le lien TreeNodes en pv
+					non => abandon
+			Si non => vérif des infos
+				Si oui => Message : Vous vous ajouter une liaison avec un user qui dit non => refus
+				Si non => restart create PersonInfo
+		Si non => Si PersonInfo lié à la personNode relatedUserID = null (c est un pas user) 
+			Vérif si tu as créer la Node
+			Si oui => U 'insert auxiliaire' already added this person in ur tree sac à merde
+			Si non => 
+				Montrer famille proche du gars, cette personne a déjà été ajoutée à sur le site, il s'agit bien de la bonne personne ?
+				Si oui => Voulez demander la liason avec cette personne ?
+					Si oui => Demander eu créateur s'il accepte (montrer famille proche)
+						Si oui => update les TreeNodes des 2 users
+						Si non => Voulez vous la créer en pv ?
+							Oui => créer le lien TreeNodes en pv
+							non => abandon
+					Si non =>  Voulez vous la créer en pv ?
+						Oui => créer le lien TreeNodes en pv
+						non => abandon
+				Si non => vérif des infos 
+					Oui => Voulez vous la créer en pv ?
+						Oui => créer en pv la personNode 
+						non => abandon		 						
+					Non => restart process
+	Si non => save  PersonNode, save PersonInfo et save treeNodes en public
+
+
+
+-besoin faire PersonInfo Service
+

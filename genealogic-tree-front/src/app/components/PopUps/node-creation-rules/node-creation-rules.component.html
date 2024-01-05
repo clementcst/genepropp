@@ -1,0 +1,34 @@
+<div class="flex flex-col items-center justify-center">
+    <div class="bg-white p-8 rounded-lg shadow-lg text-center">
+        <div class="mt-4">
+            <p class="text-gray-700 text-lg mb-4">Before creating your family tree, please provide the following required information:</p>
+
+            <ul class="text-left mb-4">
+                <li class="list-disc">First Name <span class="text-red-500">*</span></li>
+                <li class="list-disc">Last Name <span class="text-red-500">*</span></li>
+                <li class="list-disc">Date of Birth <span class="text-red-500">*</span></li>
+                <li class="list-disc">City of Birth <span class="text-red-500">*</span></li>
+                <li class="list-disc">Country of Birth <span class="text-red-500">*</span></li>
+                <li class="list-disc">Gender: Choose either "Male," "Female," or "Other."</li>
+                <li class="list-disc">Privacy: Choose either "Public," "Private," or "Restricted."</li>
+            </ul>
+            <br>
+
+            <p class="text-gray-700 text-lg mb-4">
+                The tree owner's node will be highlighted in <span class="text-red-500">red</span>,
+                male individuals in <span class="text-blue-500">blue</span>,
+                and female individuals in <span class="text-purple-500">purple</span>.
+              </p>
+
+              <p class="text-gray-700 text-lg mb-4">
+                Nodes with '(user)' after their first and last names represent users associated with the site.
+            </p>
+            
+
+              
+            <p class="text-gray-700 text-sm mb-4">Fields marked with <span class="text-red-500">*</span> are mandatory. Additionally, please select an option for both the Gender and Privacy settings.</p>
+
+            <button (click)="valider()" class="bg-green-900 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline-blue" onclick="closePopup()">Close Window</button>
+        </div>
+    </div>
+</div>
