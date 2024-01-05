@@ -17,6 +17,14 @@ Users can modify their account information, as well as the information on the no
 ### REST_API_DOCUMENTATION.xlsx  
   REST API endpoint list and technical doc
 
+## Execution
+  ### Build
+     To launch the project you need to build it first. 
+     Launch the build-and-run.bat
+     Or check README.md of the two (back and front) projects
+  ### Run 
+    To Run it launch run.bat 
+    Or check README.md of the two (back and front) projects
 ## Prerequisites
 
 OS Windows, may work with Linux.
