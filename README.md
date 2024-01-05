@@ -4,6 +4,18 @@
 This website lets you generate and view family trees. Each user can add members to his or her tree. A written chat system allows users to exchange information, validate users in their tree, etc...
 Users can modify their account information, as well as the information on the nodes that make up their tree.
 
+## What's in this folder 
+
+### genealogic-tree-back 
+  Spring Boot Java Project containing the Back 
+### genealogic-tree-front 
+  Angular Project containing the Front
+### docs 
+  Documentation Folder
+### Rapport.pdf 
+  Project's Report, containing the présentation and at the same time some technical documentation 
+### REST_API_DOCUMENTATION.xlsx  
+  REST API endpoint list and technical doc
 
 ## Prerequisites
 
