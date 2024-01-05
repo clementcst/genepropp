@@ -504,7 +504,7 @@ export class TreeContentComponent {
                           divorced: node.exPartnersId,
                           tags: this.getTags(node.gender,node.id),
                           
-                          gender : node.gender == 1 ? 'male' : node.gender == 0 ? 'female' : 'other',
+                          gender : node.gender == 0 ? 'male' : node.gender == 1 ? 'female' : 'other',
                           profilPictureUrl: node.profilPictureUrl,
                           dateOfBirth : node.dateOfBirth,
                           dateOfDeath : node.dateOfDeath,
@@ -640,10 +640,10 @@ export class TreeContentComponent {
 
       switch(node.gender){
         case 'female':
-          node.gender = 0;
+          node.gender = 1;
         break;
         case 'male':
-          node.gender = 1;
+          node.gender = 0;
         break;
         case 'other':
           node.gender = 2;
