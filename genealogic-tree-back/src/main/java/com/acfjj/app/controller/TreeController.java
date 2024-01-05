@@ -128,42 +128,47 @@ public class TreeController extends AbstractController {
 			Node node = nodeService.getNode(id);
 			Node currentNode = ("UPDATE".equals(nodeUpdate.getValue().toUpperCase())
 					|| "DELETE".equals(nodeUpdate.getValue().toUpperCase())) ? existingNodes.get(id) : null;
-			if (!Objects.isNull(node)) {
-				if ("UPDATE".equals(nodeUpdate.getValue().toUpperCase())
-						&& nodeService.getNode(id).getCreatedById() != UserId) {
-					responseStr += "the node of " + nodeService.getNode(id).getFullName()
-							+ " does not belong to you, you cannot update it\n";
-					responseSuccess = false;
-				}
-				Node nodeInDb = nodeService.getNodeByNameAndBirthInfo(currentNode.getLastName(),
-						currentNode.getFirstName(), currentNode.getDateOfBirth(),
-						currentNode.getCountryOfBirth(), currentNode.getCityOfBirth());
-
-				if ("UPDATE".equals(nodeUpdate.getValue().toUpperCase())
-						&& !Objects.isNull(nodeInDb) && nodeInDb.getId() != currentNode.getId()) {
-					responseStr += "Cannot update the node with these info : "
-							+ nodeService.getNode(id).getFullNameAndBirthInfo()
-							+ " because it already exist in the database. Try to create it from start to go further in a merge procedure\n";
-					responseSuccess = false;
-				}
-				if ("DELETE".equals(nodeUpdate.getValue().toUpperCase())
-						&& nodeService.getNode(id).getCreatedById() != UserId) {
-					responseStr += "the node of " + nodeService.getNode(id).getFullName()
-							+ " does not belong to you, you cannot delete it\n";
-					responseSuccess = false;
-				}
-				if ("DELETE".equals(nodeUpdate.getValue().toUpperCase()) && nodeService.getNode(id).getPersonInfo()
-						.getId() == userService.getUser(userId).getPersonInfo().getId()) {
-					responseStr += "This is your node, you cannot delete the main node. You cannot delete your tree either if that's your goal.\n";
-					responseSuccess = false;
-				}
-			} else {
-				if (nodeUpdate.getValue().equals("UPDATE") || nodeUpdate.getValue().equals("DELETE")) {
-					responseStr += "Cannot update or delete node with id " + id
-							+ " because it has not been found in databased\n";
-					responseSuccess = false;
+			if(nodeUpdate.getValue().toUpperCase().equals("UPDATE") || nodeUpdate.getValue().toUpperCase().equals("DELETE")) {
+				if (!Objects.isNull(node)) {
+					if ("UPDATE".equals(nodeUpdate.getValue().toUpperCase())
+							&& nodeService.getNode(id).getCreatedById() != UserId) {
+						responseStr += "the node of " + nodeService.getNode(id).getFullName()
+								+ " does not belong to you, you cannot update it\n";
+						responseSuccess = false;
+					}
+					Node nodeInDb = null;
+					if(!Objects.isNull(currentNode)) {
+						nodeInDb = nodeService.getNodeByNameAndBirthInfo(currentNode.getLastName(),
+								currentNode.getFirstName(), currentNode.getDateOfBirth(),
+								currentNode.getCountryOfBirth(), currentNode.getCityOfBirth());
+					}					
+					if ("UPDATE".equals(nodeUpdate.getValue().toUpperCase())
+							&& !Objects.isNull(nodeInDb) && nodeInDb.getId() != currentNode.getId()) {
+						responseStr += "Cannot update the node with these info : "
+								+ nodeService.getNode(id).getFullNameAndBirthInfo()
+								+ " because it already exist in the database. Try to create it from start to go further in a merge procedure\n";
+						responseSuccess = false;
+					}
+					if ("DELETE".equals(nodeUpdate.getValue().toUpperCase())
+							&& nodeService.getNode(id).getCreatedById() != UserId) {
+						responseStr += "the node of " + nodeService.getNode(id).getFullName()
+								+ " does not belong to you, you cannot delete it\n";
+						responseSuccess = false;
+					}
+					if ("DELETE".equals(nodeUpdate.getValue().toUpperCase()) && nodeService.getNode(id).getPersonInfo()
+							.getId() == userService.getUser(userId).getPersonInfo().getId()) {
+						responseStr += "This is your node, you cannot delete the main node. You cannot delete your tree either if that's your goal.\n";
+						responseSuccess = false;
+					}
+				} else {
+					if (nodeUpdate.getValue().equals("UPDATE") || nodeUpdate.getValue().equals("DELETE")) {
+						responseStr += "Cannot update or delete node with id " + id
+								+ " because it has not been found in databased\n";
+						responseSuccess = false;
+					}
 				}
 			}
+			
 		}
 		// Post Check return if problem
 		if (!responseSuccess) {
@@ -380,7 +385,9 @@ public class TreeController extends AbstractController {
 			privacy = nodeToAdd.getPrivacy();
 		}
 		Node linkedNode = nodeService.getNode(linkedNodeId);
-		
+		if(Objects.isNull(linkedNode)){
+			return new Response("The linked node doesn't exist", false);
+		}
 		switch (type.toUpperCase()) {
 		case "PARENT":
 			if (linkedNode.getParent1() == nodeToAdd || linkedNode.getParent2() == nodeToAdd) {

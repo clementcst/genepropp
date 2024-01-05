@@ -186,12 +186,6 @@ public class ConversationController extends AbstractController {
 			additionNode.getPersonInfo()
 					.setCountryOfBirth(additionNode.getCountryOfBirth().replace(Constants.TEMPORARY_STR_MAKER, ""));
 			treeService.treeMerge(tree1, tree2, baseNode, relatedToNode, additionNode, relationType);
-			// merge des tree ici
-			// tous les parametre sont pret pr toi jourdan : 
-			// baseNode la node dans le tree de l'autre type (le receiver) 
-			//additionNode la node que le sender à essayer de creeer qui etait stocker en "caché" (ligne 177 la décache)
-			// additionNode à Merge dans baseNode
-			//relatedToNode et relationType Obvious, c'est pour finir la création de la node merged pour faire le merge tree
 		} 
 		//delete addition Node, help ici, jsp comment faire pour supprimer ça
 		conversationService.disableValidation(validationMsg, userResponse, validator);
