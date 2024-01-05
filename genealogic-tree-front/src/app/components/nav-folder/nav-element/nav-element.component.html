@@ -1,4 +1,0 @@
-<li>
-    <a *ngIf="page.link != '/'" [routerLink]="page.link" class="text-xl text-white hover:text-white hover:bg-green-800 transition duration-200 px-4 py-2 rounded-md">{{ page.displayName }}</a>
-    <a *ngIf="page.link == '/'" [routerLink]="page.link" (click)="logout()" class="text-xl text-white hover:text-white hover:bg-green-800 transition duration-200 px-4 py-2 rounded-md">{{ page.displayName }}</a>
-</li>
