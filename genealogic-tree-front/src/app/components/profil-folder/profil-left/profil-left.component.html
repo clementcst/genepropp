@@ -1,0 +1,155 @@
+<div *ngIf="loadingpage; else content" class="block md:flex h-full p-4 justify-center">
+    <form class="sm:p-6 lg:p-8 bg-white rounded-lg overflow-y-scroll overflow-x-hidden w-full">
+        <div class="pb-8 px-8 mx-2">
+            <span class="text-xl font-semibold block mb-6">Profil : </span>
+            <div class="flex items-center">
+                <div class="w-40 h-40 rounded mr-12 bg-gray-300 animate-pulse"></div>
+                <div class="flex flex-col">
+                    <div class="flex items-center space-x-4 mb-4">
+                        <div class="w-16 h-6 bg-gray-300 animate-pulse"></div>
+                        <div class="w-16 h-6 bg-gray-300 animate-pulse"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ml-10 mt-2 flex">
+            <div *ngIf="changePictureFormVisible" class="flex items-center">
+                <div class="w-40 h-8 bg-gray-300 animate-pulse"></div>
+                <div class="ml-2">
+                    <div class="w-48 h-8 bg-gray-300 animate-pulse"></div>
+                    <div class="flex space-x-2">
+                        <div class="w-20 h-8 bg-gray-300 animate-pulse"></div>
+                        <div class="w-20 h-8 bg-gray-300 animate-pulse"></div>
+                    </div>
+                </div>
+            </div>
+
+            <button type="button" *ngIf="!changePictureFormVisible"
+                class="text-white bg-gray-400 animate-pulse focus:ring-2 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm sm:w-auto px-5 py-2.5">
+                Loading Profile Picture
+            </button>
+
+            <div *ngIf="showSuccessMessage" class="ml-2 relative message success-message">
+                <div class="w-48 h-8 bg-gray-300 animate-pulse"></div>
+            </div>
+            <div *ngIf="showFailedMessage" class="ml-2 relative message failed-message">
+                <div class="w-48 h-8 bg-gray-300 animate-pulse"></div>
+            </div>
+        </div>
+        <div class="w-full pb-8 px-8 mx-2 flex mt-14">
+            <label for="confidentialite" class="block mb-1 mr-4 text-xl font-semibold block">Tree visibility :</label>
+            <div class="flex">
+              <div class="flex items-center mr-4">
+                <div class="w-4 h-4 bg-gray-300 animate-pulse"></div>
+                <div class="ml-2 text-sm font-medium bg-gray-300 w-16 h-4 animate-pulse"></div>
+              </div>
+              <div class="flex items-center mr-4">
+                <div class="w-4 h-4 bg-gray-300 animate-pulse"></div>
+                <div class="ml-2 text-sm font-medium bg-gray-300 w-16 h-4 animate-pulse"></div>
+              </div>
+            </div>
+          </div>
+      
+          <div class="w-full px-8 pb-8 mx-2 block">
+            <a href="#" class="font-medium text-xl font-semibold block text-gray-400 dark:text-gray-400 hover:underline bg-gray-300 w-40 h-6 animate-pulse">Loading...</a>
+          </div>
+      
+          <div class="flex">
+            <button type="submit" [disabled]="loadingTree"
+              class="ml-10 text-white bg-gray-400 animate-pulse focus:ring-2 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm sm:w-auto px-5 py-2.5">
+              Loading...
+            </button>
+          </div>
+    </form>
+</div>
+
+<ng-template #content>
+    <div class="block md:flex h-full p-4 justify-center">
+
+        <form class="sm:p-6 lg:p-8 bg-white rounded-lg overflow-y-scroll overflow-x-hidden">
+
+            <div class="pb-8 px-8 mx-2">
+                <span class="text-xl font-semibold block mb-6">Profil : </span>
+                <div class="flex items-center">
+                    <div class="w-40 h-40 rounded mr-12">
+                        <img *ngIf="!loadingPicture" [src]="user.profilPictureUrl" alt="Default avatar"
+                            class="object-none object-scale-down w-full h-full">
+                        <div *ngIf="loadingPicture" class="ml-2">
+                            <div class="spinner red-spinner"></div>
+                        </div>
+                    </div>
+                    <app-profil-statbox *ngFor="let box of boxs" [box]="box">
+                    </app-profil-statbox>
+                </div>
+            </div>
+
+            <div class="ml-10 mt-2 flex">
+                <div *ngIf="changePictureFormVisible" class="flex items-center">
+                    <input type="text" placeholder="Enter image URL" [(ngModel)]="newPictureUrl" name="newPictureUrl"
+                        class="rounded p-2 border" />
+                    <button type="button" class="ml-2 px-4 py-2 bg-green-800 text-white rounded"
+                        (click)="submitPicture()">
+                        Save
+                    </button>
+                    <button type="button" class="ml-2 px-4 py-2 bg-red-500 text-white rounded"
+                        (click)="cancelChangePicture()">
+                        Cancel
+                    </button>
+                </div>
+
+                <button type="button" *ngIf="!changePictureFormVisible" [disabled]="loadingPicture"
+                    class="text-white bg-green-800 hover:bg-green-300 focus:ring-2 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm sm:w-auto px-5 py-2.5"
+                    (click)="showChangePictureForm()">
+                    Change Profile Picture
+                </button>
+                <div *ngIf="showSuccessMessage" class="ml-2 relative message success-message">
+                    {{ successMessage }}
+                </div>
+                <div *ngIf="showFailedMessage" class="ml-2 relative message failed-message">
+                    {{ failedMessage }}
+                </div>
+            </div>
+
+            <div class="w-full pb-8 px-8 mx-2 flex mt-14">
+                <label for="confidentialite" class="block mb-1 mr-4 text-xl font-semibold block">Tree visibility
+                    :</label>
+                <div class="flex">
+                    <div class="flex items-center mr-4">
+                        <input id="inline-radio-public" type="radio" name="node_visibility"
+                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300"
+                            [checked]="treeVisibilityControl.value === 1" (change)="updateTreeVisibility(1)">
+                        <label for="inline-radio-public" class="ml-2 text-sm font-medium">Public</label>
+                    </div>
+                    <div class="flex items-center mr-4">
+                        <input id="inline-radio-private" type="radio" name="node_visibility"
+                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300"
+                            [checked]="treeVisibilityControl.value === 0" (change)="updateTreeVisibility(0)">
+                        <label for="inline-radio-private" class="ml-2 text-sm font-medium">Private</label>
+                    </div>
+                </div>
+            </div>
+            <div class="w-full px-8 pb-8 mx-2 block">
+                <a href="myTreePage"
+                    class="font-medium text-xl font-semibold block text-green-800 dark:text-green-800 hover:underline">Go
+                    to
+                    the Tree</a>
+            </div>
+            <div class="flex">
+                <button type="submit" (click)="logTreeVisibility()" [disabled]="loadingTree"
+                    class="ml-10 text-white bg-green-800 hover:bg-green-300 focus:ring-2 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm sm:w-auto px-5 py-2.5">
+                    Submit modifications
+                </button>
+                <div *ngIf="loadingTree" class="ml-2">
+                    <div class="spinner red-spinner"></div>
+                </div>
+                <div *ngIf="showSuccessMessageTree" class="ml-2 relative message success-message">
+                    {{ successMessageTree }}
+                </div>
+                <div *ngIf="showFailedMessageTree" class="ml-2 relative message failed-message">
+                    {{ failedMessageTree }}
+                </div>
+            </div>
+        </form>
+    </div>
+</ng-template>

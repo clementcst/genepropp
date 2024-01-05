@@ -1,0 +1,17 @@
+Login : GET /account/login | @RequestParam String privateCode, @RequestParam String password
+Registration : POST /account/registration | (@RequestParam int step, @RequestBody LinkedHashMap<String, String> data, @RequestParam(required = false, defaultValue = "0") Boolean userResponse
+
+getUsers : GET /user/all (maintenant ne récup que les users validé et non admin) 
+getUser : GET /user | @RequestParam Long userId
+
+getConversation : GET /conversation | @RequestParam long conversationId
+newConversation : POST /conversation/new | @RequestParam long userId1, @RequestParam long userId2
+newMessage : POST /conversation/message/new | @RequestParam long senderId, @RequestParam long receiverId, @RequestParam String content
+
+testUsers POST /test/users | @RequestParam(required = false, defaultValue = "1") Boolean validated
+testTree1 POST /test/tree
+testTree1 POST /test/tree2
+testNodes POST /test/nodes
+Tous les test dans l'ordre POST /test
+
+updateProfile : user/profil/update | @RequestParam Long userId, @RequestBody LinkedHashMap<String,String> dataLHM

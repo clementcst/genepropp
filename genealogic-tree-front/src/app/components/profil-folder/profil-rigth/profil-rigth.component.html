@@ -1,0 +1,92 @@
+<div *ngIf="loadingpage2; else content" class="block md:flex h-full p-4 bg-green-900 justify-center">
+    <div class="sm:p-6 lg:p-8 bg-white rounded-lg overflow-y-scroll w-full">
+        <span class="text-xl font-semibold block mb-6">My information : </span>
+        <div class="grid gap-10 mb-10 md:grid-cols-2">
+            <div class="skeleton-label">Firstname
+                <span class="text-xl font-semibold block bg-gray-400 h-6 w-50 animate-pulse"></span>
+            </div>
+            <div class="skeleton-label">Lastname
+                <span class="text-xl font-semibold block bg-gray-400 h-6 animate-pulse"></span>
+            </div>
+            <div class="skeleton-label">Secu number
+                <span class="text-xl font-semibold block bg-gray-400 h-6 animate-pulse"></span>
+            </div>
+            <div class="skeleton-label">Phone number
+                <span class="text-xl font-semibold block bg-gray-400 h-6 animate-pulse"></span>
+            </div>
+            <div class="skeleton-label">Birthday
+                <span class="text-xl font-semibold block bg-gray-400 h-6 animate-pulse"></span>
+            </div>
+            <div class="skeleton-label">Nationality
+                <span class="text-xl font-semibold block bg-gray-400 h-6 animate-pulse"></span>
+            </div>
+            <div class="skeleton-label">Email
+                <span class="text-xl font-semibold block bg-gray-400 h-6 animate-pulse"></span>
+            </div>
+            <div class="skeleton-label">Address
+                <span class="text-xl font-semibold block bg-gray-400 h-6 animate-pulse"></span>
+            </div>
+        </div>
+        <div class="skeleton-label">Sexe</div>
+        <span class="text-xl font-semibold block bg-gray-400 h-6 animate-pulse"></span>
+    </div>
+</div>
+
+<ng-template #content>
+    <div class="block md:flex h-full p-4 bg-green-900 justify-center">
+        <form class="sm:p-6 lg:p-8 bg-white rounded-lg overflow-y-scroll w-full">
+            <span class="text-xl font-semibold block mb-6">My information : </span>
+            <div class="grid gap-10 mb-10 md:grid-cols-2">
+                <app-profil-inputs *ngFor="let input of inputs1" [input]="input"
+                    (valueChanged)="updateInputsData($event)"></app-profil-inputs>
+                <div>
+                    <label for="birthday"
+                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-black">Birthday</label>
+                    <input type="date" id="birthdayInput" name="birthdayInput"
+                        class="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-300 bg-gray-300 dark:border-gray-600 dark:value-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        value="{{ user.dateOfBirth }}">
+                </div>
+                <app-profil-inputs *ngFor="let input of inputs2" [input]="input"
+                    (valueChanged)="updateInputsData($event)"></app-profil-inputs>
+                <div>
+                    <label for="sexe" class="block mb-4 text-sm font-medium text-gray-900 dark:text-black">Sexe</label>
+                    <div class="flex">
+                        <div class="flex items-center mr-4">
+                            <input type="radio" id="man" name="sexeInput"
+                                class="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-300 bg-gray-300 dark:border-gray-600 dark:value-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                value="0" [checked]="user.gender === 0">
+                            <label for="man" class="ml-2 text-sm font-medium">Man</label>
+                        </div>
+                        <div class="flex items-center mr-4">
+                            <input type="radio" id="woman" name="sexeInput"
+                                class="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-300 bg-gray-300 dark:border-gray-600 dark:value-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                value="1" [checked]="user.gender === 1">
+                            <label for="woman" class="ml-2 text-sm font-medium">Woman</label>
+                        </div>
+                        <div class="flex items-center mr-4">
+                            <input type="radio" id="other" name="sexeInput"
+                                class="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-300 bg-gray-300 dark:border-gray-600 dark:value-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                value="2" [checked]="user.gender === 2">
+                            <label for="other" class="ml-2 text-sm font-medium">Other</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="relative">
+                    <button type="button" (click)="onSubmitModification()" [disabled]="loadingUser"
+                        class="text-white bg-green-800 hover:bg-green-300 focus:ring-2 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center mb-4">
+                        Submit modification
+                    </button>
+                    <div *ngIf="loadingUser" class="ml-2">
+                        <div class="spinner red-spinner"></div>
+                    </div>
+                    <div *ngIf="showSuccessMessage" class="message success-message">
+                        {{ successMessage }}
+                    </div>
+                    <div *ngIf="showFailedMessage" class="message failed-message">
+                        {{ failedMessage }}
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</ng-template>

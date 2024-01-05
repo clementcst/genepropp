@@ -1,0 +1,771 @@
+@startuml
+skinparam dpi 2000
+scale 853x23506
+
+package com.acfjj.app.utils <<Frame>> {
+class Response [[java:com.acfjj.app.utils.Response]] {
+	-value: Object
+	-message: String
+	-success: Boolean
+	+Response()
+	+Response(value: Object, message: String, success: Boolean)
+	+Response(value: Object)
+	+Response(message: String, success: Boolean)
+	+getValue(): Object
+	+setValue(value: Object): void
+	+getMessage(): String
+	+setMessage(message: String): void
+	+getSuccess(): Boolean
+	+setSuccess(success: Boolean): void
+}
+enum ValidationType [[java:com.acfjj.app.utils.ValidationType]] {
+	USER_VALIDATION
+	TREE_MERGE_VALIDATION
+	validationMsg
+	-ValidationType(validationMsg: String)
+	+{abstract} getValidationMsg(obj: Object): String
+	+{abstract} setDisableValidationMsg(msg: Message, userResponse: boolean, validator: User): void
+	+{abstract} getValidationRequests(msg: Message): LinkedHashMap<String,String>
+}
+class Misc [[java:com.acfjj.app.utils.Misc]] {
+	+{static} findMaxFrequency(liste: List<Integer>): Integer
+	+{static} getLocalDateTime(): LocalDateTime
+	+{static} formatLocalDateTimeToString(ldt: LocalDateTime): String
+	+{static} formatStringToLocalDateTime(date: String): LocalDateTime
+	+{static} isOneMonthOld(dateTime: LocalDateTime): boolean
+	+{static} isLink(input: String): boolean
+	+{static} truncateString(inputString: String, cutSize: int): String
+	+{static} isDateOfBirthAcceptable(dateOfBirhtToCheck: LocalDate): boolean
+	+{static} isDateOfBirthAcceptableForUser(dateOfBirhtToCheck: LocalDate): boolean
+	+{static} isDateBetween(dateToCheck: LocalDate, startDate: LocalDate, endDate: LocalDate): boolean
+	+{static} isPostalCodeAcceptable(postalCode: int): boolean
+	+{static} isIntBetween(intToCheck: int, inf: int, sup: int): boolean
+	+{static} isPhoneNumberAcceptable(noPhone: String): boolean
+	+{static} isSocialSecurityNumberAcceptable(noSecu: String): boolean
+	+{static} isPasswordAcceptable(password: String): boolean
+	+{static} isEmailAcceptable(email: String): boolean
+	+{static} isStringSafe(input: String): boolean
+	+{static} LHMCheck(LHM: LinkedHashMap<String,String>, mode: String): Response
+	+{static} parentIsOlder(parentBirthDate: String, childBirthDate: String): boolean
+	+{static} parentWasAlive(parentDeathDate: String, childBirthDate: String): boolean
+	+{static} birthIsPossible(birthDate: String, deathDate: String): boolean
+	+{static} dateOfDeathIsCredible(birthDate: String, deathDate: String): boolean
+	-{static} formatObjectToLocalDate(date: Object): LocalDate
+	+{static} convertObjectToLong(input: Object): long
+	+{static} convertToString(map: LinkedHashMap<String,String>): String
+	+{static} convertFromString(jsonString: String): LinkedHashMap<String,String>
+}
+class Constants [[java:com.acfjj.app.utils.Constants]] {
+	+{static} MAX_LONG_STRING_LENGTH: int
+	+{static} MAX_STRING_LENGTH: int
+	+{static} DEFAULT_PP_URL: String
+	+{static} DATE_TIME_FORMATTER: DateTimeFormatter
+	+{static} GENDER_LIST: List<Integer>
+	+{static} TREE_PRIVACY_PUBLIC: int
+	+{static} TREE_PRIVACY_PRIVATE: int
+	+{static} NODE_PRIVACY_PUBLIC: int
+	+{static} NODE_PRIVACY_RESTRICTED: int
+	+{static} NODE_PRIVACY_PRIVATE: int
+	+{static} NODE_PRIVACY_LIST: List<Integer>
+	+{static} TREE_PRIVACY_LIST: List<Integer>
+	+{static} DEFAULT_GENDER: int
+	+{static} DEFAULT_DATEOFBIRTH: LocalDate
+	+{static} MIN_DATEOFBIRTH_USER: LocalDate
+	+{static} MAX_DATEOFBIRTH_USER: LocalDate
+	+{static} MIN_DATEOFBIRTH: LocalDate
+	+{static} MAX_DATEOFBIRTH: LocalDate
+	+{static} DEFAULT_POSTAL_CODE: int
+	+{static} MIN_POSTAL_CODE: int
+	+{static} MAX_POSTAL_CODE: int
+	+{static} DEFAULT_NO_PHONE: String
+	+{static} DEFAULT_NO_SECU: String
+	+{static} TEMPORARY_STR_MAKER: String
+	+{static} POSSIBLE_LHM_KEYS: List<String>
+	+{static} USER_LHM_REQUIRED_KEYS: List<String>
+	+{static} PROFIL_UPDATE_FORBIDDEN_KEYS: List<String>
+	+{static} POSSIBLE_NODE_ACTIONS: List<String>
+	+{static} POSSIBLE_NODE_ACTIONS_CREATION: List<String>
+	+{static} SYSTEM_ADMIN_PRIVATE_CODE: String
+	+{static} SYSTEM_ADMIN_EMAIL: String
+	+{static} SYSTEM_ADMIN_DATA: LinkedHashMap<String,String>
+}
+
+}
+package com.acfjj.app.controller <<Frame>> {
+class UserController [[java:com.acfjj.app.controller.UserController]] {
+	+getUsers(): Response
+	+getUser(userId: Long): Response
+	+updateProfil(userId: Long, dataLHM: LinkedHashMap<String,String>): Response
+}
+class AbstractController {
+}
+AbstractController <|-- UserController
+abstract class AbstractController [[java:com.acfjj.app.controller.AbstractController]] {
+	#treeService: TreeService
+	#nodeService: NodeService
+	#userService: UserService
+	#conversationService: ConversationService
+}
+class AccountController [[java:com.acfjj.app.controller.AccountController]] {
+	+login(privateCode: String, password: String): Response
+	+registration(step: int, dataLHM: LinkedHashMap<String,String>, userResponse: Boolean): Response
+	+registerUser(user: User, existingNode: Node): Response
+	-registrationStep1(userToRegister: User, data: LinkedHashMap<String,String>): Response
+	-registrationStep2(userToRegister: User, data: LinkedHashMap<String,String>, userResponse: Boolean): Response
+	-sendUserValidationToAdmin(userToValidate: User): Response
+	-createTheSystemAdminUser(): Response
+	-passwordCompare(user: User, password: String): Boolean
+}
+class ConversationController {
+}
+AccountController --> "1" ConversationController : conversationController
+class AbstractController {
+}
+AbstractController <|-- AccountController
+class ConversationController [[java:com.acfjj.app.controller.ConversationController]] {
+	+getConversation(conversationId: long): Response
+	+newConversation(userId1: long, userId2: long): Response
+	+newMessage(senderId: long, receiverId: long, content: String): Response
+	+newValidationMessage(senderId: long, receiverId: long, validationType: ValidationType, concernedUser: User, baseNodeId: Long, additionNodeId: Long, relatedToNodeId: Long, relationType: String): Response
+	+newValidationMessage(senderId: long, receiverId: long, validationType: ValidationType, concernedUser: User): Response
+	+newValidationMessage(senderId: long, receiverId: long, validationType: ValidationType, baseNodeId: Long, additionNodeId: Long, relatedToNodeId: Long, relationType: String): Response
+	+newTreeMergeValidation(senderId: long, receiverId: long, baseNodeId: long, additionNodeId: long, relatedToNodeId: long, relationType: String): Response
+	+userValidation(msgId: long, concernedUserId: long, validatorId: long, userResponse: Boolean): Response
+	+treeMergeValidation(msgId: long, requesterId: long, validatorId: long, baseNodeId: long, additionNodeId: long, relatedToNodeId: long, relationType: String, userResponse: Boolean): Response
+}
+class AbstractController {
+}
+AbstractController <|-- ConversationController
+class TestDataController [[java:com.acfjj.app.controller.TestDataController]] {
+	+allTest(): Response
+	+addTestUsers(validated: Boolean): Response
+	+addTestTree(): Response
+	+addTestTree2(): Response
+	+addTestNodes(): void
+}
+class AccountController {
+}
+TestDataController --> "1" AccountController : accountController
+class TreeController {
+}
+TestDataController --> "1" TreeController : treeController
+class AbstractController {
+}
+AbstractController <|-- TestDataController
+class TreeController [[java:com.acfjj.app.controller.TreeController]] {
+	+getTree(treeId: Long): Response
+	+addView(treeId: Long): Response
+	+updateTree(requestData: Map<String,Object>, userId: int, treeId: int): Response
+	-{static} reorderUpdates(updates: LinkedHashMap<Long,String>, unknownRelation: LinkedHashMap<Long,String>): LinkedHashMap<Long,String>
+	-{static} swapElements(map: LinkedHashMap<Long,String>, key1: Long, key2: Long): LinkedHashMap<Long,String>
+	-{static} getNextEntry(updates: LinkedHashMap<Long,String>, id: Long): Map.Entry<Long,String>
+	+deleteTree(treeId: Long): Response
+	+getNodes(): Response
+	+getNode(nodeId: Long): Response
+	+deleteNode(node: Node): Response
+	+deleteNodeFromTree(node: Node, treeId: long): Response
+	+updateNode(nodeId: Long, node: Node): void
+	+addNode(node: Node): Response
+	+addTree(tree: Tree): Response
+	+addLinkedNode(treeId: Long, linkedNodeId: long, nodeToAdd: Node, privacy: int, type: String, alreadyInTree: boolean): Response
+	+preProcessNodeInTreeCreation(node: Node, treeId: long, userWhoWantsToCreate: User, relatedToNode: Node, relationType: String): Response
+	+autorizedLink(treeId: Long, node: Node, nodeToLink: Node): boolean
+	-firstVerifications(tree: List<LinkedHashMap<String,String>>, userConnectedId: Long): String
+	-checkParentValidity(tree: List<LinkedHashMap<String,String>>, returnStr: String, thereIsAProb: boolean, node: LinkedHashMap<String,String>, parentIdKey: String, firstNameKey: String, lastNameKey: String, dateOfBirthKey: String, dateOfDeathKey: String): void
+	-checkPartnerValidity(tree: List<LinkedHashMap<String,String>>, returnStr: String, thereIsAProb: boolean, node: LinkedHashMap<String,String>, partnerIdKey: String, firstNameKey: String, lastNameKey: String, dateOfBirthKey: String, dateOfDeathKey: String): void
+	-{static} findNodeWithId(tree: List<LinkedHashMap<String,String>>, id: Long): LinkedHashMap<String,String>
+	-getNodeIfNonNegative(nodeId: Long): Node
+	+{static} replaceId(relationsMap: LinkedHashMap<Long,String>, oldId: Long, idInDb: Long): LinkedHashMap<Long,String>
+	+{static} replaceIdInUpdates(updates: LinkedHashMap<Long,String>, oldId: Long, idInDb: Long): LinkedHashMap<Long,String>
+	-addParentRelations(id: Long, TreeId: Long, relatedToNodes: String[], nodeToAdd: LinkedHashMap<Long,Node>, existingNodes: LinkedHashMap<Long,Node>, unknownRelation: LinkedHashMap<Long,String>, updates: LinkedHashMap<Long,String>): void
+	-addPartnerRelations(id: Long, TreeId: Long, relatedToNodes: String[], nodeToAdd: LinkedHashMap<Long,Node>, existingNodes: LinkedHashMap<Long,Node>, unknownRelation: LinkedHashMap<Long,String>, updates: LinkedHashMap<Long,String>): void
+	-addChildRelations(id: Long, TreeId: Long, relatedToNodes: String[], nodeToAdd: LinkedHashMap<Long,Node>, existingNodes: LinkedHashMap<Long,Node>, unknownRelation: LinkedHashMap<Long,String>, updates: LinkedHashMap<Long,String>): void
+	-sendPreProcessNodeInTreeCreation(key: String, id: Long, treeId: Long, user: User, relatedToNodes: String[], nodesToAdd: Map<Long,Node>, existingNodes: Map<Long,Node>, unknownRelation: Map<Long,String>): Response
+}
+class AbstractController {
+}
+AbstractController <|-- TreeController
+
+}
+package com.acfjj.app.repository <<Frame>> {
+interface TreeNodesRepository [[java:com.acfjj.app.repository.TreeNodesRepository]] {
+	findAll(): Set<TreeNodes>
+	findByNode(node: Node): TreeNodes
+}
+interface "CrudRepository<TreeNodes,Long>" as CrudRepository_TreeNodes_Long_ {
+}
+CrudRepository_TreeNodes_Long_ <|-- TreeNodesRepository
+interface UserRepository [[java:com.acfjj.app.repository.UserRepository]] {
+	findByPersonInfo(personInfo: PersonInfo): User
+	findByEmail(email: String): User
+	findByPrivateCode(privateCode: String): User
+	findByIsAdmin(isAdmin: Boolean): List<User>
+	findByIsAdminAndValidated(isAdmin: Boolean, Validated: Boolean): List<User>
+}
+interface "CrudRepository<User,Long>" as CrudRepository_User_Long_ {
+}
+CrudRepository_User_Long_ <|-- UserRepository
+interface TreeRepository [[java:com.acfjj.app.repository.TreeRepository]] {
+	findByPrivacy(i: int): List<Tree>
+	findByName(name: String): Tree
+}
+interface "CrudRepository<Tree,Long>" as CrudRepository_Tree_Long_ {
+}
+CrudRepository_Tree_Long_ <|-- TreeRepository
+interface ConversationRepository [[java:com.acfjj.app.repository.ConversationRepository]] {
+	findByUser1(user1: User): List<Conversation>
+	findByUser2(user2: User): List<Conversation>
+	findByUser1AndUser2(user1: User, user2: User): Conversation
+}
+interface "CrudRepository<Conversation,Long>" as CrudRepository_Conversation_Long_ {
+}
+CrudRepository_Conversation_Long_ <|-- ConversationRepository
+interface PersonInfoRepository [[java:com.acfjj.app.repository.PersonInfoRepository]] {
+	findByLastName(lastName: String): List<PersonInfo>
+	findByFirstName(firstName: String): List<PersonInfo>
+	findByCityOfBirth(cityName: String): List<PersonInfo>
+	findByCountryOfBirth(countryName: String): List<PersonInfo>
+	findByDateOfBirth(dateOfBirth: LocalDate): List<PersonInfo>
+	findByLastNameAndFirstNameAndDateOfBirthAndCountryOfBirthAndCityOfBirth(lastName: String, firstName: String, dateOfBirth: LocalDate, countryOfBirth: String, cityofBirth: String): List<PersonInfo>
+}
+interface "CrudRepository<PersonInfo,Long>" as CrudRepository_PersonInfo_Long_ {
+}
+CrudRepository_PersonInfo_Long_ <|-- PersonInfoRepository
+interface NodeRepository [[java:com.acfjj.app.repository.NodeRepository]] {
+	findByPersonInfo(personInfo: PersonInfo): Node
+	deleteById(id: long): Void
+}
+interface "CrudRepository<Node,Long>" as CrudRepository_Node_Long_ {
+}
+CrudRepository_Node_Long_ <|-- NodeRepository
+interface MessageRepository [[java:com.acfjj.app.repository.MessageRepository]] {
+	findByValidationInfosAndValidationType(validationInfos: String, validationType: ValidationType): List<Message>
+	findByReceiverAndValidationType(receiver: User, validationType: ValidationType): List<Message>
+	findBySenderAndValidationType(sender: User, validationType: ValidationType): List<Message>
+}
+interface "CrudRepository<Message,Long>" as CrudRepository_Message_Long_ {
+}
+CrudRepository_Message_Long_ <|-- MessageRepository
+
+}
+package com.acfjj.app.model <<Frame>> {
+class Message [[java:com.acfjj.app.model.Message]] {
+	-id: Long
+	-content: String
+	-messageDateTime: LocalDateTime
+	-validationType: ValidationType
+	-validationInfos: String
+	+Message()
+	+Message(sender: User, receiver: User, content: String, validationType: ValidationType, concernedUser: User, baseNode: Node, additionNode: Node, relatedToNode: Node, relationType: String)
+	+Message(sender: User, receiver: User, validationType: ValidationType, userConcernedByValidation: User)
+	+Message(sender: User, receiver: User, validationType: ValidationType, baseNode: Node, additionNode: Node, relatedToNode: Node, relationType: String)
+	+Message(sender: User, receiver: User, content: String)
+	+getId(): Long
+	+setId(id: Long): void
+	+getContent(): String
+	+setContent(content: String): void
+	+getSenderId(): Long
+	+getReceiverId(): Long
+	+getConversationId(): Long
+	+setConversation(conversation: Conversation): void
+	+getMessageDateTime(): LocalDateTime
+	+setMessageDateTime(messageDateTime: LocalDateTime): void
+	+getValidationType(): ValidationType
+	+setValidationType(validationType: ValidationType): void
+	+getIsValidation(): Boolean
+	+getRequests(): LinkedHashMap<String,String>
+	+getValidationInfos(): LinkedHashMap<String,String>
+	+setValidationInfos(validationInfos: LinkedHashMap<String,String>): void
+	+disableValidation(response: boolean, validator: User): void
+}
+class User {
+}
+Message --> "1" User : sender
+class User {
+}
+Message --> "1" User : receiver
+class Conversation {
+}
+Message --> "1" Conversation : conversation
+class User {
+}
+Message --> "1" User : getSender()
+class User {
+}
+Message --> "1" User : getReceiver()
+class Conversation {
+}
+Message --> "1" Conversation : getConversation()
+class Node [[java:com.acfjj.app.model.Node]] {
+	-id: Long
+	-privacy: int
+	-hasChild: boolean
+	-dateOfDeath: LocalDate
+	+Node()
+	+Node(id: Long, personInfo: PersonInfo, createdBy: User, parent1: Node, parent2: Node, privacy: int, dateOfDeath: LocalDate)
+	+Node(id: Long, personInfo: PersonInfo, createdBy: User, parent1: Node, parent2: Node, privacy: int)
+	+Node(id: Long, personInfo: PersonInfo, createdBy: User, privacy: int)
+	+Node(id: Long, lastName: String, firstname: String, gender: int, dateOfBirth: LocalDate, countryOfBirth: String, cityOfBirth: String, createdBy: User, parent1: Node, parent2: Node, privacy: int, nationality: String, adress: String, postalCode: int, profilPictureUrl: String)
+	+Node(id: Long, lastName: String, firstname: String, gender: int, dateOfBirth: LocalDate, countryOfBirth: String, cityOfBirth: String, createdBy: User, parent1: Node, privacy: int, nationality: String, adress: String, postalCode: int, profilPictureUrl: String)
+	+Node(id: Long, lastName: String, firstname: String, gender: int, dateOfBirth: LocalDate, countryOfBirth: String, cityOfBirth: String, createdBy: User, privacy: int, nationality: String, adress: String, postalCode: int, profilPictureUrl: String)
+	+Node(id: Long, lastName: String, firstname: String, gender: int, dateOfBirth: LocalDate, countryOfBirth: String, cityOfBirth: String, createdBy: User, parent1: Node, parent2: Node, privacy: int, nationality: String, adress: String, postalCode: int, profilPictureUrl: String, dateOfDeath: LocalDate)
+	+Node(id: Long, lastName: String, firstname: String, gender: int, dateOfBirth: LocalDate, countryOfBirth: String, cityOfBirth: String, createdBy: User, parent1: Node, privacy: int, nationality: String, adress: String, postalCode: int, profilPictureUrl: String, dateOfDeath: LocalDate)
+	+Node(id: Long, lastName: String, firstname: String, gender: int, dateOfBirth: LocalDate, countryOfBirth: String, cityOfBirth: String, createdBy: User, privacy: int, nationality: String, adress: String, postalCode: int, profilPictureUrl: String, dateOfDeath: LocalDate)
+	+getId(): Long
+	+setId(id: Long): void
+	+getHasChild(): boolean
+	+setHasChild(hasChild: boolean): void
+	+setPersonInfo(personInfo: PersonInfo): void
+	+getFullName(): String
+	+getFullNameAndBirthInfo(): String
+	+setCreatedBy(createdBy: User): void
+	+getCreatedById(): Long
+	+getParent1Id(): Long
+	+setParent1(parent1: Node): void
+	+getParent2Id(): Long
+	+setParent2(parent2: Node): void
+	+addTreeNodes(nodeTree: TreeNodes): void
+	+setTreeNodes(nodeTree: Set<TreeNodes>): void
+	+removeTreeNodes(treeNode: TreeNodes): void
+	+setPartner(partner: Node): void
+	+getPartnerId(): Long
+	+setExPartners(exPartner: Set<Node>): void
+	+addExPartners(exPartner: Node): void
+	+removeExPartners(exPartner: Node): void
+	+getExPartnersId(): List<Long>
+	+setSiblings(sibling: Set<Node>): void
+	+addSiblings(sibling: Node): void
+	+removeSiblings(sibling: Node): void
+	+getSiblingsId(): List<Long>
+	+isOrphan(): boolean
+	+getPrivacy(): int
+	+setPrivacy(privacy: int): void
+	+isPublic(): boolean
+	+getLastName(): String
+	+getFirstName(): String
+	+getGender(): int
+	+getDateOfBirth(): LocalDate
+	+getCountryOfBirth(): String
+	+getCityOfBirth(): String
+	+isDead(): Boolean
+	+getDateOfDeath(): LocalDate
+	+setDateOfDeath(dateOfDeath: LocalDate): void
+	+getNationality(): String
+	+getAdress(): String
+	+getPostalCode(): int
+	+getProfilPictureUrl(): String
+	+getTreeId(): Long
+	+getTreesId(): List<Long>
+	+getIsAUserNode(): boolean
+	+equals(obj: Object): boolean
+	+{static} CastAsNode(data: LinkedHashMap<String,String>, createdBy: User, parent1: Node, parent2: Node, partner: Node): Node
+	+{static} merge(baseNode: Node, additionNode: Node): Node
+	+toString(): String
+}
+class PersonInfo {
+}
+Node --> "1" PersonInfo : personInfo
+class User {
+}
+Node --> "1" User : createdBy
+class Node {
+}
+Node --> "1" Node : parent1
+class Node {
+}
+Node --> "1" Node : parent2
+class Node {
+}
+Node --> "1" Node : partner
+class Node {
+}
+Node --> "*" Node : exPartners
+class Node {
+}
+Node --> "*" Node : siblings
+class TreeNodes {
+}
+Node --> "*" TreeNodes : treeNodes
+class PersonInfo {
+}
+Node --> "1" PersonInfo : getPersonInfo()
+class User {
+}
+Node --> "1" User : getCreatedBy()
+class Node {
+}
+Node --> "1" Node : getParent1()
+class Node {
+}
+Node --> "1" Node : getParent2()
+class TreeNodes {
+}
+Node --> "*" TreeNodes : getTreeNodes()
+class Node {
+}
+Node --> "1" Node : getPartner()
+class Node {
+}
+Node --> "*" Node : getExPartners()
+class Node {
+}
+Node --> "*" Node : getSiblings()
+class Tree {
+}
+Node --> "1" Tree : getTree()
+class Tree {
+}
+Node --> "*" Tree : getTrees()
+class TreeNodes [[java:com.acfjj.app.model.TreeNodes]] {
+	-id: Long
+	-privacy: int
+	-depth: int
+	+TreeNodes()
+	+TreeNodes(tree: Tree, node: Node, privacy: int, depth: int)
+	+getId(): Long
+	+setId(id: Long): void
+	+setTree(tree: Tree): void
+	+setNode(node: Node): void
+	+getPrivacy(): int
+	+setPrivacy(privacyNode: int): void
+	+getDepth(): int
+	+setDepth(profondeur: int): void
+	+equals(obj: Object): boolean
+	+toString(): String
+}
+class Tree {
+}
+TreeNodes --> "1" Tree : tree
+class Node {
+}
+TreeNodes --> "1" Node : node
+class Tree {
+}
+TreeNodes --> "1" Tree : getTree()
+class Node {
+}
+TreeNodes --> "1" Node : getNode()
+class Tree [[java:com.acfjj.app.model.Tree]] {
+	-id: Long
+	-name: String
+	-privacy: int
+	-viewOfMonth: long
+	-viewOfYear: long
+	-VOMresetDate: LocalDate
+	-VOYresetDate: LocalDate
+	+Tree()
+	+Tree(name: String, privacy: int, treeNode: TreeNodes)
+	+Tree(name: String, privacy: int)
+	+getId(): Long
+	+setId(id: Long): void
+	+getName(): String
+	+setName(name: String): void
+	+getPrivacy(): int
+	+setPrivacy(privacy: int): void
+	+getTreeNodesByNode(node: Node): TreeNodes
+	+addTreeNodes(treeNode: TreeNodes): void
+	+setTreeNodes(treeNode: Set<TreeNodes>): void
+	+isPublic(): boolean
+	+setIsPublic(isPublic: Boolean): void
+	+getViewOfMonth(): long
+	+setViewOfMonth(viewOfMonth: long): void
+	+getViewOfYear(): long
+	+setViewOfYear(viewOfYear: long): void
+	+addAView(): void
+	+resetViewIfNec(): void
+	+getVOMresetDate(): LocalDate
+	+setVOMresetDate(vOMresetDate: LocalDate): void
+	+getVOYresetDate(): LocalDate
+	+setVOYresetDate(vOYresetDate: LocalDate): void
+	+equals(obj: Object): boolean
+	+toString(): String
+}
+class TreeNodes {
+}
+Tree --> "*" TreeNodes : treeNodes
+class TreeNodes {
+}
+Tree --> "*" TreeNodes : getTreeNodes()
+class Node {
+}
+Tree --> "*" Node : getNodes()
+class PersonInfo [[java:com.acfjj.app.model.PersonInfo]] {
+	-id: Long
+	-lastName: String
+	-firstName: String
+	-gender: int
+	-dateOfBirth: LocalDate
+	-countryOfBirth: String
+	-cityOfBirth: String
+	-isDead: Boolean
+	-nationality: String
+	-adress: String
+	-postalCode: int
+	-profilPictureUrl: String
+	+PersonInfo()
+	+PersonInfo(lastName: String, firstname: String, gender: int, dateOfBirth: LocalDate, countryOfBirth: String, cityOfBirth: String, isDead: Boolean, nationality: String, adress: String, postalCode: int, profilPictureUrl: String)
+	+getGender(): int
+	+setGender(gender: int): void
+	+getDateOfBirth(): LocalDate
+	+setDateOfBirth(dateOfBirth: LocalDate): void
+	+setDateOfBirth(year: int, month: int, day: int): void
+	+getCityOfBirth(): String
+	+setCityOfBirth(cityOfBirth: String): void
+	+isDead(): Boolean
+	+setIsDead(isDead: Boolean): void
+	+getId(): Long
+	+setId(id: Long): void
+	+getLastName(): String
+	+setLastName(lastName: String): void
+	+getFirstName(): String
+	+setFirstName(firstname: String): void
+	+getNationality(): String
+	+setNationality(nationality: String): void
+	+getAdress(): String
+	+setAdress(adress: String): void
+	+getPostalCode(): int
+	+setPostalCode(postalCode: int): void
+	+getProfilPictureUrl(): String
+	+setProfilPictureUrl(profilPictureUrl: String): void
+	+setRelatedUser(relatedUser: User): void
+	+setRelatedNode(relatedNode: Node): void
+	+getCountryOfBirth(): String
+	+setCountryOfBirth(countryOfBirth: String): void
+	+isOrphan(): Boolean
+	+{static} mergeUserPersonInfoWithNode(node: Node, user: User): PersonInfo
+	+equals(obj: Object): boolean
+	+toString(): String
+}
+class User {
+}
+PersonInfo --> "1" User : relatedUser
+class Node {
+}
+PersonInfo --> "1" Node : relatedNode
+class User {
+}
+PersonInfo --> "1" User : getRelatedUser()
+class Node {
+}
+PersonInfo --> "1" Node : getRelatedNode()
+class Conversation [[java:com.acfjj.app.model.Conversation]] {
+	-id: Long
+	+Conversation()
+	+Conversation(user1: User, user2: User, messages: Set<Message>)
+	+Conversation(user1: User, user2: User)
+	+getId(): Long
+	+setId(id: Long): void
+	+addMessage(message: Message): void
+	+getUserId1(): Long
+	+getUserId2(): Long
+	+getWithWho(asker: User): User
+}
+class User {
+}
+Conversation --> "1" User : user1
+class User {
+}
+Conversation --> "1" User : user2
+class Message {
+}
+Conversation --> "*" Message : messages
+class Message {
+}
+Conversation --> "*" Message : getMessages()
+class User {
+}
+Conversation --> "1" User : getUser1()
+class User {
+}
+Conversation --> "1" User : getUser2()
+class User [[java:com.acfjj.app.model.User]] {
+	-id: Long
+	-privateCode: String
+	-email: String
+	-password: String
+	-validated: Boolean
+	-isAdmin: Boolean
+	-noSecu: String
+	-noPhone: String
+	+User()
+	+User(lastName: String, firstname: String, gender: int, dateOfBirth: LocalDate, countryOfBirth: String, cityOfBirth: String, email: String, password: String, noSecu: String, noPhone: String, nationality: String, adress: String, postalCode: int, profilPictureUrl: String)
+	+getId(): Long
+	+getPrivateCode(): String
+	+setPrivateCode(privateCode: String): void
+	+setPersonInfo(personInfo: PersonInfo): void
+	+getEmail(): String
+	+setEmail(email: String): void
+	+getPassword(): String
+	+setPassword(hashedPassword: String): void
+	+isValidated(): Boolean
+	+setValidated(validated: Boolean): void
+	+isAdmin(): Boolean
+	+setIsAdmin(admin: Boolean): void
+	+setMyTree(myTree: Tree): void
+	+getMyTreeId(): Long
+	+getIsMyTreePublic(): Boolean
+	+getConversationsId(): List<Long>
+	+addConversation1(conversation: Conversation): void
+	+removeConversation1(conversation: Conversation): void
+	+addConversation2(conversation: Conversation): void
+	+removeConversation2(conversation: Conversation): void
+	+getConversationWith(user: User): Conversation
+	+getNoSecu(): String
+	+setNoSecu(noSecu: String): void
+	+getNoPhone(): String
+	+setNoPhone(noPhone: String): void
+	+getFullName(): String
+	+getFullNameAndBirthInfo(): String
+	+getLastName(): String
+	+setLastName(lastName: String): void
+	+getFirstName(): String
+	+setFirstName(firstName: String): void
+	+getDateOfBirth(): LocalDate
+	+setDateOfBirth(dateOfBirth: LocalDate): void
+	+setDateOfBirth(year: int, month: int, day: int): void
+	+getGender(): int
+	+setGender(gender: int): void
+	+getCityOfBirth(): String
+	+setCityOfBirth(cityOfBirth: String): void
+	+getCountryOfBirth(): String
+	+setCountryOfBirth(countryOfBirth: String): void
+	+getNationality(): String
+	+setNationality(nationality: String): void
+	+getAdress(): String
+	+setAdress(adress: String): void
+	+getPostalCode(): int
+	+setPostalCode(postalCode: int): void
+	+getProfilPictureUrl(): String
+	+setProfilPictureUrl(profilPictureUrl: String): void
+	+getRelatedNodeId(): Long
+	+getTreeSize(): long
+	+getTreeName(): String
+	+equals(obj: Object): boolean
+	+toString(): String
+	+{static} generatePrivateCode(): String
+	+updateWithLHM(dataLHM: LinkedHashMap<String,String>): Boolean
+	+{static} castLHMAsUser(dataLHM: LinkedHashMap<String,String>): User
+	+{static} isCastableUsing(dataLHM: LinkedHashMap<String,String>): Boolean
+	+{static} isUpdatableUsing(dataLHM: LinkedHashMap<String,String>): boolean
+}
+class PersonInfo {
+}
+User --> "1" PersonInfo : personInfo
+class Tree {
+}
+User --> "1" Tree : myTree
+class Conversation {
+}
+User --> "*" Conversation : conversations1
+class Conversation {
+}
+User --> "*" Conversation : conversations2
+class PersonInfo {
+}
+User --> "1" PersonInfo : getPersonInfo()
+class Tree {
+}
+User --> "1" Tree : getMyTree()
+class Conversation {
+}
+User --> "*" Conversation : getConversations()
+
+}
+package com.acfjj.app <<Frame>> {
+class GenTreeApp [[java:com.acfjj.app.GenTreeApp]] {
+	+{static} main(args: String[]): void
+}
+
+}
+package com.acfjj.app.service <<Frame>> {
+class UserService [[java:com.acfjj.app.service.UserService]] {
+	+getAllUsers(): List<User>
+	+getUser(id: long): User
+	+getUserByNameAndBirthInfo(lastName: String, firstName: String, dateOfBirth: LocalDate, countryOfBirth: String, cityofBirth: String): User
+	+getUserByEmail(email: String): User
+	+getUserByPrivateCode(privateCode: String): User
+	+getUserPersonInfo(userId: long): PersonInfo
+	+addUser(user: User): void
+	+deleteUser(id: long): void
+	+updateUser(id: long, user: User): void
+	+existSystemAdminUser(): Boolean
+	+getSystemAdminUser(): User
+	+getAdminUsers(): List<User>
+	+getValidatedNonAdminUsers(): List<User>
+}
+class AbstractService {
+}
+AbstractService <|-- UserService
+class TreeService [[java:com.acfjj.app.service.TreeService]] {
+	+getAllTrees(): List<Tree>
+	+getTree(id: long): Tree
+	+addTree(tree: Tree): void
+	+getUniqueName(tree: Tree): String
+	+deleteTree(id: long): void
+	+updateTree(id: long, tree: Tree): void
+	+isNameTaken(name: String): boolean
+	+getTreeByName(name: String): Tree
+	+getPublicTrees(): List<Tree>
+	+addNodeToTree(tree: Tree, node: Node, privacy: int, depth: int): void
+	+addParentToNodeInTree(treeId: Long, node: Node, parent: Node, privacy: int): void
+	+addChildToNodeInTree(treeId: Long, parent: Node, child: Node, privacy: int): void
+	+addPartnerToNodeInTree(treeId: Long, node: Node, partner: Node, privacy: int): void
+	+addSiblingsToTree(treeId: Long, node: Node, sibling: Node, privacy: int): void
+	+addExPartnerToNodeInTree(treeId: Long, node: Node, exPartner: Node, privacy: int): void
+	+removeNodeFromTree(tree: Tree, node: Node): void
+	+treeMerge(tree1: Tree, tree2: Tree, baseNode: Node, relatedToNode: Node, nodeToMerge: Node, newLink: String): void
+	-mergeTreeInto(tree: Tree, commonNode: Node, relatedToNode: Node, newLink: String): void
+}
+class AbstractService {
+}
+AbstractService <|-- TreeService
+class NodeService [[java:com.acfjj.app.service.NodeService]] {
+	+getAllNodes(): List<Node>
+	+getNode(id: Long): Node
+	+addNode(node: Node): void
+	+addParent(node: Node, parentNode: Node): void
+	+updateParent(nodeId: Long, parentNodeId: Long, whichParent: int): void
+	+deleteNode(id: Long): void
+	+removeLinks(nodeId: Long, treeId: Long): void
+	+removeLinksInTree(nodeId: Long, treeId: Long): void
+	-removeParentFromNode(node: Node, parent: Node, treeNodes: Set<TreeNodes>): void
+	+updateNode(id: Long, node: Node): void
+	+updateWithoutRelation(id: Long, node: Node): void
+	+getParentsOfNode(id: Long): List<Node>
+	+doesNodeBelongToTree(nodeId: Long, treeId: Long): boolean
+	+getGenerationGap(node1: Node, node2: Node): Integer
+	+getNodeByNameAndBirthInfo(lastName: String, firstName: String, dateOfBirth: LocalDate, countryOfBirth: String, cityofBirth: String): Node
+	+getPublicNodeByNameAndBirthInfo(lastName: String, firstName: String, dateOfBirth: LocalDate, countryOfBirth: String, cityofBirth: String): Node
+}
+class AbstractService {
+}
+AbstractService <|-- NodeService
+class ConversationService [[java:com.acfjj.app.service.ConversationService]] {
+	+getConversation(id: long): Conversation
+	+getUserConversations(user: User): List<Conversation>
+	+getConversationOfUsers(user1: User, user2: User): Conversation
+	+addConversation(user1: User, user2: User): String
+	+updateConversation(id: long, conversation: Conversation): void
+	+updateMessage(id: long, message: Message): void
+	+addMessageToConversation(message: Message, conversation: Conversation): void
+	+getUserValidationsOfConcernedUser(concernedUser: User): List<Message>
+	+userHasTreeMergeValidationsOnGoing(user: User): boolean
+	+getMessage(msgId: Long): Message
+	+disableValidation(msg: Message, userResponse: boolean, validator: User): void
+}
+class AbstractService {
+}
+AbstractService <|-- ConversationService
+abstract class AbstractService [[java:com.acfjj.app.service.AbstractService]] {
+	~conversationRepository: ConversationRepository
+	~messageRepository: MessageRepository
+	~nodeRepository: NodeRepository
+	~personInfoRepository: PersonInfoRepository
+	~treeNodesRepository: TreeNodesRepository
+	~treeRepository: TreeRepository
+	~userRepository: UserRepository
+}
+
+}
+
+@enduml
