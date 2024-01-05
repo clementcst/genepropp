@@ -81,14 +81,7 @@ This is the back-end part of the GenTree application.
     spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
     angular.app.url=http://localhost:4200
     ```
-
-### `src/test`
-
-- **java:**
-  - (Contains test files)
-
-- **resources:**
-  - **test.properties:**
+    - **test.properties:**
     ```properties
     spring.application.name=GenTreeAppTests
     server.port=8080
@@ -100,6 +93,13 @@ This is the back-end part of the GenTree application.
     spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
     angular.app.url=http://localhost:4200
     ```
+
+### `src/test`
+
+- **java:**
+  - **model:**
+  - **service:**
+  
 
 ## Spring Boot Dependencies
 
