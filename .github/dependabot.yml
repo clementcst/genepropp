@@ -1,0 +1,15 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/genealogic-tree-front"
+    schedule:
+      interval: "weekly"
+    labels: "npm dependencies"
+    target-branch: 
+      - "main"
+      - "pre-main"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
