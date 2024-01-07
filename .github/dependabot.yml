@@ -4,10 +4,8 @@ updates:
     directory: "/genealogic-tree-front"
     schedule:
       interval: "weekly"
-    labels: "npm dependencies"
-    target-branch: 
-      - "main"
-      - "pre-main"
+    labels: 
+      - "npm dependencies"
 
   - package-ecosystem: "github-actions"
     directory: "/"
