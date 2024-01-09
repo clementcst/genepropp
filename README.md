@@ -58,7 +58,7 @@ To have a good Angular environment, type in your console :
 
 - Install angular tools
   ```
-  ng add @angular/material
+  npm add @angular/material
   ```
 
 - Install familytree depency
