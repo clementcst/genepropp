@@ -219,9 +219,15 @@ public class TreeController extends AbstractController {
 					addChildRelations(id, TreeId, relatedToNodes, nodesToAdd, existingNodes, unknownRelation, updates);
 					break;
 				case "UPDATE":
+					if(id <= 0) {
+						break;
+					}
 					nodeService.updateWithoutRelation(id, existingNodes.get(id));
 					break;
 				case "DELETE":
+					if(id <= 0) {
+						break;
+					}
 					deleteNodeFromTree(nodeService.getNode(id), TreeId);
 					break;
 				default:
@@ -684,6 +690,11 @@ public class TreeController extends AbstractController {
 				updates = replaceIdInUpdates(updates, Misc.convertObjectToLong(relatedToNodes[3]),
 						nodeService.getNode(id).getParent2Id());
 			}
+		}
+		Node child = nodeService.getNode(id);
+		if(!Objects.isNull(child.getParent1Id()) && !Objects.isNull(child.getParent2Id())) {
+			addLinkedNode(TreeId,child.getParent1Id(), child.getParent2(),
+					child.getParent2().getPrivacy(), "Partner", true);
 		}
 	}
 
