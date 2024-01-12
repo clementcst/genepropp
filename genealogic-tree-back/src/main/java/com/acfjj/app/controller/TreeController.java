@@ -542,19 +542,24 @@ public class TreeController extends AbstractController {
 	        }
 
 	        if (node != null) {
-	            checkParentValidity(tree, returnStr, thereIsAProb, node, "parent1Id", "firstName", "lastName", "dateOfBirth", "dateOfDeath");
-	            checkParentValidity(tree, returnStr, thereIsAProb, node, "parent2Id", "firstName", "lastName", "dateOfBirth", "dateOfDeath");
+	        	Response reponse;
+	        	reponse = checkParentValidity(tree, returnStr, thereIsAProb, node, "parent1Id", "firstName", "lastName", "dateOfBirth", "dateOfDeath");
+	        	thereIsAProb = !reponse.getSuccess();
+	        	returnStr = reponse.getMessage();
+	        	reponse = checkParentValidity(tree, returnStr, thereIsAProb, node, "parent2Id", "firstName", "lastName", "dateOfBirth", "dateOfDeath");
+	        	thereIsAProb = !reponse.getSuccess();
+	        	returnStr = reponse.getMessage();
 	            if(!Objects.isNull(node.get("partnerId")) && !node.get("partnerId").equals("null")) {
 		            checkPartnerValidity(tree, returnStr, thereIsAProb, node, "partnerId", "firstName", "lastName", "dateOfBirth", "dateOfDeath");
+
 	            }
 	        }
 	    }
-
 	    return !thereIsAProb ? "OK" : returnStr;
 	}
 	
 	@SuppressWarnings("null")
-	private void checkParentValidity(List<LinkedHashMap<String, String>> tree, String returnStr, boolean thereIsAProb,
+	private Response checkParentValidity(List<LinkedHashMap<String, String>> tree, String returnStr, boolean thereIsAProb,
 	                                  LinkedHashMap<String, String> node, String parentIdKey, String firstNameKey,
 	                                  String lastNameKey, String dateOfBirthKey, String dateOfDeathKey) {
 	    if (node.containsKey(parentIdKey) && !Objects.isNull(node.get(parentIdKey))) {
@@ -583,6 +588,7 @@ public class TreeController extends AbstractController {
 	            thereIsAProb = true;
 	        }
 	    }
+	    return new Response(returnStr, !thereIsAProb);
 	}
 	
 	@SuppressWarnings("null")
