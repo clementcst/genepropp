@@ -119,3 +119,13 @@ This is the back-end part of the GenTree application.
 4. The back-end will start, and you can access it at [http://localhost:8080](http://localhost:8080).
 
 Note: Make sure you have MySQL installed, and the database configurations in `application.properties` are appropriate.
+
+## Credentials
+
+### System Admin 
+Private Code : TheSytemAdmin
+Password : TestTest7
+
+### Account With a Tree
+Private Code : ZTNKcg8o6tl9NhBo6CM4e890Xh7intbu9aJAo56ZQZ5P7q03ckj72E8uTZM8kJR0MKD6G5A2IZT209Bu3qJSiGWtQJfwxz6g3hs7ezTm9Y37YNMr43fVm1cCn4YVeb0Z
+Password : Ceciest1mdp
